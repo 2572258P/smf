@@ -1,0 +1,9 @@
+<h1>{{ question.question_text }}</h1>
+
+<ul>    
+{% for c in question.choice_set.all %}
+<li>No:{{forloop.counter}}. Current Count: {{c.votes}}</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'main:detail' question.id %}"> return to detail</a>
