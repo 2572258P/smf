@@ -1,4 +1,4 @@
-# smf
+# SMF
 Study Mates Finder
 # Version Information
 - Python: 3.8.13
