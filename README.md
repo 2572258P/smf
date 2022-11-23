@@ -1,6 +1,7 @@
 # SMF
 Study Mates Finder
 # Project Version Information
+- SMF version : 1.0
 - Python: 3.8.13
 - Python Django: 3.2
 
