@@ -10,7 +10,8 @@ SMF -
 <body>
     <div>
         <a href="{% url 'main:index' %}">Home</a>
-        <a href="{% url 'main:registration' %}">Registration</a>
+        <a href="{% url 'main:search' %}">Search</a>
+        <a href="{% url 'main:registration' %}">Registration</a>        
         {% block body_block %}
         {% endblock %}
     </div>

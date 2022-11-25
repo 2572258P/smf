@@ -11,7 +11,8 @@ from .models import Choice
 
 
 def search(request):
-    return render(request,'search.html',{})
+    questions = Question.objects.all()
+    return render(request,'search.html',{'questions':questions})
 
 
 def index(request):

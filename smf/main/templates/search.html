@@ -1,6 +1,14 @@
 
-{% forloop q in Questions %}
-    <list>
-        <item>Text / Label</item>
-    </list>
-{% end forloop%}
+<form action="{% url 'main:search' %}" method="post">
+{% csrf_token %}
+{% for q in questions %}
+    <fieldset> <!-- for making a group -->
+        <legend><h1>{{ q.question_text }}</h1></legend>
+        {% for c in q.choice_set.all %}        
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+            <label for="choice{{ forloop.counter }}">{{c.choice_text}}</label><br>
+        {% endfor%}
+    </fieldset>
+{% endfor%}
+<input type="submit" value="Submit">
+</form>
