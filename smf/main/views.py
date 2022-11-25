@@ -9,8 +9,13 @@ from .forms import UserForm,UserProfileForm
 from .models import Question
 from .models import Choice
 
+
+def search(request):
+    return render(request,'search.html',{})
+
+
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[0:5] #sort in ascending order
+    latest_question_list = Question.objects.order_by('pub_date') #sort in ascending order
     output = '<br>'.join([q.question_text for q in latest_question_list])
     template = loader.get_template('index.html')
     context = {'latest_question_list' : latest_question_list}

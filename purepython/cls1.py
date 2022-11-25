@@ -1,7 +1,4 @@
+from main import cls
 
-class clsTest:
-    a = 1
-    b = 2
-    class clsTest2:
-        c = 3
-        d = 4
+a = cls()
+a.func()
