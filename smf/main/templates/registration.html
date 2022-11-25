@@ -1,0 +1,19 @@
+{% extends 'base_frame.html' %}
+
+{% block title_block %}
+    Registration
+{% endblock %}
+
+{% block body_block %}
+<h1>Registration</h1>
+{% if registered %}
+Registration has been complete.
+{% else %}
+<form id="user_form" method="post" action="{% url 'main:registration' %}" encryption="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    {{ profile_form.as_p }}
+    <input type="submit" name="submit" value="Registration" />
+</form>
+{% endif %}
+{% endblock%}

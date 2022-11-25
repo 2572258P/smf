@@ -3,6 +3,8 @@ from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render,get_object_or_404
 from django.urls import reverse
+from .forms import UserForm,UserProfileForm
+
 
 from .models import Question
 from .models import Choice
@@ -44,3 +46,34 @@ def vote(request, question_id):
 
         return HttpResponseRedirect(reverse('main:results', args=(question.id,)))
 
+
+def registration(request):
+    print("registration - started")
+    registered = False
+    if request.method == 'POST':
+        user_form = UserForm(request.POST)
+        profile_form = UserProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            user.set_password(user.password)
+            user.save()
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            profile.save();
+            registered = True
+        else:
+            print(user_form.errors,profile_form.errors)
+    else:
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    print("registration - %s" % registered)
+    con_dic = {'user_form' : user_form,'profile_form':profile_form,'registered':registered}
+    return render(request,'registration.html', context = con_dic)
+
+
+def test(request):
+    return render(request,'registration.html',{})    
