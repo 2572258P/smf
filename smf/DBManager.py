@@ -13,7 +13,7 @@ from main.models import Question
 from django.utils import timezone
 
 def generateQuestion(num):
-    q = Question(question_text="question{}".format(num),pub_date=timezone.now())
+    q = Question(question_text="Question{}".format(num),pub_date=timezone.now())
     q.save()
     for i in range(5):
         q.choice_set.create(choice_text="choice {}".format(i+1))
@@ -21,7 +21,7 @@ def generateQuestion(num):
 
 def generate():
     print("Start")
-    for i in range(0,10):
+    for i in range(0,2):
         generateQuestion(i+1)
     print("End")
 

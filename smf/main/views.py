@@ -4,15 +4,83 @@ from django.template import loader
 from django.shortcuts import render,get_object_or_404
 from django.urls import reverse
 from .forms import UserForm,UserProfileForm
+from django.contrib.auth.models import User
 
 
-from .models import Question
-from .models import Choice
+from .models import Question,Choice,Answer,UserProfile
+
+
+def vote(request, question_id):
+    question = get_object_or_404(Question,pk=question_id)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+        
+    except (KeyError,Choice.DoesNotExist):
+        return render(request,'detail.html',{'question':question,"error_message": "You didn't select a choice.",})
+    else:
+        print(request.POST['choice'])
+        selected_choice.votes += 1
+        selected_choice.save()
+        return HttpResponseRedirect(reverse('main:results', args=(question.id,)))
 
 
 def search(request):
     questions = Question.objects.all()
-    return render(request,'search.html',{'questions':questions})
+    answers = {}    
+
+    if 'Load' in request.POST:        
+        print("Load")
+        foundUser = User.objects.get(username=request.POST['userId'])        
+        try:
+            print(request.POST['userId'])
+            foundUser = User.objects.get(username=request.POST['userId'])
+        except:
+            print("user does not exist")
+        else:
+            if foundUser:
+                for ans in Answer.objects.all():
+                    answers[ans.question_id] = ans.choice_id
+
+    if 'Save' in request.POST:
+        print("Save")
+        try:
+            print(request.POST['userId'])
+            foundUser = User.objects.get(username=request.POST['userId'])
+        except:
+            print("user does not exist")
+        else:
+            if foundUser:
+                for q in Question.objects.all():
+                    print(q.pk)
+                    choice_id = "choice" + str(q.pk)
+                    if choice_id in request.POST:
+                        ans = Answer.objects.filter(question_id=q.pk).first()
+                        if ans:
+                            ans.choice_id = request.POST[choice_id]
+                            ans.save()
+                        else:
+                            userprofile = UserProfile.objects.get(user = foundUser)
+                            new_ans = Answer(user = userprofile,question_id=q.pk,choice_id=request.POST[choice_id])
+                            new_ans.save()        
+        print(request.POST)
+    if 'Find' in request.POST:
+        print("Find")
+
+    #if(request.method == 'POST'):
+        #val = request.POST['choice']
+    """    
+        for q in questions:
+            for c in q.choice_set.all():
+                name = str(q.pk) + "_choice_" + str(c.pk)
+                
+    """         
+        
+        
+
+#        for q in questions:
+#            print(request.POST[q.pk_ ])
+    
+    return render(request,'search.html',{'questions':questions,'answers':answers})
 
 
 def index(request):
@@ -38,19 +106,6 @@ def results(request, question_id):
     question = get_object_or_404(Question,pk=question_id)
 
     return render(request,'results.html',{'question':question})
-
-def vote(request, question_id):
-    question = get_object_or_404(Question,pk=question_id)
-    try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
-        
-    except (KeyError,Choice.DoesNotExist):
-        return render(request,'detail.html',{'question':question,"error_message": "You didn't select a choice.",})
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-
-        return HttpResponseRedirect(reverse('main:results', args=(question.id,)))
 
 
 def registration(request):

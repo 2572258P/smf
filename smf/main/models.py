@@ -10,6 +10,7 @@ ex1) Question.objects.filter(id=1)
 ex2) Question.objects.filter(question_text__startswith='What')
 """
 
+
 # User Info
 class UserProfile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -17,12 +18,6 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-
-
-class Answer(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    question_id = models.IntegerField(default=-1)
-    answer =  models.IntegerField(default=-1)
 
 # Create your models here.
 class Question(models.Model):
@@ -41,3 +36,8 @@ class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
+
+class Answer(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    question_id = models.IntegerField(default=-1)
+    choice_id =  models.IntegerField(default=-1)
