@@ -1,13 +1,13 @@
 #from django.shortcuts import render
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import loader
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
 from .forms import UserForm,UserProfileForm
 from django.contrib.auth.models import User
 
 
-from .models import Question,Choice,Answer,UserProfile
+from .models import Question,Choice,Answer,UserProfile,LastAccUser
 
 
 def vote(request, question_id):
@@ -23,17 +23,18 @@ def vote(request, question_id):
         selected_choice.save()
         return HttpResponseRedirect(reverse('main:results', args=(question.id,)))
 
-
-def search(request):
+def data_management(request):
     questions = Question.objects.all()
-    answers = {}    
+    answers = {}
 
-    if 'Load' in request.POST:        
-        print("Load")
-        foundUser = User.objects.get(username=request.POST['userId'])        
+    last_user = LastAccUser.objects.first();
+    print(last_user)
+
+    if 'Load' in request.POST:
+        print("Load")        
         try:
-            print(request.POST['userId'])
             foundUser = User.objects.get(username=request.POST['userId'])
+            print("found user:" + request.POST['userId'])
         except:
             print("user does not exist")
         else:
@@ -61,27 +62,16 @@ def search(request):
                         else:
                             userprofile = UserProfile.objects.get(user = foundUser)
                             new_ans = Answer(user = userprofile,question_id=q.pk,choice_id=request.POST[choice_id])
-                            new_ans.save()        
+                            new_ans.save()
         print(request.POST)
-    if 'Find' in request.POST:
-        print("Find")
+    if 'Find' in request.POST:        
+        lastUser = LastAccUser.objects.get_or_create(lastUser=request.POST['userId'])
+        return redirect('main:search_result')
 
-    #if(request.method == 'POST'):
-        #val = request.POST['choice']
-    """    
-        for q in questions:
-            for c in q.choice_set.all():
-                name = str(q.pk) + "_choice_" + str(c.pk)
-                
-    """         
-        
-        
+    return render(request,'data_management.html',{'questions':questions,'answers':answers,'last_user':last_user})
 
-#        for q in questions:
-#            print(request.POST[q.pk_ ])
-    
-    return render(request,'search.html',{'questions':questions,'answers':answers})
-
+def search_reslt(request):
+    return HttpResponse("Show Results")
 
 def index(request):
     latest_question_list = Question.objects.order_by('pub_date') #sort in ascending order

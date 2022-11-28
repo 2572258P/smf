@@ -4,17 +4,14 @@
 {% load main_extras %}
 
 {% block body_block %}
-<form action="{% url 'main:search' %}" method="post">
+<form action="{% url 'main:data_management' %}" method="post">
 {% csrf_token %}
 <label for="userId">User ID:</label>
-<input type="text" name="userId" id="userId" >
+<input type="text" name="userId" id="userId" value={{last_user}} >
 <input type="submit" name="Save" value="Save">
 <input type="submit" name="Load" value="Load">
 
-
-
 {% for q in questions %}
-
 
 <input type="hidden" name="question{{q.id}}" value="{{q.id}}" id="question{{q.id}}" >
 <fieldset> <!-- for making a group -->
