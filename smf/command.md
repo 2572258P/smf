@@ -17,7 +17,7 @@ python manage.py createsuperuser
 python manage.py migrate
 # Apply all migrations: admin, auth, contenttypes, polls, sessions - create db fields based on the apps installed by default
 
-python manage.py makemigrations myapp
+python manage.py makemigrations myapp #important to add app name
 # By running makemigrations, you’re telling Django that you’ve made some changes to your models 
 # namely, it generates DB schema
 

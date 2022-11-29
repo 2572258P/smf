@@ -19,14 +19,13 @@
 <fieldset> <!-- for making a group -->
     <legend><h1>{{ q.question_text }}</h1></legend>
     {% for c in q.choice_set.all %}
-        {% if answers|dict_val:q.id == c.id %}
-            <input type="radio" checked="checked" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
+        {% if  answers|get_list_in_dict:q.id|is_val_in_list:c.id == True %}
+            <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
             <label for="choice{{ forloop.counter }}">{{c.choice_text}} ___ {{ c.id }}</label><br>
         {% else %}
-            <input type="radio" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
+            <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
             <label for="choice{{ forloop.counter }}">{{c.choice_text}} ___ {{ c.id }}</label><br>
         {% endif %}
-
     {% endfor%}
 </fieldset>
 {% endfor %}

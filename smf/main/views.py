@@ -4,10 +4,11 @@ from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import Question,Choice,LastAccUser,UserProfile
-from .handler_models import handle_load,handle_save
-from .handler_users import handle_registration
+from .view_handler_models import handle_load,handle_save
+from .view_handler_users import handle_registration
 
 """
 Show last user when
@@ -17,10 +18,35 @@ Save last user when
 
 """
 
-def data_management(request):
-    
-    context = {}
+def question_creator(request):
+    scq_text = request.POST.get('scq_text','')
+    mcq_text = request.POST.get('mcq_text','')
+    scq_choice_num = range(1,11)
+    mcq_choice_num = range(1,11)
+    message = ''
+    if scq_text == '' and mcq_text == '':
+        message = 'empty question cannot be summitted.'
+    elif scq_text != '':
+        q = Question(type="scq",ctrl_type='radio',question_text=scq_text,pub_date=timezone.now())        
+        q.save()
+        for i in scq_choice_num:
+            choice_text = request.POST.get("scq_c%i"%i,'')
+            if choice_text != '':
+                q.choice_set.create(choice_text=choice_text)
+    elif mcq_text != '':
+        q = Question(type="mcq",ctrl_type='checkbox',question_text=mcq_text,pub_date=timezone.now())        
+        q.save()
+        for i in mcq_choice_num:
+            choice_text = request.POST.get("mcq_c%i"%i,'')
+            print(choice_text)
+            if choice_text != '':
+                q.choice_set.create(choice_text=choice_text)
+        print()
 
+    return render(request,'question_creator.html',{'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num})
+
+def data_management(request):    
+    context = {}
     context['questions'] = Question.objects.all()
     print('entry')
     
@@ -48,9 +74,9 @@ def data_management(request):
                 context['message'] = "Data have successfully saved."        
                 handle_save(request,profile)
 
-            lastUser = LastAccUser.objects.first()
+            lastUser = LastAccUser.objects.get_or_create(lastUser=posted_name)[0]           
             lastUser.lastUser = request.POST['userId']
-            lastUser.save()        
+            lastUser.save()
             context['last_user'] = request.POST['userId']
     else:        
         context['last_user'] = LastAccUser.objects.first()
@@ -68,12 +94,12 @@ def registration(request):
     return render(request,'registration.html', handle_registration(request))
 
 def index(request):
+    print("index")
+    print(Question.objects)
+    
     latest_question_list = Question.objects.order_by('pub_date') #sort in ascending order
-    output = '<br>'.join([q.question_text for q in latest_question_list])
-    template = loader.get_template('index.html')
-    context = {'latest_question_list' : latest_question_list}
-    #return HttpResponse(template.render(context,request))
-    return render(request,'index.html',context)
+    return render(request,'index.html',{'latest_question_list' : latest_question_list})
+
 
 #----- Code snippets -----
 def vote(request, question_id):

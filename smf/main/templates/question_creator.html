@@ -1,0 +1,28 @@
+{% extends 'base_frame.html' %}
+
+{% block body_block %}
+<p>{{message}}</p>
+<form action="{% url 'main:question_creator' %}" method="post">
+{% csrf_token %}
+<p><label for="html">SCQ Question: </label>
+<input type="text" name="scq_text"{{i}} id="scq_text"></p>
+
+{% for i in scq_choice_num %}
+    <p><label>{{ forloop.counter }}: </label>
+    <input type="text" name="scq_c{{ forloop.counter }}" id="scq_c{{forloop.counter}}"></p>
+{% endfor %}
+<input type="submit" name="Create" value="Create SCQ">
+<hr>
+<p><label for="html">MCQ Question: </label>
+    <input type="text" name="mcq_text"{{i}} id="mcq_text"></p>    
+{% for i in mcq_choice_num %}
+    <p><label>{{ forloop.counter }}: </label>
+    <input type="text" name="mcq_c{{ forloop.counter }}" id="mcq_c{{forloop.counter}}"></p>
+{% endfor %}
+<input type="submit" name="Create" value="Create MCQ">
+
+</form>
+
+<hr>    
+</form>
+{% endblock%}
