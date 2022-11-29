@@ -11,6 +11,8 @@
 <input type="submit" name="Save" value="Save">
 <input type="submit" name="Load" value="Load">
 
+<p>{{message}}</p>
+
 {% for q in questions %}
 
 <input type="hidden" name="question{{q.id}}" value="{{q.id}}" id="question{{q.id}}" >

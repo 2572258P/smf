@@ -41,6 +41,6 @@ class Choice(models.Model):
     votes = models.IntegerField(default=0)
 
 class Answer(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     question_id = models.IntegerField(default=-1)
     choice_id =  models.IntegerField(default=-1)
