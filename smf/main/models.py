@@ -32,17 +32,18 @@ class Question(models.Model):
 
     type = models.CharField(max_length=32)
     ctrl_type = models.CharField(max_length=16)
-    question_text = models.CharField(max_length=200)
+    question_text = models.CharField(max_length=200)    
     pub_date = models.DateTimeField('date published')
 
 class Choice(models.Model):
     def __str__(self):
         return self.choice_text
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
+    choice_text = models.CharField(max_length=200)    
     votes = models.IntegerField(default=0)
 
 class Answer(models.Model):
     profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     question_id = models.IntegerField(default=-1)
     choice_id =  models.IntegerField(default=-1)
+    answer_text = models.CharField(max_length=1000)

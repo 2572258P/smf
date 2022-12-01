@@ -21,34 +21,38 @@ Save last user when
 def question_creator(request):
     scq_text = request.POST.get('scq_text','')
     mcq_text = request.POST.get('mcq_text','')
+    tbq_text = request.POST.get('tbq_text','')
     scq_choice_num = range(1,11)
     mcq_choice_num = range(1,11)
     message = ''
-    if scq_text == '' and mcq_text == '':
+    if scq_text == '' and mcq_text == '' and tbq_text == '':
         message = 'empty question cannot be summitted.'
-    elif scq_text != '':
-        q = Question(type="scq",ctrl_type='radio',question_text=scq_text,pub_date=timezone.now())        
-        q.save()
-        for i in scq_choice_num:
-            choice_text = request.POST.get("scq_c%i"%i,'')
-            if choice_text != '':
-                q.choice_set.create(choice_text=choice_text)
-    elif mcq_text != '':
-        q = Question(type="mcq",ctrl_type='checkbox',question_text=mcq_text,pub_date=timezone.now())        
-        q.save()
-        for i in mcq_choice_num:
-            choice_text = request.POST.get("mcq_c%i"%i,'')
-            print(choice_text)
-            if choice_text != '':
-                q.choice_set.create(choice_text=choice_text)
-        print()
-
+    else:
+        if scq_text != '':
+            q = Question(type="scq",ctrl_type='radio',question_text=scq_text,pub_date=timezone.now())        
+            q.save()
+            for i in scq_choice_num:
+                choice_text = request.POST.get("scq_c%i"%i,'')
+                if choice_text != '':
+                    q.choice_set.create(choice_text=choice_text)
+        if mcq_text != '':
+            q = Question(type="mcq",ctrl_type='checkbox',question_text=mcq_text,pub_date=timezone.now())        
+            q.save()
+            for i in mcq_choice_num:
+                choice_text = request.POST.get("mcq_c%i"%i,'')
+                print(choice_text)
+                if choice_text != '':
+                    q.choice_set.create(choice_text=choice_text)
+        if tbq_text != '':
+            q = Question(type="tbq",ctrl_type='textarea',question_text=tbq_text,pub_date=timezone.now())        
+            q.save()
     return render(request,'question_creator.html',{'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num})
 
 def data_management(request):    
     context = {}
     context['questions'] = Question.objects.all()
     print('entry')
+    context['answers'] = {}
     
     posted_name = request.POST.get('userId','')
     print("posted name %s" % posted_name)

@@ -4,25 +4,27 @@
 <p>{{message}}</p>
 <form action="{% url 'main:question_creator' %}" method="post">
 {% csrf_token %}
-<p><label for="html">SCQ Question: </label>
-<input type="text" name="scq_text"{{i}} id="scq_text"></p>
+<p><label for="html">Q) Text-based Question: </label></p>
+    <p><textarea name="tbq_text" id="tbq_text" rows="4" cols="50"></textarea></p>
+<hr>
+<p><label for="html">Q) Single Choice Question: </label>
+<p><textarea name="scq_text" id="scq_text" rows="4" cols="50"></textarea></p>
 
 {% for i in scq_choice_num %}
     <p><label>{{ forloop.counter }}: </label>
     <input type="text" name="scq_c{{ forloop.counter }}" id="scq_c{{forloop.counter}}"></p>
 {% endfor %}
-<input type="submit" name="Create" value="Create SCQ">
 <hr>
-<p><label for="html">MCQ Question: </label>
-    <input type="text" name="mcq_text"{{i}} id="mcq_text"></p>    
+
+<p><label for="html">Q) Multiple Choice Question: </label>
+<p><textarea name="mcq_text" id="mcq_text" rows="4" cols="50"></textarea></p> 
 {% for i in mcq_choice_num %}
     <p><label>{{ forloop.counter }}: </label>
     <input type="text" name="mcq_c{{ forloop.counter }}" id="mcq_c{{forloop.counter}}"></p>
 {% endfor %}
-<input type="submit" name="Create" value="Create MCQ">
+<input type="submit" name="Create" value="Create Questions">
 
 </form>
 
-<hr>    
 </form>
 {% endblock%}
