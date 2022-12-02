@@ -1,0 +1,43 @@
+{% extends "base_frame.html" %}
+{% load main_extras %}
+{% block body_block %}
+
+
+{% if questions %}
+    <p>Questions: {{questions.count}}</p>
+    <ul>
+        {% for q in questions %}        
+        <li>{{q.question_text}}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No questions are available</p>
+{% endif %}
+
+{% if users %}
+    <p>Users: {{users_len}}</p>
+    <ul>
+        {% for u in users %}        
+        <li>{{u.username}}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No users are available</p>
+{% endif %}
+
+{% if answers %}
+    <p>Answers: {{answers.count}}</p>
+    {% for a in answers %}
+    {{a.profile.user.username}} / A)
+    {% if a.choice_id != -1 %}        
+        {{choices|first_in_queryset:a.choice_id}}
+    {% else %}
+        {{a.answer_text}}
+    {% endif %}
+    Q) {{questions|first_in_queryset:a.question_id}}
+    <br>
+    {% endfor %}
+{% else %}
+    <p>No answers are available</p>
+{% endif %}
+{% endblock %}

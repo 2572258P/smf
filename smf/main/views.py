@@ -6,7 +6,7 @@ from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Question,Choice,LastAccUser,UserProfile
+from .models import Question,Choice,LastAccUser,UserProfile,Answer
 from .view_handler_models import handle_load,handle_save
 from .view_handler_users import handle_registration
 
@@ -26,7 +26,7 @@ def question_creator(request):
     mcq_choice_num = range(1,11)
     message = ''
     if scq_text == '' and mcq_text == '' and tbq_text == '':
-        message = 'empty question cannot be summitted.'
+        message = 'Enter questions and choices with types at least one'
     else:
         if scq_text != '':
             q = Question(type="scq",ctrl_type='radio',question_text=scq_text,pub_date=timezone.now())        
@@ -97,12 +97,17 @@ def results(request, question_id):
 def registration(request):
     return render(request,'registration.html', handle_registration(request))
 
-def index(request):
-    print("index")
-    print(Question.objects)
+def dashboard(request):    
+    context = {}
     
-    latest_question_list = Question.objects.order_by('pub_date') #sort in ascending order
-    return render(request,'index.html',{'latest_question_list' : latest_question_list})
+    context['questions'] = Question.objects.order_by('pub_date') #sort in ascending order
+    user_list = User.objects.all()
+    context['users'] = user_list
+    context['users_len'] = len(user_list)
+    context['answers'] = Answer.objects.order_by('profile')
+    context['choices'] = Choice.objects.all()
+
+    return render(request,'dashboard.html',context)
 
 
 #----- Code snippets -----

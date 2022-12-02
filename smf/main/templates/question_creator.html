@@ -1,14 +1,16 @@
 {% extends 'base_frame.html' %}
 
 {% block body_block %}
-<p>{{message}}</p>
+<p><b>{{message}}</b></p>
 <form action="{% url 'main:question_creator' %}" method="post">
 {% csrf_token %}
-<p><label for="html">Q) Text-based Question: </label></p>
+<p><label for="html">Q) Text-based Question: (Enter your question below)</label></p>
     <p><textarea name="tbq_text" id="tbq_text" rows="4" cols="50"></textarea></p>
 <hr>
-<p><label for="html">Q) Single Choice Question: </label>
+<p><label for="html">Q) Single Choice Question: (Enter your question below)</label>
 <p><textarea name="scq_text" id="scq_text" rows="4" cols="50"></textarea></p>
+
+<label for="html">Add choices for the question: </label>
 
 {% for i in scq_choice_num %}
     <p><label>{{ forloop.counter }}: </label>
@@ -16,8 +18,9 @@
 {% endfor %}
 <hr>
 
-<p><label for="html">Q) Multiple Choice Question: </label>
+<p><label for="html">Q) Multiple Choice Question: (Enter your question below)</label>
 <p><textarea name="mcq_text" id="mcq_text" rows="4" cols="50"></textarea></p> 
+<label for="html">Add choices for the question: </label>
 {% for i in mcq_choice_num %}
     <p><label>{{ forloop.counter }}: </label>
     <input type="text" name="mcq_c{{ forloop.counter }}" id="mcq_c{{forloop.counter}}"></p>

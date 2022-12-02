@@ -22,7 +22,7 @@ def handle_save(request,profile):
         if q.type == 'scq' or q.type == 'mcq':
             c_id = "choice" + str(q.pk)
             if q.type == 'scq':
-                a = Answer(profile=profile,question_id=q.pk,choice_id=request.POST[c_id])
+                a = Answer(profile=profile,question_id=q.pk,choice_id=request.POST.get(c_id,-1))
                 a.save()
             elif q.type == 'mcq':
                 for ans in request.POST.getlist(c_id):

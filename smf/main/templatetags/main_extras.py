@@ -5,10 +5,15 @@ register = template.Library()
 
 @register.filter(name='get_val_in_dict')
 def get_val_in_dict(dict,key):
-    print("dict key - %s"%key)
-    print("dict content - ")
-    print(dict.get(key))
     return dict.get(key)
+
+@register.filter(name='first_in_queryset')
+def first_in_queryset(query,id):
+    lst = list(query.filter(id=id))
+    if len(lst) > 0:
+        return lst[0]
+    else:
+        return ''
 
 @register.filter(name='get_list_in_dict')
 def get_list_in_dict(dict,key):
@@ -23,10 +28,8 @@ def is_val_in_list(list,key):
 
 @register.filter(name='get_val_in_list')
 def get_val_in_list(list,index):
-    print("list content - ")
-    print(list)
     if list == None:
-        return 'None'
+        return ''
     if index >= 0 or index < list.len():
         return list[index]
-    return 'None'
+    return ''
