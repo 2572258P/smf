@@ -4,7 +4,7 @@
 
 
 {% if questions %}
-    <p>Questions: {{questions.count}}</p>
+    <p><b>Questions: {{questions.count}}</b></p>
     <ul>
         {% for q in questions %}        
         <li>{{q.question_text}}</li>
@@ -15,7 +15,7 @@
 {% endif %}
 
 {% if users %}
-    <p>Users: {{users_len}}</p>
+    <p><b>Users: {{users_len}}</b></p>
     <ul>
         {% for u in users %}        
         <li>{{u.username}}</li>
@@ -26,15 +26,15 @@
 {% endif %}
 
 {% if answers %}
-    <p>Answers: {{answers.count}}</p>
+    <p><b>Answers: {{answers.count}}</b></p>
     {% for a in answers %}
-    {{a.profile.user.username}} / A)
+    {{a.profile.user.username}} / Q) {{questions|first_in_queryset:a.question_id}} / 
+    A)
     {% if a.choice_id != -1 %}        
         {{choices|first_in_queryset:a.choice_id}}
     {% else %}
         {{a.answer_text}}
-    {% endif %}
-    Q) {{questions|first_in_queryset:a.question_id}}
+    {% endif %}    
     <br>
     {% endfor %}
 {% else %}

@@ -9,6 +9,7 @@ from django.utils import timezone
 from .models import Question,Choice,LastAccUser,UserProfile,Answer
 from .view_handler_models import handle_load,handle_save
 from .view_handler_users import handle_registration
+from .view_handler_search import handle_search_result
 
 """
 Show last user when
@@ -18,7 +19,8 @@ Save last user when
 
 """
 
-def question_creator(request):
+def question_creator(request,question_type="scq"):
+    print("----- question_creator")
     scq_text = request.POST.get('scq_text','')
     mcq_text = request.POST.get('mcq_text','')
     tbq_text = request.POST.get('tbq_text','')
@@ -40,22 +42,19 @@ def question_creator(request):
             q.save()
             for i in mcq_choice_num:
                 choice_text = request.POST.get("mcq_c%i"%i,'')
-                print(choice_text)
                 if choice_text != '':
                     q.choice_set.create(choice_text=choice_text)
         if tbq_text != '':
             q = Question(type="tbq",ctrl_type='textarea',question_text=tbq_text,pub_date=timezone.now())        
             q.save()
-    return render(request,'question_creator.html',{'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num})
+    return render(request,'question_creator.html',{'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type})
 
 def data_management(request):    
     context = {}
     context['questions'] = Question.objects.all()
-    print('entry')
     context['answers'] = {}
     
     posted_name = request.POST.get('userId','')
-    print("posted name %s" % posted_name)
 
     if posted_name != '':
         try:
@@ -66,29 +65,31 @@ def data_management(request):
                 context['message'] = "The user does not exist"
         else:
             if 'Find' in request.POST:
-                print('find')
-                return redirect('main:search_result')
+                return redirect('main:search_result',userId=posted_name)
             elif 'Load' in request.POST:
-                print("Load - %s" % posted_name)
                 context['message'] = "Data have successfully loaded."
                 context['last_user'] = request.POST['userId']
                 context['answers'] = handle_load(request,profile)
             elif 'Save' in request.POST:
-                print("Save - %s" % foundUser)
                 context['message'] = "Data have successfully saved."        
                 handle_save(request,profile)
-
-            lastUser = LastAccUser.objects.get_or_create(lastUser=posted_name)[0]           
+            
+            LastAccUser.objects.all().delete()
+            lastUser = LastAccUser.objects.get_or_create(lastUser=posted_name)[0]
             lastUser.lastUser = request.POST['userId']
             lastUser.save()
             context['last_user'] = request.POST['userId']
     else:        
         context['last_user'] = LastAccUser.objects.first()
 
-    return render(request,'data_management.html',context)    
+    return render(request,'data_management.html',context)
  
-def search_reslt(request):
-    return HttpResponse("Show Results")
+def search_result(request,userId=""):
+    result = handle_search_result(userId)
+    for r in result:
+        print(r.percent)
+    context = { 'search_results' : result }
+    return render(request, 'search_results.html',context)
 
 def results(request, question_id):
     question = get_object_or_404(Question,pk=question_id)
@@ -97,9 +98,8 @@ def results(request, question_id):
 def registration(request):
     return render(request,'registration.html', handle_registration(request))
 
-def dashboard(request):    
-    context = {}
-    
+def dashboard(request):
+    context = {}    
     context['questions'] = Question.objects.order_by('pub_date') #sort in ascending order
     user_list = User.objects.all()
     context['users'] = user_list
@@ -119,7 +119,6 @@ def vote(request, question_id):
     except (KeyError,Choice.DoesNotExist):
         return render(request,'detail.html',{'question':question,"error_message": "You didn't select a choice.",})
     else:
-        print(request.POST['choice'])
         selected_choice.votes += 1
         selected_choice.save()
         return HttpResponseRedirect(reverse('main:results', args=(question.id,)))

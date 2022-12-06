@@ -6,8 +6,11 @@ SMF -
     Base Frame
 {% endblock %}
 </title>
+{% block head_block %}
+{% endblock %}
 </head>
 <body>
+    
     <div>
         <a href="{% url 'main:dashboard' %}">Dashboard / </a>
         <a href="{% url 'main:data_management' %}">Data Management / </a>

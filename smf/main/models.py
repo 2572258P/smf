@@ -13,7 +13,7 @@ ex2) Question.objects.filter(question_text__startswith='What')
 
 # User Info
 class UserProfile(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     profile_text = models.CharField(max_length=500)
     def __str__(self):
         return self.user.username
