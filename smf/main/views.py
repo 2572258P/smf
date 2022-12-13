@@ -9,15 +9,8 @@ from django.utils import timezone
 from .models import Question,Choice,LastAccUser,UserProfile,Answer
 from .view_handler_models import handle_load,handle_save
 from .view_handler_users import handle_registration
-from .view_handler_search import handle_search_result
+from .view_handler_search import handle_search_result,calculate_similarities
 
-"""
-Show last user when
-1.Entry 2.Load 
-Save last user when
-1. Save 2. Load only when succeeeded
-
-"""
 
 def question_creator(request,question_type="scq"):
     print("----- question_creator")
@@ -84,7 +77,8 @@ def data_management(request):
 
     return render(request,'data_management.html',context)
  
-def search_result(request,userId=""):
+def search_result(request,userId):
+    print("----- UserId %s"%userId)
     result = handle_search_result(userId)
     for r in result:
         print(r.percent)
@@ -106,6 +100,14 @@ def dashboard(request):
     context['users_len'] = len(user_list)
     context['answers'] = Answer.objects.order_by('profile')
     context['choices'] = Choice.objects.all()
+
+    sen1 = request.POST.get('sen1','')
+    sen2 = request.POST.get('sen2','')
+    context['compare_result'] = sen2
+    if sen1 != '' and sen2 != '':
+        context['compare_result'] = calculate_similarities(sen1,sen2)
+    else:
+        context['compare_result'] = ''
 
     return render(request,'dashboard.html',context)
 
@@ -133,4 +135,9 @@ def detail(request, question_id):
     return render(request,'detail.html',{'question':question})
 
 def test(request):
-    return render(request,'registration.html',{})    
+    ts1 = ["I love football" for i in range(100)]
+    ts2 = ["I love books" for i in range(100)]
+
+    for i in range(100):
+        calculate_similarities(ts1[i],ts2[i])
+    return HttpResponse('test page')

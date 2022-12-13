@@ -1,11 +1,21 @@
 
-class cls():
-    def __init__(self,val):
-        self.val = val
-    def getval(self):
-        return self.val
+from module import cls
 
-ls = [cls(1),cls(2),cls(3)]
-sr = sorted(ls,key = cls.getval,reverse=True)
+def sort():
+    ls = [cls(1),cls(2),cls(3)]
+    sr = sorted(ls,key = cls.getval,reverse=True)
 
-print(sr[0].val)
+#Type?
+def type():
+    c = cls(1)
+    print(type(c))
+    print(sr[0].val)
+
+def mvh():
+    #multi values in hash?
+    h = {}
+    h['a'] = [0,1]
+    h['b'] = [2,3]
+    print(h['a'])
+
+mvh()

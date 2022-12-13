@@ -13,6 +13,7 @@ from main.models import Question,Answer,UserProfile,Choice
 from django.utils import timezone
 import time
 from django.contrib.auth.models import User
+import pandas as pd
 
 
 def generateQuestion(num):
@@ -43,16 +44,19 @@ def allocate_random_answer(users):
             continue
 
         profile = UserProfile.objects.get(user=user)        
-        anss = Answer.objects.filter(profile = profile)        
+        anss = Answer.objects.filter(profile = profile)
         anss.delete()
         for q in Question.objects.all():
             if q.type == 'tbq':
-                pass
+                dataset = pd.read_csv("dataset/dataset.csv")
+                randIndex = random.randint(0,len(dataset['review/text'])-1)
+                a = Answer(answer_text=dataset['review/text'][randIndex],choice_id=-1,profile=profile,question_id=q.pk)
+                a.save()
             else:
                 cs = Choice.objects.filter(question = q)
                 cs_ids = [c.id for c in cs] 
                 count = 1 if q.type == 'scq' else len(cs)
-                random_count = random.randint(1,count)            
+                random_count = random.randint(1,count)
                 for i in range(random_count):
                     random_id = random.randint(0,len(cs_ids)-1)
                     if random_id < len(cs_ids):

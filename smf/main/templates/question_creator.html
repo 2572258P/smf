@@ -34,7 +34,7 @@ $(document).ready(function()
 {% csrf_token %}
 {% if selectedType == 'tbq'%}
     <p><label for="html">Q) Text-based Question: (Enter your question below)</label></p>
-        <p><textarea name="tbq_text" id="tbq_text" rows="4" cols="50"></textarea></p>
+    <p><textarea name="tbq_text" id="tbq_text" rows="4" cols="50"></textarea></p>
     <hr>
 {% endif %}
 
@@ -58,7 +58,5 @@ $(document).ready(function()
 {% endfor %}
 {% endif %}
 <input type="submit" name="Create" value="Create Questions">
-</form>
-
 </form>
 {% endblock%}

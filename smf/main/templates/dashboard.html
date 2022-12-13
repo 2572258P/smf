@@ -1,7 +1,18 @@
 {% extends "base_frame.html" %}
 {% load main_extras %}
 {% block body_block %}
-
+<h1>Dashboard</h1>
+<p>Fill out texts below to calculate similarities</p>
+<form action="{% url 'main:dashboard' %}" method="post">
+    {% csrf_token %}
+    <p><label for="html">Q) Sentence1: (Enter any sentences below)</label></p>
+    <p><textarea name="sen1" id="sen1" rows="2" cols="50"></textarea></p>
+    <p><label for="html">Q) Sentence2: (Enter any sentences below)</label></p>
+    <p><textarea name="sen2" id="sen2" rows="2" cols="50"></textarea></p>    
+    <input type="submit" name="compare" value="Compare">
+</form>
+{{compare_result}}
+<hr>
 
 {% if questions %}
     <p><b>Questions: {{questions.count}}</b></p>
