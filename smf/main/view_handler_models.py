@@ -1,6 +1,7 @@
 
-from .models import Question,Answer,UserProfile
+from .models import Question,Answer,UserProfile,STF
 from collections import defaultdict
+from django.utils import timezone
 
 def handle_load(request,profile):
     answers = {}
@@ -31,4 +32,36 @@ def handle_save(request,profile):
         elif q.type == 'tbq':
             a = Answer(profile=profile,question_id=q.pk,answer_text=request.POST["text_ans%i"%q.id])
             a.save()
-            
+
+def handle_createQuestion(request,question_type):
+    scq_text = request.POST.get('scq_text','')
+    mcq_text = request.POST.get('mcq_text','')
+    tbq_text = request.POST.get('tbq_text','')
+    scq_choice_num = range(1,11)
+    mcq_choice_num = range(1,11)
+    message = ''
+    if scq_text == '' and mcq_text == '' and tbq_text == '':
+        message = 'Enter questions and choices with types at least one'
+    else:
+        choiceWords = []
+        if scq_text != '':
+            q = Question(type="scq",ctrl_type='radio',question_text=scq_text,pub_date=timezone.now())        
+            q.save()
+            for i in scq_choice_num:
+                choice_text = request.POST.get("scq_c%i"%i,'')                
+                if choice_text != '':
+                    q.choice_set.create(choice_text=choice_text)
+                    choiceWords.append(choice_text)
+        if mcq_text != '':
+            q = Question(type="mcq",ctrl_type='checkbox',question_text=mcq_text,pub_date=timezone.now())        
+            q.save()
+            for i in mcq_choice_num:
+                choice_text = request.POST.get("mcq_c%i"%i,'')
+                if choice_text != '':
+                    q.choice_set.create(choice_text=choice_text)
+                    choiceWords.append(choice_text)
+        if tbq_text != '':
+            q = Question(type="tbq",ctrl_type='textarea',question_text=tbq_text,pub_date=timezone.now())        
+            q.save()
+        STF.Update(choiceWords)
+    return {'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type}

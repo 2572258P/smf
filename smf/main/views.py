@@ -4,43 +4,17 @@ from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
-from django.utils import timezone
 
-from .models import Question,Choice,LastAccUser,UserProfile,Answer
-from .view_handler_models import handle_load,handle_save
+
+from .models import Question,Choice,LastAccUser,UserProfile,Answer,STF
+from .view_handler_models import handle_load,handle_save,handle_createQuestion
 from .view_handler_users import handle_registration
-from .view_handler_search import handle_search_result,calculate_similarities
+from .view_handler_search import handle_search_result
 
 
-def question_creator(request,question_type="scq"):
-    print("----- question_creator")
-    scq_text = request.POST.get('scq_text','')
-    mcq_text = request.POST.get('mcq_text','')
-    tbq_text = request.POST.get('tbq_text','')
-    scq_choice_num = range(1,11)
-    mcq_choice_num = range(1,11)
-    message = ''
-    if scq_text == '' and mcq_text == '' and tbq_text == '':
-        message = 'Enter questions and choices with types at least one'
-    else:
-        if scq_text != '':
-            q = Question(type="scq",ctrl_type='radio',question_text=scq_text,pub_date=timezone.now())        
-            q.save()
-            for i in scq_choice_num:
-                choice_text = request.POST.get("scq_c%i"%i,'')
-                if choice_text != '':
-                    q.choice_set.create(choice_text=choice_text)
-        if mcq_text != '':
-            q = Question(type="mcq",ctrl_type='checkbox',question_text=mcq_text,pub_date=timezone.now())        
-            q.save()
-            for i in mcq_choice_num:
-                choice_text = request.POST.get("mcq_c%i"%i,'')
-                if choice_text != '':
-                    q.choice_set.create(choice_text=choice_text)
-        if tbq_text != '':
-            q = Question(type="tbq",ctrl_type='textarea',question_text=tbq_text,pub_date=timezone.now())        
-            q.save()
-    return render(request,'question_creator.html',{'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type})
+def question_creator(request,question_type="scq"): 
+    context = handle_createQuestion(request,question_type) 
+    return render(request,'question_creator.html',context)
 
 def data_management(request):    
     context = {}
@@ -105,7 +79,7 @@ def dashboard(request):
     sen2 = request.POST.get('sen2','')
     context['compare_result'] = sen2
     if sen1 != '' and sen2 != '':
-        context['compare_result'] = calculate_similarities(sen1,sen2)
+        context['compare_result'] = STF.calculate_single_similarities(sen1,sen2)
     else:
         context['compare_result'] = ''
 
@@ -135,9 +109,5 @@ def detail(request, question_id):
     return render(request,'detail.html',{'question':question})
 
 def test(request):
-    ts1 = ["I love football" for i in range(100)]
-    ts2 = ["I love books" for i in range(100)]
-
-    for i in range(100):
-        calculate_similarities(ts1[i],ts2[i])
-    return HttpResponse('test page')
+    print(STF.scores[0][2])
+    return HttpResponse("This is test page!")

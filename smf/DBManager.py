@@ -64,7 +64,7 @@ def allocate_random_answer(users):
                         a.save()
 
 if __name__ == "__main__":
-    cmdlist = ['generate_users','allocate_answers','delete_all_users','clear_all']
+    cmdlist = ['generate_users','allocate_answers','delete_all_users','clear_all','help']
 
     if( len(sys.argv) > 1 ):
         cmd = sys.argv[1]
