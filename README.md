@@ -2,8 +2,8 @@
 Study Mates Finder
 # Project Version Information
 - SMF version : 1.0
-- Python: 3.8.13
-- Python Django: 3.2
+- Python: 3.9.12
+- Python Django: 4.1.4
 - Sentence Transformers 2.2.2
 
 # Overview
