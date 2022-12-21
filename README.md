@@ -5,6 +5,7 @@ Study Mates Finder
 - Python: 3.9.12
 - Python Django: 4.1.4
 - Sentence Transformers 2.2.2
+  - https://www.sbert.net/docs/installation.html
 - pytouch 1.13.1 (stable) , CUDA(11.6)
   - https://pytorch.org/get-started/locally/
     - conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
