@@ -14,8 +14,20 @@ SMF -
     <div>
         <a href="{% url 'main:dashboard' %}">Dashboard / </a>
         <a href="{% url 'main:data_management' %}">Data Management / </a>
-        <a href="{% url 'main:question_creator' %}">Question Creator / </a>
-        <a href="{% url 'main:registration' %}">Registration</a>        
+        <a href="{% url 'main:question_creator' %}">Question Creator / </a>        
+        {% if user.is_authenticated %}
+            <p>Welcome! {{ user.username }} <a href="{% url 'main:logout' %}">logout</a> </p>
+        {% else %}
+        <a href="{% url 'main:registration' %}">Registration</a>
+            <form action="{% url 'main:login' %}" method="post">
+            {% csrf_token %}
+            <label for="username">User name:</label>
+            <input type="text" name="username" value={{last_user}}>
+            <label for="password">password</label>
+            <input type="password" name="password">
+            <input type="submit" name="login" value="login">        
+            </form>
+        {% endif %}
         {% block body_block %}
         {% endblock %}
     </div>

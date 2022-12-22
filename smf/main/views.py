@@ -1,12 +1,14 @@
 #from django.shortcuts import render
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate,login,logout
+
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
 
 
-from .models import Question,Choice,LastAccUser,UserProfile,Answer,STF
+from .models import Question,Choice,LastAccUser,UserProfile,Answer#,STF
 from .view_handler_models import handle_load,handle_save,handle_createQuestion
 from .view_handler_users import handle_registration
 from .view_handler_search import handle_search_result
@@ -16,11 +18,53 @@ def question_creator(request,question_type="scq"):
     context = handle_createQuestion(request,question_type) 
     return render(request,'question_creator.html',context)
 
-def data_management(request):    
+def user_login(request):    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(username=username,password=password)
+        if user:
+            if user.is_active:
+                login(request,user)
+
+                LastAccUser.objects.all().delete()
+                lastUser = LastAccUser(lastUser=username)                
+                lastUser.save()
+
+                return redirect(reverse('main:dashboard'))
+            else:
+                return HttpResponse("Your account is disabled.")
+        else:
+            HttpResponse(f"Invalid login details: {username},{password}")
+            return HttpResponse("Invalid login details supplied.")
+
+    return HttpResponse("The request was not POST type")
+
+def user_logout(request):
+    logout(request)
+    return redirect(reverse('main:dashboard'))
+
+def data_management(request):
     context = {}
-    context['questions'] = Question.objects.all()
-    context['answers'] = {}
-    
+
+    if request.user.is_authenticated:
+        context['questions'] = Question.objects.all()
+        context['answers'] = {}
+        profile = UserProfile.objects.get(user=request.user)
+        if 'Find' in request.POST:
+            return redirect('main:search_result',userId=request.user.username)
+        elif 'Save' in request.POST:
+            context['message'] = "Data have successfully saved."        
+            handle_save(request,profile)        
+        else:
+            context['message'] = "Data have successfully loaded."
+            
+        context['answers'] = handle_load(request,profile)
+            
+    return render(request,'data_management.html',context)
+
+    """
     posted_name = request.POST.get('userId','')
 
     if posted_name != '':
@@ -34,28 +78,19 @@ def data_management(request):
             if 'Find' in request.POST:
                 return redirect('main:search_result',userId=posted_name)
             elif 'Load' in request.POST:
-                context['message'] = "Data have successfully loaded."
-                context['last_user'] = request.POST['userId']
+                context['message'] = "Data have successfully loaded."                
                 context['answers'] = handle_load(request,profile)
             elif 'Save' in request.POST:
                 context['message'] = "Data have successfully saved."        
-                handle_save(request,profile)
-            
-            LastAccUser.objects.all().delete()
-            lastUser = LastAccUser.objects.get_or_create(lastUser=posted_name)[0]
-            lastUser.lastUser = request.POST['userId']
-            lastUser.save()
-            context['last_user'] = request.POST['userId']
+                handle_save(request,profile)            
     else:        
         context['last_user'] = LastAccUser.objects.first()
+    """
 
-    return render(request,'data_management.html',context)
+    
  
 def search_result(request,userId):
-    print("----- UserId %s"%userId)
     result = handle_search_result(userId)
-    for r in result:
-        print(r.percent)
     context = { 'search_results' : result }
     return render(request, 'search_results.html',context)
 
@@ -65,6 +100,7 @@ def results(request, question_id):
 
 def registration(request):
     return render(request,'registration.html', handle_registration(request))
+
 
 def dashboard(request):
     context = {}    
@@ -83,31 +119,10 @@ def dashboard(request):
     else:
         context['compare_result'] = ''
 
+    #load the user logged in the lastest time
+    last_user = LastAccUser.objects.all()
+    if len(last_user) > 0:
+        context['last_user'] = last_user[0]
+
     return render(request,'dashboard.html',context)
 
-
-#----- Code snippets -----
-def vote(request, question_id):
-    question = get_object_or_404(Question,pk=question_id)
-    try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
-        
-    except (KeyError,Choice.DoesNotExist):
-        return render(request,'detail.html',{'question':question,"error_message": "You didn't select a choice.",})
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        return HttpResponseRedirect(reverse('main:results', args=(question.id,)))
-
-
-def detail(request, question_id):
-    try:
-        question = Question.objects.get(pk=question_id)
-    except:
-        raise Http404("Question does not exist")
-           
-    return render(request,'detail.html',{'question':question})
-
-def test(request):
-    print(STF.scores[0][2])
-    return HttpResponse("This is test page!")

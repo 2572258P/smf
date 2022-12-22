@@ -12,6 +12,8 @@ python manage.py shell
 
 python manage.py createsuperuser
 
+python manage.py 
+
 
 ----- <DB>      -----
 python manage.py migrate

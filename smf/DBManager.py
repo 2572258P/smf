@@ -32,7 +32,7 @@ def generate_user(count):
         try:
             print("progress :{:.0f}%".format((i+1)/(count)*100))
             username = "user_"+current_time+str(i)
-            newuser = User.objects.create_user(username=username, password=current_time)
+            newuser = User.objects.create_user(username=username, password='123456ab!')
             userpf = UserProfile(user=newuser)
             userpf.save()
         except Exception as inst:
@@ -50,7 +50,9 @@ def allocate_random_answer(users):
             if q.type == 'tbq':
                 dataset = pd.read_csv("dataset/dataset.csv")
                 randIndex = random.randint(0,len(dataset['review/text'])-1)
-                a = Answer(answer_text=dataset['review/text'][randIndex],choice_id=-1,profile=profile,question_id=q.pk)
+                text = dataset['review/text'][randIndex][:32]
+                print(text)
+                a = Answer(answer_text=text,choice_id=-1,profile=profile,question_id=q.pk)
                 a.save()
             else:
                 cs = Choice.objects.filter(question = q)

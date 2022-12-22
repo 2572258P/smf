@@ -1,5 +1,5 @@
 
-from .models import Question,Answer,UserProfile,STF
+from .models import Question,Answer,UserProfile#,STF
 from collections import defaultdict
 from django.utils import timezone
 
@@ -43,7 +43,6 @@ def handle_createQuestion(request,question_type):
     if scq_text == '' and mcq_text == '' and tbq_text == '':
         message = 'Enter questions and choices with types at least one'
     else:
-        choiceWords = []
         if scq_text != '':
             q = Question(type="scq",ctrl_type='radio',question_text=scq_text,pub_date=timezone.now())        
             q.save()
@@ -51,7 +50,6 @@ def handle_createQuestion(request,question_type):
                 choice_text = request.POST.get("scq_c%i"%i,'')                
                 if choice_text != '':
                     q.choice_set.create(choice_text=choice_text)
-                    choiceWords.append(choice_text)
         if mcq_text != '':
             q = Question(type="mcq",ctrl_type='checkbox',question_text=mcq_text,pub_date=timezone.now())        
             q.save()
@@ -59,9 +57,7 @@ def handle_createQuestion(request,question_type):
                 choice_text = request.POST.get("mcq_c%i"%i,'')
                 if choice_text != '':
                     q.choice_set.create(choice_text=choice_text)
-                    choiceWords.append(choice_text)
         if tbq_text != '':
             q = Question(type="tbq",ctrl_type='textarea',question_text=tbq_text,pub_date=timezone.now())        
-            q.save()
-        STF.Update(choiceWords)
+            q.save()       
     return {'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type}

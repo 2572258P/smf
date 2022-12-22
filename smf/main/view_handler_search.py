@@ -1,18 +1,128 @@
-from .models import Question,Answer,UserProfile,STF,Choice
+from .models import Question,Answer,UserProfile,Choice#,STF
 from collections import defaultdict
 from django.contrib.auth.models import User
+import time
 
-class Ansdata():
+from sentence_transformers import SentenceTransformer, util
+
+class STF():
+    """
+    what it does
+    1. caching the calculated results with similarities
+    2. providing utilities
+    """
+    words = []
+    scores = []
+    initialized = False
+    @staticmethod
+    def init():
+        
+        if STF.initialized == True:
+            return
+        STF.initialized = True
+
+        STF.model = SentenceTransformer('all-MiniLM-L6-v2')
+        #STF.model = SentenceTransformer('all-mpnet-base-v2')
+        #STF.model = SentenceTransformer('paraphrase-MiniLM-L3-v2')
+        
+        
+        for c in Choice.objects.all():
+            if c.choice_text in STF.words:
+                continue
+            STF.words.append(c.choice_text)
+        STF.calculate()
+    @staticmethod
+    def Update():
+        updated = False
+        words = [ ch.choice_text for ch in Choice.objects.all() ]
+
+        for word in words:
+            if word in STF.words:
+                continue
+            updated = True
+            STF.words.append(word)
+        if updated == True:
+            STF.calculate()
+
+    @staticmethod
+    def getScore(word1,word2):
+        if word1 not in STF.words or word2 not in STF.words:
+            return 0
+        idx1 = STF.words.index(word1)
+        idx2 = STF.words.index(word2)
+        return STF.scores[idx1][idx2]
+
+    @staticmethod
+    def calculate():
+        #Compute embedding for both lists        
+        if len(STF.words) <= 0: 
+            return
+        embeddings1 = STF.model.encode(STF.words, convert_to_tensor=True)
+        embeddings2 = STF.model.encode(STF.words, convert_to_tensor=True)
+
+        #Compute cosine-similarities
+        STF.scores = util.cos_sim(embeddings1, embeddings2)        
+    @staticmethod
+    def calculate_single_similarities(sen1,sen2):
+        #Compute embedding for both lists
+        embeddings1 = STF.model.encode([sen1], convert_to_tensor=True)
+        embeddings2 = STF.model.encode([sen2], convert_to_tensor=True)
+
+        #Compute cosine-similarities
+        cosine_scores = util.cos_sim(embeddings1, embeddings2)
+
+        return cosine_scores[0][0]
+    @staticmethod
+    def calculate_similarities(array1,array2):
+        STF.init()
+        STF.Update()
+
+        #Compute embedding for both lists
+        embeddings1 = STF.model.encode(array1, show_progress_bar=True)
+        embeddings2 = STF.model.encode(array2, show_progress_bar=True)
+
+        #Compute cosine-similarities
+        cosine_scores = util.cos_sim(embeddings1, embeddings2)
+
+        return cosine_scores
+    @staticmethod
+    def gen_sim_table_from_tbq(myProfile):
+        tbqs = Question.objects.filter(type='tbq')
+        table = {}
+        for tbq in tbqs:
+            table[tbq.id] = {}
+            answers = Answer.objects.filter(question_id = tbq.id)
+            otherUserNames = []
+            myTextAns = []
+            otherTextAns = []
+
+            for ans in answers:
+                if ans.profile == myProfile:
+                    myTextAns.append(ans.answer_text)
+                else:
+                    otherTextAns.append(ans.answer_text)
+                    otherUserNames.append(ans.profile.user.username)
+
+            print("---- Start NLP Operation -----")
+            startTime = time.time()
+            simResult = STF.calculate_similarities(myTextAns,otherTextAns)
+            i = 0
+            for oun in otherUserNames:
+                table[tbq.id][oun] = simResult[0][i]
+                i += 1
+            
+            print("End NLP Operation Time: {}s".format(time.time()-startTime))
+        return table
+
+
+
+
+class SCQ_MCQ_Ansdata():
     def __init__(self):
         self.choices = []
-        self.text = ""
     def addChoice(self,choice):
         if choice != -1:
-            self.choices.append(choice)
-    def addText(self,text):
-        if text != '' and text != None:
-            self.text = text
-    
+            self.choices.append(choice)    
     def calcChoiceWeight(self,otherAns):
         weight = 0
         for mc in self.choices: #when the answers are for Single Choice Questions or Multiple Choice Questons.
@@ -51,40 +161,15 @@ def getPercentWithAnswers(mp,op,anss1,anss2):
     
     return int((matchedCount / totalCount) * 100)
 
-def convertToAnsdata(ansQuery):
+def gen_table_scq_mcq(ansQuery):
     result = {}
     for ans in ansQuery:
         if ans.question_id not in result:
-            result[ans.question_id] = Ansdata()
+            result[ans.question_id] = SCQ_MCQ_Ansdata()
         result[ans.question_id].addChoice(ans.choice_id)
-        result[ans.question_id].addText(ans.answer_text)
     return result
 
 
-def getSimTableFromTBQ(myProfile):
-    tbqs = Question.objects.filter(type='tbq')
-
-    table = {}
-    for tbq in tbqs:
-        table[tbq.id] = {}
-        answers = Answer.objects.filter(question_id = tbq.id)
-        otherUserNames = []
-        myTextAns = []
-        otherTextAns = []
-
-        for ans in answers:
-            if ans.profile == myProfile:
-                myTextAns.append(ans.answer_text)
-            else:
-                otherTextAns.append(ans.answer_text)
-                otherUserNames.append(ans.profile.user.username)
-        print(myTextAns,otherTextAns)
-        simResult = STF.calculate_similarities(myTextAns,otherTextAns)
-        i = 0
-        for oun in otherUserNames:
-            table[tbq.id][oun] = simResult[0][i]
-            i += 1
-    return table
 
 def handle_search_result(username):
     myUser = User.objects.get(username=username)
@@ -92,24 +177,22 @@ def handle_search_result(username):
     allUserProfiles = UserProfile.objects.all()
     resultInfos = []
 
-    print(" ----- ----- ")
-    simTable = getSimTableFromTBQ(myProfile)
-    print(simTable)
+    simTable = STF.gen_sim_table_from_tbq(myProfile)
 
-    myAnss = convertToAnsdata(Answer.objects.filter(profile=myProfile))
+    myChoiceAnss = gen_table_scq_mcq(Answer.objects.filter(profile=myProfile))
     for up in allUserProfiles:
         if up.user.username == username or up.user.username == 'admin': #except user itself and admin
             continue
 
-        otherAnss = convertToAnsdata(Answer.objects.filter(profile=up))
+        otherChoiceAnss = gen_table_scq_mcq(Answer.objects.filter(profile=up))
         totalWeight = 0
 
-        for myQNum in myAnss.keys():
-            if myQNum in otherAnss: #if the other users have the same questions with me
-                totalWeight += myAnss[myQNum].calcChoiceWeight(otherAnss[myQNum])
+        for myQNum in myChoiceAnss.keys():
+            if myQNum in otherChoiceAnss: #if the other users have the same questions with me
+                totalWeight += myChoiceAnss[myQNum].calcChoiceWeight(otherChoiceAnss[myQNum])
             if myQNum in simTable:
                 totalWeight += simTable[myQNum][up.user.username]
-        
-        resultInfos.append(Resultinfo(up.user.username,totalWeight / len(myAnss) * 100))
+        if len(myChoiceAnss) > 0:
+            resultInfos.append(Resultinfo(up.user.username,totalWeight / len(myChoiceAnss) * 100))
     sr = sorted(resultInfos,key = Resultinfo.getPercent,reverse=True)
     return sr
