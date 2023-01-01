@@ -1,28 +1,43 @@
-
 {% extends 'base_frame.html' %}
 
 {% load main_extras %}
 
+
 {% block body_block %}
 <form action="{% url 'main:data_management' %}" method="post">
 {% csrf_token %}
+<script>
+     const pri_color = {high:"red",medium:"green",low:"grey"}     
+</script>
 
 
 {% if user.is_authenticated %}
-    <p>{{message}}</p>
+    <h2>{{message}}</h2>
+    <p>
+        <b>&lt;Help&gt;</b><br>
+        Priority Colour :<span style="color:red">High</span>,<span style="color:green">Medium</span>,<span style="color:grey">Low</span><br>
+        Exact Matching Type(emt): <span style="font-weight:bold">Bold</span>
+    </p>
     {% for q in questions %}
     <input type="hidden" name="question{{q.id}}" value="{{q.id}}" id="question{{q.id}}" >
     <fieldset> <!-- for making a group -->
-        <legend><h1>{{ q.question_text }}</h1></legend>
+        <legend id="legend_{{q.id}}"><h1>{{ q.question_text }}</h1></legend>
+        <script>
+            document.getElementById("legend_{{q.id}}").style.color = pri_color["{{q.priority}}"];
+            console.log("Question Id:{{q.id}}")
+        </script>
         {% for c in q.choice_set.all %}
             {% if answers|get_list_in_dict:q.id|is_val_in_list:c.id == True %}
                 <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
-                <label for="choice{{ forloop.counter }}">{{c.choice_text}} ___ {{ c.id }}</label><br>
             {% else %}
-                <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
-                <label for="choice{{ forloop.counter }}">{{c.choice_text}} ___ {{ c.id }}</label><br>
-            {% endif %}
-        {% endfor%}
+                <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >                
+            {% endif %}                
+            <label id="choice_{{c.id}}">{{c.choice_text}}</span><br>
+            <script>
+                if ("{{q.match_type}}" == "emt")
+                    document.getElementById("choice_{{c.id}}").style.fontWeight = "bold"
+            </script>
+        {% endfor %}
         {% if 'tbq' == q.type %}        
             <textarea name="text_ans{{q.id}}" id="text_ans{{q.id}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
         {% endif %}

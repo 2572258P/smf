@@ -6,12 +6,12 @@
 <script>
 function selectQuestion() 
 {
-  var x = document.getElementById("questionType").value;
+  var x = document.getElementById("qType").value;
   window.location.href = "{% url 'main:question_creator' %}"+x;  
 }
 $(document).ready(function()
 {
-    $("#questionType").val("{{selectedType}}")
+    $("#qType").val("{{selectedType}}")
 });
 </script>
 
@@ -19,19 +19,17 @@ $(document).ready(function()
 
 {% block body_block %}
 
-<p>
-<select id="questionType" onchange="selectQuestion()">
+<p>Type Of Question:
+<select id="qType" onchange="selectQuestion()">
     <option value="scq">Single Choice Question</option>
     <option value="mcq">Multiple Choice Question</option>
     <option value="tbq">Text-based Question</option>
 </select>
-</p>
-<p><b>{{message}}</b></p>
-
-
+<p><h2>{{message}}</h2></p>
 
 <form action="{% url 'main:question_creator' %}" method="post">
 {% csrf_token %}
+
 {% if selectedType == 'tbq'%}
     <p><label for="html">Q) Text-based Question: (Enter your question below)</label></p>
     <p><textarea name="tbq_text" id="tbq_text" rows="4" cols="50"></textarea></p>
@@ -57,6 +55,32 @@ $(document).ready(function()
     <input type="text" name="mcq_c{{ forloop.counter }}" id="mcq_c{{forloop.counter}}"></p>
 {% endfor %}
 {% endif %}
-<input type="submit" name="Create" value="Create Questions">
+
+</p>
+<p>Priority:
+<select id="mPri" name="mPri">
+    <option value="high">High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+</select>
+</p>
+
+{% if selectedType == 'scq' or selectedType == 'mcq' %}
+</p>
+<p>Type Of Match:
+<select id="mType" name="mType">
+    <option value="smt">Similar Answer Match</option>
+    <option value="emt">Exact Answer Match</option>
+</select>
+</p>
+<p><b>Description of Matching Type:</b><br>
+1. "Correlative Answer Match" increases probability with the similar answer.<br>
+e.g., A similar answer adds a point(0 ~ 1) by similarity and exact answer add a point 1.<br>
+2. "Exact Answer Match" simply increases probability only with the same answer.</p>
+{% endif %}
+
+
+
+<input type="submit" name="Create" value="Create">
 </form>
 {% endblock%}

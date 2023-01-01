@@ -1,7 +1,6 @@
 from .forms import UserForm,UserProfileForm
 
 def handle_registration(request):
-    print("registration - started")
     registered = False
     if request.method == 'POST':
         user_form = UserForm(request.POST)
@@ -23,5 +22,4 @@ def handle_registration(request):
         user_form = UserForm()
         profile_form = UserProfileForm()
 
-    print("registration - %s" % registered)
     return {'user_form' : user_form,'profile_form':profile_form,'registered':registered}

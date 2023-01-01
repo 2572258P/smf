@@ -6,7 +6,7 @@ class MainConfig(AppConfig):
     name = 'main'
     #def ready(self):
         #from .models import STF        
-        #STF.init()
+        #STF.Init()
 
         
 

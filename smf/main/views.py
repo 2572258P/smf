@@ -11,7 +11,7 @@ from django.urls import reverse
 from .models import Question,Choice,LastAccUser,UserProfile,Answer#,STF
 from .view_handler_models import handle_load,handle_save,handle_createQuestion
 from .view_handler_users import handle_registration
-from .view_handler_search import handle_search_result
+from .view_handler_search import handle_search_result,STF
 
 
 def question_creator(request,question_type="scq"): 
@@ -63,29 +63,7 @@ def data_management(request):
         context['answers'] = handle_load(request,profile)
             
     return render(request,'data_management.html',context)
-
-    """
-    posted_name = request.POST.get('userId','')
-
-    if posted_name != '':
-        try:
-            foundUser = User.objects.get(username=posted_name)
-            profile = UserProfile.objects.get(user=foundUser)
-        except:
-            if posted_name != '':
-                context['message'] = "The user does not exist"
-        else:
-            if 'Find' in request.POST:
-                return redirect('main:search_result',userId=posted_name)
-            elif 'Load' in request.POST:
-                context['message'] = "Data have successfully loaded."                
-                context['answers'] = handle_load(request,profile)
-            elif 'Save' in request.POST:
-                context['message'] = "Data have successfully saved."        
-                handle_save(request,profile)            
-    else:        
-        context['last_user'] = LastAccUser.objects.first()
-    """
+  
 
     
  
@@ -103,6 +81,11 @@ def registration(request):
 
 
 def dashboard(request):
+
+   
+
+    STF.Init()
+    STF.Update()
     context = {}    
     context['questions'] = Question.objects.order_by('pub_date') #sort in ascending order
     user_list = User.objects.all()
@@ -113,16 +96,16 @@ def dashboard(request):
 
     sen1 = request.POST.get('sen1','')
     sen2 = request.POST.get('sen2','')
-    context['compare_result'] = sen2
-    if sen1 != '' and sen2 != '':
-        context['compare_result'] = STF.calculate_single_similarities(sen1,sen2)
-    else:
-        context['compare_result'] = ''
+    context['compare_result'] = STF.calculate_single_similarities(sen1,sen2)
+
 
     #load the user logged in the lastest time
     last_user = LastAccUser.objects.all()
     if len(last_user) > 0:
         context['last_user'] = last_user[0]
 
+    # test
+    print(User.objects.filter(username='admin1').first())
+    
     return render(request,'dashboard.html',context)
 

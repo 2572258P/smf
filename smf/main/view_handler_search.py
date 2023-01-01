@@ -15,7 +15,7 @@ class STF():
     scores = []
     initialized = False
     @staticmethod
-    def init():
+    def Init():
         
         if STF.initialized == True:
             return
@@ -74,9 +74,6 @@ class STF():
         return cosine_scores[0][0]
     @staticmethod
     def calculate_similarities(array1,array2):
-        STF.init()
-        STF.Update()
-
         #Compute embedding for both lists
         embeddings1 = STF.model.encode(array1, show_progress_bar=True)
         embeddings2 = STF.model.encode(array2, show_progress_bar=True)
@@ -91,54 +88,54 @@ class STF():
         table = {}
         for tbq in tbqs:
             table[tbq.id] = {}
-            answers = Answer.objects.filter(question_id = tbq.id)
-            otherUserNames = []
-            myTextAns = []
-            otherTextAns = []
-
-            for ans in answers:
-                if ans.profile == myProfile:
-                    myTextAns.append(ans.answer_text)
-                else:
-                    otherTextAns.append(ans.answer_text)
-                    otherUserNames.append(ans.profile.user.username)
-
+            otherAnsArr = []
+            myAnsArr = []
+            allOtherUsers = UserProfile.objects.all().exclude(user=myProfile.user)            
+            myans = Answer.objects.filter(question_id = tbq.id,profile=myProfile).first()
+            myAnsArr.append( myans.answer_text if myans != None else "")
+            for OUP in allOtherUsers:
+                otherAns = Answer.objects.filter(question_id = tbq.id,profile=OUP).first()
+                otherAnsArr.append( otherAns.answer_text if otherAns != None else "")
             print("---- Start NLP Operation -----")
+            print(myAnsArr)
+            print(otherAnsArr)
             startTime = time.time()
-            simResult = STF.calculate_similarities(myTextAns,otherTextAns)
+            simResult = STF.calculate_similarities(myAnsArr,otherAnsArr)
+            print("----- End NLP Operation Time: {}s".format(time.time()-startTime))
             i = 0
-            for oun in otherUserNames:
-                table[tbq.id][oun] = simResult[0][i]
+            for OUP in allOtherUsers:
+                table[tbq.id][OUP.user.username] = simResult[0][i]
                 i += 1
-            
-            print("End NLP Operation Time: {}s".format(time.time()-startTime))
+        print(table)
         return table
 
-
-
-
-class SCQ_MCQ_Ansdata():
-    def __init__(self):
+class WeightCalculator():
+    def __init__(self,match_type):
         self.choices = []
+        self.match_type = match_type
     def addChoice(self,choice):
         if choice != -1:
             self.choices.append(choice)    
     def calcChoiceWeight(self,otherAns):
         weight = 0
-        for mc in self.choices: #when the answers are for Single Choice Questions or Multiple Choice Questons.
-            if mc in otherAns.choices:
-                weight += 1
-            else:
+        for myChoice in self.choices: #when the answers are for Single Choice Questions or Multiple Choice Questons.
+            if self.match_type == 'emt':
+                if myChoice in otherAns.choices: #if other user has exactly the same answer
+                    weight += 1
+            elif self.match_type == 'smt': #if other user does not have the same answer, find the highest weighted answer            
                 highestScore = 0
-                for oc in otherAns.choices:
-                    try:
-                        mct = Choice.objects.get(pk=mc).choice_text
-                        oct = Choice.objects.get(pk=oc).choice_text
-                        score = STF.getScore(mct,oct)
-                        highestScore = score if highestScore < score else highestScore 
-                    except Exception as e:
-                        print(e)
-                weight += highestScore
+                if myChoice in otherAns.choices:
+                    weight += 1
+                else:
+                    for otherUserChoice in otherAns.choices:
+                        try:
+                            mct = Choice.objects.get(pk=myChoice).choice_text
+                            oct = Choice.objects.get(pk=otherUserChoice).choice_text
+                            score = STF.getScore(mct,oct)
+                            highestScore = score if highestScore < score else highestScore 
+                        except Exception as e:
+                            print(e)
+                    weight += highestScore
         if weight > 0: #When a question type is scq or mcq
             return weight / len(self.choices)
         return 0
@@ -161,15 +158,23 @@ def getPercentWithAnswers(mp,op,anss1,anss2):
     
     return int((matchedCount / totalCount) * 100)
 
-def gen_table_scq_mcq(ansQuery):
+def gen_table_by_answers(ansQueryForAll):
     result = {}
-    for ans in ansQuery:
+    for ans in ansQueryForAll:
         if ans.question_id not in result:
-            result[ans.question_id] = SCQ_MCQ_Ansdata()
+            qt = Question.objects.get(pk=ans.question_id)
+            result[ans.question_id] = WeightCalculator(qt.match_type)
         result[ans.question_id].addChoice(ans.choice_id)
     return result
 
-
+def GetWeightByPriority(priority):
+    if priority == 'high':
+        return 1
+    if priority == 'medium':
+        return 0.6
+    if priority == 'low':
+        return 0.3
+    return 1
 
 def handle_search_result(username):
     myUser = User.objects.get(username=username)
@@ -177,22 +182,27 @@ def handle_search_result(username):
     allUserProfiles = UserProfile.objects.all()
     resultInfos = []
 
-    simTable = STF.gen_sim_table_from_tbq(myProfile)
+    STF.Init()
+    STF.Update()
+    AllAnswerWeightTable_tbq = STF.gen_sim_table_from_tbq(myProfile)
 
-    myChoiceAnss = gen_table_scq_mcq(Answer.objects.filter(profile=myProfile))
-    for up in allUserProfiles:
-        if up.user.username == username or up.user.username == 'admin': #except user itself and admin
+    myQnATable = gen_table_by_answers(Answer.objects.filter(profile=myProfile))
+    for OUP in allUserProfiles: #iterate all other users' profiles and calulation weight with mine
+        if OUP.user.username == username or OUP.user.username == 'admin': #except myself and admin
             continue
-
-        otherChoiceAnss = gen_table_scq_mcq(Answer.objects.filter(profile=up))
+        otherQnATable = gen_table_by_answers(Answer.objects.filter(profile=OUP))
         totalWeight = 0
 
-        for myQNum in myChoiceAnss.keys():
-            if myQNum in otherChoiceAnss: #if the other users have the same questions with me
-                totalWeight += myChoiceAnss[myQNum].calcChoiceWeight(otherChoiceAnss[myQNum])
-            if myQNum in simTable:
-                totalWeight += simTable[myQNum][up.user.username]
-        if len(myChoiceAnss) > 0:
-            resultInfos.append(Resultinfo(up.user.username,totalWeight / len(myChoiceAnss) * 100))
+        for myQId in myQnATable.keys():
+            if myQId in otherQnATable: #if the other users have the same questions with me
+                totalWeight += myQnATable[myQId].calcChoiceWeight(otherQnATable[myQId])
+            if myQId in AllAnswerWeightTable_tbq:
+                totalWeight += AllAnswerWeightTable_tbq[myQId][OUP.user.username]
+        
+        qt = Question.objects.get(pk=myQId)
+        totalWeight = totalWeight * GetWeightByPriority(qt.priority)
+            
+        if len(otherQnATable) > 0:
+            resultInfos.append(Resultinfo(OUP.user.username,totalWeight / len(myQnATable) * 100))
     sr = sorted(resultInfos,key = Resultinfo.getPercent,reverse=True)
     return sr
