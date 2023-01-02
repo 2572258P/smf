@@ -162,9 +162,10 @@ def gen_table_by_answers(ansQueryForAll):
     result = {}
     for ans in ansQueryForAll:
         if ans.question_id not in result:
-            qt = Question.objects.get(pk=ans.question_id)
-            result[ans.question_id] = WeightCalculator(qt.match_type)
-        result[ans.question_id].addChoice(ans.choice_id)
+            qo = Question.objects.filter(pk=ans.question_id).first()            
+            if qo != None:
+                result[ans.question_id] = WeightCalculator(qo.match_type)
+                result[ans.question_id].addChoice(ans.choice_id)
     return result
 
 def GetWeightByPriority(priority):
@@ -199,10 +200,10 @@ def handle_search_result(username):
             if myQId in AllAnswerWeightTable_tbq:
                 totalWeight += AllAnswerWeightTable_tbq[myQId][OUP.user.username]
         
-        qt = Question.objects.get(pk=myQId)
-        totalWeight = totalWeight * GetWeightByPriority(qt.priority)
-            
-        if len(otherQnATable) > 0:
-            resultInfos.append(Resultinfo(OUP.user.username,totalWeight / len(myQnATable) * 100))
+            qo = Question.objects.filter(pk=myQId).first()
+            if qo != None:
+                totalWeight = totalWeight * GetWeightByPriority(qo.priority)            
+            if len(otherQnATable) > 0:
+                resultInfos.append(Resultinfo(OUP.user.username,totalWeight / len(myQnATable) * 100))
     sr = sorted(resultInfos,key = Resultinfo.getPercent,reverse=True)
     return sr

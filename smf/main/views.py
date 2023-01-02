@@ -18,7 +18,37 @@ def question_creator(request,question_type="scq"):
     context = handle_createQuestion(request,question_type) 
     return render(request,'question_creator.html',context)
 
-def user_login(request):    
+
+def question_management(request):
+    context = {}
+    if request.POST.get('Delete'):
+        deleted = False
+        for q in Question.objects.all():
+            if request.POST.get('del_'+str(q.id)):
+                Answer.objects.filter(question_id=q.id).delete()
+                q.delete()
+                deleted = True
+        if deleted:
+            context['msg_delete'] = 'Questions have been successfully deleted'
+    else:
+        context['msg_dic'] = {}
+        for q in Question.objects.all():
+            if request.POST.get('update'+str(q.id)):
+                new_pri = request.POST.get('mPri_'+str(q.id),None)
+                new_type = request.POST.get('mType_'+str(q.id),None)
+                if new_pri and new_pri != q.priority or new_type and new_type != q.match_type:
+                    q.priority = new_pri
+                    q.match_type = new_type
+                    q.save()
+                    context['msg_dic'][q.id] = "Questions have been successfully updated"
+                else:
+                    context['msg_dic'][q.id] = "Nothing changed"
+    
+    context['questions'] = Question.objects.all()
+    return render(request,'question_management.html',context)
+
+
+def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -81,9 +111,6 @@ def registration(request):
 
 
 def dashboard(request):
-
-   
-
     STF.Init()
     STF.Update()
     context = {}    

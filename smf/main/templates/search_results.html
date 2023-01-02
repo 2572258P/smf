@@ -2,7 +2,12 @@
 
 {% block body_block %}
 <br>
+{% if search_results %}
+
 {% for sr in search_results %}
     {{sr.userid}} / {{sr.percent}} %<br>
 {% endfor %}
+{% else %}
+    No one matched.
+{% endif %}
 {% endblock %}

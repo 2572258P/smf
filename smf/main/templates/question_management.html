@@ -1,0 +1,81 @@
+{% extends 'base_frame.html' %}
+{% load main_extras %}
+
+{% block head_block %}
+
+<script>
+    function confirm_delete()
+    {
+        sel_questions = document.getElementsByClassName('question_items');
+        var selcount = 0;
+        for(var i = 0;i < sel_questions.length;i++ )
+            if(sel_questions[i].checked)
+                selcount++;
+        document.getElementById('msg_del').innerHTML = '';
+        if(selcount > 0)
+            return confirm('Do you want to delete the selected questions permanantely?')
+        else
+        {
+            document.getElementById('msg_del').innerHTML = 'Nothing was selected to delete';
+            return false;
+        }
+    }
+</script>
+{% endblock %}
+
+{% block body_block %}
+<h2>Question Delete</h2>
+<h3 id="msg_del">{{ msg_delete }}</h3>
+
+{% if questions.count > 0 %}
+<form action="{% url 'main:question_management' %}" method="post">
+    {% csrf_token %}
+    {% for q in questions %}
+        <input type="checkbox" name="del_{{q.id}}" class="question_items"> <label>{{ q.question_text}}</label><br>
+    {% endfor %}
+    <input type="submit" name="Delete" value="Delete" onclick="return confirm_delete()">
+</form>
+{% else %}
+No questions on the list
+{% endif %}
+<hr>
+<h2>Question Update</h2>
+{% if questions.count > 0 %}
+    <div><u>* Since those questions below have distributed to the participants, setting only additional properties is allowed. </u></div>
+    <br>
+    {% for q in questions %}
+    <form action="{% url 'main:question_management' %}" method="post">
+    {% csrf_token %}        
+        <div>
+            <b>Title: {{q.question_text}}</b><br>            
+            {% for c in q.choice_set.all %}
+                {{forloop.counter}} ) {{c.choice_text}}<br>
+            {% endfor %}
+            Type: {{q.type}}</b><br>
+            Priority:
+            <select id="mPri_{{q.id}}" name="mPri_{{q.id}}">
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select><br>
+            Type Of Match:
+            <select id="mType_{{q.id}}" name="mType_{{q.id}}">
+                <option value="smt">Similar Answer Match</option>
+                <option value="emt">Exact Answer Match</option>
+            </select>            
+            <script>
+                document.getElementById("mPri_{{q.id}}").value = "{{q.priority}}"
+                document.getElementById("mType_{{q.id}}").value = "{{q.match_type}}"
+            </script>
+        </div>
+        <input type="submit" name="update{{q.id}}" value="Update">
+    </form>
+    {%if msg_dic %}
+        <h3 id="msg_update">{{ msg_dic|get_val_in_dict:q.id }}</h3>
+    {% endif %}
+    {% endfor %}
+    
+{% else %}
+No questions on the list
+{% endif %}
+{% endblock %}

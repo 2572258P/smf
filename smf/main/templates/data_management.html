@@ -30,7 +30,7 @@
             {% if answers|get_list_in_dict:q.id|is_val_in_list:c.id == True %}
                 <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
             {% else %}
-                <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >                
+                <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
             {% endif %}                
             <label id="choice_{{c.id}}">{{c.choice_text}}</span><br>
             <script>

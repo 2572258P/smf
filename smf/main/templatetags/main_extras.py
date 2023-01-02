@@ -5,8 +5,8 @@ register = template.Library()
 
 @register.filter(name='get_val_in_dict')
 def get_val_in_dict(dict,key):
-    return dict.get(key)
-
+    return dict.get(key,'')
+    
 @register.filter(name='first_in_queryset')
 def first_in_queryset(query,id):
     lst = list(query.filter(id=id))
