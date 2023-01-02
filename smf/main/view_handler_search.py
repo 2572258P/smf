@@ -106,7 +106,6 @@ class STF():
             for OUP in allOtherUsers:
                 table[tbq.id][OUP.user.username] = simResult[0][i]
                 i += 1
-        print(table)
         return table
 
 class WeightCalculator():
@@ -161,20 +160,21 @@ def getPercentWithAnswers(mp,op,anss1,anss2):
 def gen_table_by_answers(ansQueryForAll):
     result = {}
     for ans in ansQueryForAll:
-        if ans.question_id not in result:
-            qo = Question.objects.filter(pk=ans.question_id).first()            
-            if qo != None:
-                result[ans.question_id] = WeightCalculator(qo.match_type)
-                result[ans.question_id].addChoice(ans.choice_id)
+        qo = Question.objects.filter(pk=ans.question_id).first()
+        if ans.question_id not in result and qo != None:
+            result[ans.question_id] = WeightCalculator(qo.match_type)        
+        if ans.question_id in result:
+            result[ans.question_id].addChoice(ans.choice_id)
+
     return result
 
 def GetWeightByPriority(priority):
     if priority == 'high':
         return 1
     if priority == 'medium':
-        return 0.6
+        return 0.66
     if priority == 'low':
-        return 0.3
+        return 0.33
     return 1
 
 def handle_search_result(username):
@@ -195,15 +195,16 @@ def handle_search_result(username):
         totalWeight = 0
 
         for myQId in myQnATable.keys():
-            if myQId in otherQnATable: #if the other users have the same questions with me
-                totalWeight += myQnATable[myQId].calcChoiceWeight(otherQnATable[myQId])
-            if myQId in AllAnswerWeightTable_tbq:
-                totalWeight += AllAnswerWeightTable_tbq[myQId][OUP.user.username]
-        
+            
             qo = Question.objects.filter(pk=myQId).first()
-            if qo != None:
-                totalWeight = totalWeight * GetWeightByPriority(qo.priority)            
-            if len(otherQnATable) > 0:
-                resultInfos.append(Resultinfo(OUP.user.username,totalWeight / len(myQnATable) * 100))
+            priorityWeight = GetWeightByPriority(qo.priority) if qo != None else 0            
+
+            if myQId in otherQnATable: #if the other users have the same questions with me
+                totalWeight += myQnATable[myQId].calcChoiceWeight(otherQnATable[myQId]) * priorityWeight
+            if myQId in AllAnswerWeightTable_tbq:
+                totalWeight += AllAnswerWeightTable_tbq[myQId][OUP.user.username] * priorityWeight
+                
+        if len(otherQnATable) > 0:
+            resultInfos.append(Resultinfo(OUP.user.username,totalWeight / len(myQnATable) * 100))
     sr = sorted(resultInfos,key = Resultinfo.getPercent,reverse=True)
     return sr

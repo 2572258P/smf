@@ -19,7 +19,7 @@ SMF -
         {% if user.is_authenticated %}
             <p>Welcome! {{ user.username }} <a href="{% url 'main:logout' %}">logout</a> </p>
         {% else %}
-        <a href="{% url 'main:registration' %}">Registration</a>
+        / <a href="{% url 'main:registration' %}">Registration</a>
             <form action="{% url 'main:login' %}" method="post">
             {% csrf_token %}
             <label for="username">User name:</label>

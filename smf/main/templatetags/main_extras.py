@@ -30,6 +30,6 @@ def is_val_in_list(list,key):
 def get_val_in_list(list,index):
     if list == None:
         return ''
-    if index >= 0 or index < list.len():
+    if index >= 0 and index < len(list):
         return list[index]
     return ''

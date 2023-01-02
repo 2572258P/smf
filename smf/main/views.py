@@ -81,18 +81,20 @@ def data_management(request):
     if request.user.is_authenticated:
         context['questions'] = Question.objects.all()
         context['answers'] = {}
-        profile = UserProfile.objects.get(user=request.user)
-        if 'Find' in request.POST:
-            return redirect('main:search_result',userId=request.user.username)
-        elif 'Save' in request.POST:
-            context['message'] = "Data have successfully saved."        
-            handle_save(request,profile)        
+        profile = UserProfile.objects.filter(user=request.user).first()
+        if profile:
+            if 'Find' in request.POST:
+                return redirect('main:search_result',userId=request.user.username)
+            elif 'Save' in request.POST:
+                context['message'] = "Data have successfully saved."        
+                handle_save(request,profile)        
+            else:
+                context['message'] = "Data have successfully loaded."
+                
+            context['answers'] = handle_load(request,profile)                
+            return render(request,'data_management.html',context)
         else:
-            context['message'] = "Data have successfully loaded."
-            
-        context['answers'] = handle_load(request,profile)
-            
-    return render(request,'data_management.html',context)
+            return HttpResponse("{} User Profile Does not Exist".format(request.user))
   
 
     

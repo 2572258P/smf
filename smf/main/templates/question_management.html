@@ -71,7 +71,7 @@ No questions on the list
         <input type="submit" name="update{{q.id}}" value="Update">
     </form>
     {%if msg_dic %}
-        <h3 id="msg_update">{{ msg_dic|get_val_in_dict:q.id }}</h3>
+        <h3 style="color:red" id="msg_update">{{ msg_dic|get_val_in_dict:q.id }}</h3>
     {% endif %}
     {% endfor %}
     
