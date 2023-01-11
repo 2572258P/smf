@@ -1,0 +1,74 @@
+<!DOCTYPE html> 
+<html lang="en">        
+<head>       
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formatter</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>         
+    <script>
+    $(document).ready(function()
+    {
+        for( let i = 1;i < 3;i++)
+        {
+            console.log("#hpl"+i)
+            $("#hpl"+i).click(function()
+            {
+                $.ajax(
+                    {
+                        type: "POST",
+                        url: "{% url 'index' %}",
+                        data: 
+                        {
+                            text: i,
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            dataType: "json",
+                        },
+                        success: function (data) {
+                            $('#output').html(data.msg)
+                        },
+                        failure: function () {
+                            $('#output').html('Error Encountered!') 
+                        }    
+                    });
+            });
+
+        }
+    });
+</script>
+
+</head>        
+<body>         
+    <div>     
+        <form action="" method="post">
+            <label for="">Enter Text:</label>
+            <br>
+            <textarea name="text" id="text_box" cols="50" rows="10"></textarea>            
+        </form> 
+        <a href="#" id="hpl1">My Text</a>
+        <a href="#" id="hpl2">My Text</a>
+        <span>Result:</span>
+        <div style="border:1px solid black; width:420px; height:400px;" id="output">    
+        </div>
+    </div>     
+    <script>
+        $('#text_box').on('input', function (e) {
+            e.preventDefault();
+         $.ajax({
+            type: "POST",
+            url: "{% url 'index' %}",
+            data: {
+               text: $('#text_box').val(),
+               csrfmiddlewaretoken: '{{ csrf_token }}',
+               dataType: "json",
+            },  
+            success: function (data) {
+               $('#output').html(data.msg)
+            },
+            failure: function () {
+               $('#output').html('Error Encountered!') 
+            }    
+         });
+      });              
+    </script>        
+</body>              
+</html>

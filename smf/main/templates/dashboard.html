@@ -1,19 +1,64 @@
 {% extends "base_frame.html" %}
+
+{% block head_block %}
+<!-- Head_Block -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+<script>
+$(document).ready(function()
+{
+    {% for dq in draft_questions %}
+        $("#like_{{dq.id}}").click(function()
+        {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'main:dashboard' %}",
+                data:{
+                    qid: '{{dq.id}}',
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    dataType: "json",
+                },
+                success: function (data){
+                    //console.log(data.msg);
+                    $("#result{{dq.id}}").html(data.result);
+                    $("#msg{{dq.id}}").html(data.msg);
+                },
+                failure: function (){
+                }
+            });
+        });
+    {% endfor %}
+});
+</script>
+
+{% endblock %}
+
+
 {% load main_extras %}
 {% block body_block %}
 <h1>Dashboard</h1>
-<p>Fill out texts below to calculate similarities</p>
-<form action="{% url 'main:dashboard' %}" method="post">
-    {% csrf_token %}
-    <p><label for="html">Q) Sentence1: (Enter any sentences below)</label></p>
-    <p><textarea name="sen1" id="sen1" rows="2" cols="50"></textarea></p>
-    <p><label for="html">Q) Sentence2: (Enter any sentences below)</label></p>
-    <p><textarea name="sen2" id="sen2" rows="2" cols="50"></textarea></p>    
-    <input type="submit" name="compare" value="Compare">
-</form>
-{{compare_result}}
-<hr>
-{{test_msg}}
+
+
+<h2>1. Draft Questions - Registered by users</h2>
+{% for q in draft_questions %}    
+<fieldset> <!-- for making a group -->
+    <legend id="legend_{{q.id}}" style="color:grey"><h1>{{ q.question_text }}</h1></legend>
+    {% for c in q.choice_set.all %}
+        <input type="{{q.ctrl_type}}" disabled>
+        <label disabled>{{c.choice_text}}<br>
+    {% endfor %}
+    {% if 'tbq' == q.type %}
+        <textarea name="text_ans{{q.id}}" " rows="4" cols="50" disabled></textarea><br>
+    {% endif %}
+    <br>
+    <input type="button" value="Vote" id="like_{{q.id}}" />
+    <label>Count: </label>
+    <label id="result{{q.id}}">{{votes|get_val_in_dict:q.id}}</label>
+    <br><label id="msg{{q.id}}"></label>
+</fieldset>
+
+{% endfor %}
+<br>
+<h2>2. Data Monitoring</h2>
 
 {% if questions %}
     <p><b>Questions: {{questions.count}}</b></p>
@@ -26,11 +71,11 @@
     <p>No questions are available</p>
 {% endif %}
 
-{% if users %}
-    <p><b>Users: {{users_len}}</b></p>
+{% if profiles %}
+    <p><b>Users: {{profile_len}}</b></p>
     <ul>
-        {% for u in users %}        
-        <li>{{u.username}}</li>
+        {% for p in profiles %}
+        <li>{{p.user.username}} / admin: {{p.admin}}</li>
         {% endfor %}
     </ul>
 {% else %}
@@ -52,4 +97,18 @@
 {% else %}
     <p>No answers are available</p>
 {% endif %}
+
+<h2>3. Similarity Test</h2>
+<p>Fill out texts below to calculate similarities</p>
+<form action="{% url 'main:dashboard' %}" method="post">
+    {% csrf_token %}
+    <p><label for="html">Q) Sentence1: (Enter any sentences below)</label></p>
+    <p><textarea name="sen1" id="sen1" rows="2" cols="50"></textarea></p>
+    <p><label for="html">Q) Sentence2: (Enter any sentences below)</label></p>
+    <p><textarea name="sen2" id="sen2" rows="2" cols="50"></textarea></p>    
+    <input type="submit" name="compare" value="Compare">
+</form>
+<span>Similarity: {{compare_result}}</span>
+<hr>
+{{test_msg}}
 {% endblock %}

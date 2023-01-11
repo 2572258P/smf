@@ -6,10 +6,7 @@
 {% block body_block %}
 <form action="{% url 'main:data_management' %}" method="post">
 {% csrf_token %}
-<script>
-     const pri_color = {high:"red",medium:"green",low:"grey"}     
-</script>
-
+<script>const pri_color = {high:"red",medium:"green",low:"grey"}</script>
 
 {% if user.is_authenticated %}
     <h2>{{message}}</h2>
@@ -32,7 +29,7 @@
             {% else %}
                 <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
             {% endif %}                
-            <label id="choice_{{c.id}}">{{c.choice_text}}</span><br>
+            <label id="choice_{{c.id}}">{{c.choice_text}}<br>
             <script>
                 if ("{{q.match_type}}" == "emt")
                     document.getElementById("choice_{{c.id}}").style.fontWeight = "bold"
@@ -47,6 +44,22 @@
     <input type="submit" name="Save" value="Save Data">
     <input type="submit" name="Find" value="Find Mates">
     </form>
+
+    {% for q in draft_questions %}    
+    <fieldset> <!-- for making a group -->
+        <legend id="legend_{{q.id}}" style="color:grey"><h1>{{ q.question_text }}</h1></legend>
+        {% for c in q.choice_set.all %}
+            <input type="{{q.ctrl_type}}" disabled>
+            <label disabled>{{c.choice_text}}<br>
+        {% endfor %}
+        {% if 'tbq' == q.type %}
+            <textarea name="text_ans{{q.id}}" id="text_ans{{q.id}}" rows="4" cols="50" disabled>{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
+        {% endif %}
+        <br>
+        <label>Like: {{q.like}} / Dislike:{{q.dislike}}<br>
+    </fieldset>
+    {% endfor %}
+    <br>
 {% else %}
     <p>Login is required for this page.</p>
 {% endif %}

@@ -7,9 +7,9 @@ from sentence_transformers import SentenceTransformer, util
 
 class STF():
     """
-    what it does
+    Purpose of the class
     1. caching the calculated results with similarities
-    2. providing utilities
+    2. providing utilities for NLP
     """
     words = []
     scores = []
@@ -84,7 +84,7 @@ class STF():
         return cosine_scores
     @staticmethod
     def gen_sim_table_from_tbq(myProfile):
-        tbqs = Question.objects.filter(type='tbq')
+        tbqs = Question.objects.filter(type='tbq').exclude(approved=False)
         table = {}
         for tbq in tbqs:
             table[tbq.id] = {}

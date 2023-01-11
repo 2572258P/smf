@@ -2,20 +2,75 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 
-from django.http import HttpResponse,Http404,HttpResponseRedirect
+from django.http import HttpResponse,Http404,HttpResponseRedirect,JsonResponse
 from django.template import loader
 from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
 
 
-from .models import Question,Choice,LastAccUser,UserProfile,Answer#,STF
+from .models import Question,Choice,LastAccUser,UserProfile,Answer,QuestionVote#,STF
 from .view_handler_models import handle_load,handle_save,handle_createQuestion
 from .view_handler_users import handle_registration
 from .view_handler_search import handle_search_result,STF
 
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
+def dashboard(request):
+    STF.Init()
+    STF.Update()
+    context = {}    
+    context['questions'] = Question.objects.order_by('pub_date').exclude(approved=False) #sort in ascending order
+    context['draft_questions'] = Question.objects.all().exclude(approved=True)
+    profile_list = UserProfile.objects.all()
+    context['profiles'] = profile_list
+    context['profile_len'] = len(profile_list)
+    context['answers'] = Answer.objects.order_by('profile')
+    context['choices'] = Choice.objects.all()
+
+    sen1 = request.POST.get('sen1','')
+    sen2 = request.POST.get('sen2','')
+    context['compare_result'] = STF.calculate_single_similarities(sen1,sen2)
+    
+    context['votes'] = {}
+    for dq in Question.objects.all().exclude(approved=True):
+        context['votes'][dq.pk] = QuestionVote.objects.filter(question=dq).count()
+
+    #load the user logged in the lastest time
+    last_user = LastAccUser.objects.all()
+    if len(last_user) > 0:
+        context['last_user'] = last_user[0]
+
+    if is_ajax(request):
+        response = {}
+        qid = request.POST.get('qid', None)
+        q = Question.objects.filter(pk=qid).first()
+        qv = QuestionVote.objects.filter(username=request.user.username,question=q).first()
+        
+        if qv == None:
+            new_qv = QuestionVote(username=request.user.username,question=q)
+            new_qv.save()
+            response['msg'] = "You have voted to the question"
+        else:
+            qv.delete()
+            response['msg'] = "Your vote has been cancelled"
+        voteCount = QuestionVote.objects.filter(question=q).count()
+        alluserCount = UserProfile.objects.all().exclude(admin=True).count()
+        response['result'] = voteCount
+
+        print(" ----- vote count {} alluserCount {}".format(voteCount,alluserCount) )
+        if voteCount > alluserCount/2:            
+            q.approved = True
+            q.save()
+
+        return JsonResponse(response)
+    else:
+        return render(request,'dashboard.html',context)
+
 
 def question_creator(request,question_type="scq"): 
-    context = handle_createQuestion(request,question_type) 
+    profile = UserProfile.objects.filter(user=request.user).first()
+    context = handle_createQuestion(request,question_type,profile)
     return render(request,'question_creator.html',context)
 
 
@@ -79,7 +134,7 @@ def data_management(request):
     context = {}
 
     if request.user.is_authenticated:
-        context['questions'] = Question.objects.all()
+        context['questions'] = Question.objects.all().exclude(approved=False)
         context['answers'] = {}
         profile = UserProfile.objects.filter(user=request.user).first()
         if profile:
@@ -110,31 +165,4 @@ def results(request, question_id):
 
 def registration(request):
     return render(request,'registration.html', handle_registration(request))
-
-
-def dashboard(request):
-    STF.Init()
-    STF.Update()
-    context = {}    
-    context['questions'] = Question.objects.order_by('pub_date') #sort in ascending order
-    user_list = User.objects.all()
-    context['users'] = user_list
-    context['users_len'] = len(user_list)
-    context['answers'] = Answer.objects.order_by('profile')
-    context['choices'] = Choice.objects.all()
-
-    sen1 = request.POST.get('sen1','')
-    sen2 = request.POST.get('sen2','')
-    context['compare_result'] = STF.calculate_single_similarities(sen1,sen2)
-
-
-    #load the user logged in the lastest time
-    last_user = LastAccUser.objects.all()
-    if len(last_user) > 0:
-        context['last_user'] = last_user[0]
-
-    # test
-    print(User.objects.filter(username='admin1').first())
-    
-    return render(request,'dashboard.html',context)
 
