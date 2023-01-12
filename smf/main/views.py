@@ -12,9 +12,8 @@ from .models import Question,Choice,LastAccUser,UserProfile,Answer,QuestionVote#
 from .view_handler_models import handle_load,handle_save,handle_createQuestion
 from .view_handler_users import handle_registration
 from .view_handler_search import handle_search_result,STF
+from .view_handler_common import CheckAuth,ShowNonAuthPage,is_ajax
 
-def is_ajax(request):
-    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 def dashboard(request):
     STF.Init()
@@ -41,19 +40,20 @@ def dashboard(request):
     if len(last_user) > 0:
         context['last_user'] = last_user[0]
 
-    if is_ajax(request):
+    if is_ajax(request): # Handling from ajax request
         response = {}
         qid = request.POST.get('qid', None)
         q = Question.objects.filter(pk=qid).first()
         qv = QuestionVote.objects.filter(username=request.user.username,question=q).first()
         
-        if qv == None:
+        if qv is None:
             new_qv = QuestionVote(username=request.user.username,question=q)
             new_qv.save()
             response['msg'] = "You have voted to the question"
         else:
             qv.delete()
             response['msg'] = "Your vote has been cancelled"
+
         voteCount = QuestionVote.objects.filter(question=q).count()
         alluserCount = UserProfile.objects.all().exclude(admin=True).count()
         response['result'] = voteCount
@@ -68,13 +68,21 @@ def dashboard(request):
         return render(request,'dashboard.html',context)
 
 
-def question_creator(request,question_type="scq"): 
+
+def question_creator(request,question_type="scq"):
+    if CheckAuth(request) is False:
+        return ShowNonAuthPage()
     profile = UserProfile.objects.filter(user=request.user).first()
     context = handle_createQuestion(request,question_type,profile)
     return render(request,'question_creator.html',context)
 
 
 def question_management(request):
+    if CheckAuth(request) is False:
+        return ShowNonAuthPage()
+    if request.user.is_authenticated is False:
+        return HttpResponse("The page requires log-in")
+
     context = {}
     if request.POST.get('Delete'):
         deleted = False
@@ -131,6 +139,8 @@ def user_logout(request):
     return redirect(reverse('main:dashboard'))
 
 def data_management(request):
+    if CheckAuth(request) is False:
+        return ShowNonAuthPage()
     context = {}
 
     if request.user.is_authenticated:

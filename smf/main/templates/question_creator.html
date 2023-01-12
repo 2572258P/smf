@@ -71,13 +71,15 @@ $(document).ready(function()
 <select id="mType" name="mType">
     <option value="smt">Similar Answer Match</option>
     <option value="emt">Exact Answer Match</option>
+    <option value="xor">XOR Answer Match</option>
 </select>
 </p>
 <b>Description of Matching Type:</b>
     <div>
     1. "Similar Answer Match" increases probability with the similar answers.<br>
     e.g., A similar answer adds a point(0 ~ 1) by similarity and exact answer add a point 1.<br>
-    2. "Exact Answer Match" simply increases probability only with the same answer.</p>
+    2. "Exact Answer Match" simply increases probability only with the same answer.<br>
+    3. "XOR Answer Match" It adds a point only when others have different answers from mine.
     </div>
 {% endif %}
 
