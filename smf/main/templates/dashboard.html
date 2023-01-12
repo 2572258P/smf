@@ -39,6 +39,9 @@ $(document).ready(function()
 
 
 <h2>1. Draft Questions - Registered by users</h2>
+{% if not draft_questions %}
+No questions yet. Any user can register customized questions.
+{% endif %}
 {% for q in draft_questions %}    
 <fieldset> <!-- for making a group -->
     <legend id="legend_{{q.id}}" style="color:grey"><h1>{{ q.question_text }}</h1></legend>

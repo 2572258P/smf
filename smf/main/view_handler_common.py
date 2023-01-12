@@ -14,7 +14,7 @@ def CheckAuth(request):
         return False        
     return True
 
-def ShowNonAuthPage():
+def ShowNotAuthedPage():
     return HttpResponse("This page requires login")
 
 def is_ajax(request):

@@ -33,7 +33,7 @@
     {% for q in questions %}
         <input type="checkbox" name="del_{{q.id}}" class="question_items"> <label>{{ q.question_text}}</label><br>
     {% endfor %}
-    <input type="submit" name="Delete" value="Delete" onclick="return confirm_delete()">
+    <input type="submit" name="delete" value="Delete" onclick="return confirm_delete()">
 </form>
 {% else %}
 No questions on the list
@@ -43,9 +43,9 @@ No questions on the list
 {% if questions.count > 0 %}
     <div><u>* Since those questions below have distributed to the participants, setting only additional properties is allowed. </u></div>
     <br>
-    {% for q in questions %}
     <form action="{% url 'main:question_management' %}" method="post">
-    {% csrf_token %}        
+    {% csrf_token %}
+    {% for q in questions %}
         <div>
             <b>Title: {{q.question_text}}</b><br>            
             {% for c in q.choice_set.all %}
@@ -68,13 +68,16 @@ No questions on the list
                 document.getElementById("mPri_{{q.id}}").value = "{{q.priority}}"
                 document.getElementById("mType_{{q.id}}").value = "{{q.match_type}}"
             </script>
-        </div>
-        <input type="submit" name="update{{q.id}}" value="Update">
-    </form>
+        </div>    
     {%if msg_dic %}
         <h3 style="color:red" id="msg_update">{{ msg_dic|get_val_in_dict:q.id }}</h3>
     {% endif %}
+    <br>
     {% endfor %}
+    
+    <input type="submit" name="update_changes" value="Update Changes">
+    </form>
+    
     
 {% else %}
 No questions on the list
