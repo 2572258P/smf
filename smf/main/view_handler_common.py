@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 def GetWeightByPriority(priority):
     if priority == 'high':
@@ -15,7 +16,7 @@ def CheckAuth(request):
     return True
 
 def ShowNotAuthedPage():
-    return HttpResponse("This page requires login")
+    return redirect('main:login_requirement')
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'

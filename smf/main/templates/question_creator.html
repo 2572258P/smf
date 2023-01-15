@@ -2,7 +2,14 @@
 
 {% block head_block %}
 {% load static %}
-<script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
+
+<script>
+    $(document).ready(function()
+    {
+        $("#menu_qc").addClass("menu_select");
+    });
+</script>
+
 <script>
 function selectQuestion() 
 {
@@ -38,11 +45,11 @@ $(document).ready(function()
 
 {% if selectedType == 'scq' %}
     <p><label for="html">Q) Single Choice Question: (Enter your question below)</label>
-    <p><textarea name="scq_text" id="scq_text" rows="4" cols="50"></textarea></p>
+    <p><textarea style="width: 85%;" name="scq_text" id="scq_text" rows="4" cols="50"></textarea></p>
     <label for="html">Add choices for the question: </label>
 {% for i in scq_choice_num %}
     <p><label>{{ forloop.counter }}: </label>
-    <input type="text" name="scq_c{{ forloop.counter }}" id="scq_c{{forloop.counter}}"></p>
+    <input style="width: 85%;" type="text" name="scq_c{{ forloop.counter }}" id="scq_c{{forloop.counter}}"></p>
 {% endfor %}
 {% endif %}
 

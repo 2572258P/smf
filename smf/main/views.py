@@ -11,8 +11,11 @@ from django.urls import reverse
 from .models import Question,Choice,LastAccUser,UserProfile,Answer,QuestionVote#,STF
 from .view_handler_common import CheckAuth,ShowNotAuthedPage,is_ajax
 from .view_handler_models import handle_load,handle_save,handle_createQuestion
-from .view_handler_users import handle_registration
+from .view_handler_users import handle_registration,handle_myaccount
 from .view_handler_search import handle_search_result,STF
+
+def login_requirement(request):
+    return render(request,'login_requirement.html',{})
 
 
 
@@ -24,7 +27,7 @@ def dashboard(request):
     context['draft_questions'] = Question.objects.all().exclude(approved=True)
     profile_list = UserProfile.objects.all()
     context['profiles'] = profile_list
-    context['profile_len'] = len(profile_list)
+    context['profile_len'] = profile_list.count()
     context['answers'] = Answer.objects.order_by('profile')
     context['choices'] = Choice.objects.all()
 
@@ -38,8 +41,9 @@ def dashboard(request):
 
     #load the user logged in the lastest time
     last_user = LastAccUser.objects.all()
-    if len(last_user) > 0:
-        context['last_user'] = last_user[0]
+    context['last_user'] = last_user[0] if last_user.count() > 0 else ""
+   
+    
 
     if is_ajax(request): # Handling from ajax request
         response = {}
@@ -78,8 +82,7 @@ def question_creator(request,question_type="scq"):
     return render(request,'question_creator.html',context)
 
 
-def question_management(request):
-    
+def question_management(request):    
     if CheckAuth(request) is False:
         return ShowNotAuthedPage()
     if request.user.is_authenticated is False:
@@ -176,5 +179,7 @@ def results(request, question_id):
     return render(request,'results.html',{'question':question})
 
 def registration(request):
-    return render(request,'registration.html', handle_registration(request))
+    return handle_registration(request)
 
+def my_account(request):
+    return handle_myaccount(request)

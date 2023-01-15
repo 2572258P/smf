@@ -1,25 +1,82 @@
 from .forms import UserForm,UserProfileForm
+from .view_handler_common import is_ajax
+from django.http import JsonResponse
+from django.shortcuts import render,get_object_or_404,redirect
+from django.contrib.auth.models import User
+from .models import UserProfile
+from django.contrib.auth import authenticate,login,logout
+
+import re
+import random
+
+def handle_myaccount(request):    
+    if is_ajax(request): #Received
+        response = {} 
+        pf = UserProfile.objects.filter(user=request.user).first()
+        if pf:            
+            pf.email = request.POST.get('email')
+            pf.profile_text = request.POST.get('pf_text')
+            pf.profile_text_open = request.POST.get('pf_text_open') == 'true'
+            pf.save()
+        response['msg'] = "updated"
+
+        return JsonResponse(response)
+    else:
+        context = {}
+        context['username'] = request.user.username
+        pf = UserProfile.objects.filter(user=request.user).first()
+        if pf:
+            context['email'] = pf.email
+            context['pf_text'] = pf.profile_text
+            context['pf_text_open'] = 'True' if pf.profile_text_open == True else 'False'
+            
+        return render(request,'profile_management.html',context )
+
 
 def handle_registration(request):
-    registered = False
-    if request.method == 'POST':
-        user_form = UserForm(request.POST)
-        profile_form = UserProfileForm(request.POST)
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save()
-            user.set_password(user.password)
-            user.save()
+    response = {}
+    if is_ajax(request) and request.POST.get('cmd') == 'create':        
+        check_username = request.POST.get('check_username')        
+        new_username = request.POST.get('username')
+        password = request.POST.get('password')        
+        success = False
 
-            profile = profile_form.save(commit=False)
-            profile.user = user
-
-            profile.save();
-            registered = True
+        if new_username is not None and len(new_username) < 5:
+            response['msg'] = "User name must be at least five letters."
+        elif new_username is not None and re.match("^[A-Za-z0-9_-]*$",new_username) == None:
+            response['msg'] = "Special letters are not allowed to use for user name."
+        elif User.objects.filter(username = new_username).first():
+            response['msg'] = "User name \"{}\" is not available.".format(new_username)
+        elif password is not None and len(password) < 8:
+            response['msg'] = "Password must to be set eight letters at least."
         else:
-            print(user_form.errors,profile_form.errors)
-    else:
-        user_form = UserForm()
-        profile_form = UserProfileForm()
+            success = True
+        response['success'] = success
 
-    return {'user_form' : user_form,'profile_form':profile_form,'registered':registered}
+        if success:
+            newuser = User.objects.create_user(username=new_username, password=password)
+            userpf = UserProfile(user=newuser,
+            profile_text=request.POST.get('pf_text'),
+            profile_text_open=request.POST.get('pf_text_open') == 'true',
+            email=request.POST.get('email'))
+            userpf.save()
+            
+            user = authenticate(username=new_username,password=password)
+            if user and user.is_active:
+                login(request,user)
+
+        return JsonResponse(response)
+    elif is_ajax(request) and request.POST.get('cmd') == 'test_user_fill':
+
+        profile_auto_texts = ['I want to study with you','I love talking wit others','I want to be a friend of yours.']
+
+        user_count = User.objects.all().count()
+        response['test_user_name'] = 'user' + str(user_count)
+        response['pw'] = '123456ab!'
+        response['pw_confirm'] = '123456ab!'
+        response['email'] = '2572258p@gmail.com'
+        response['pf_text'] = profile_auto_texts[random.randint(0,len(profile_auto_texts)-1)]
+        return JsonResponse(response)
+    else:        
+        return render(request,'profile_registration.html',{} )

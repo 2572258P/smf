@@ -2,7 +2,6 @@
 
 {% block head_block %}
 <!-- Head_Block -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
 <script>
 $(document).ready(function()
 {
@@ -26,48 +25,50 @@ $(document).ready(function()
                 }
             });
         });
-    {% endfor %}
+    {% endfor %}    
+    $("#menu_db").addClass("menu_select")    
 });
 </script>
 
-{% endblock %}
+{% endblock %} 
 
 
 {% load main_extras %}
 {% block body_block %}
-<h1>Dashboard</h1>
-
-
-<h2>1. Draft Questions - Registered by users</h2>
+<div class="div_type1">
+<h2>Draft Questions - Registered by users</h2>
 {% if not draft_questions %}
 No questions yet. Any user can register customized questions.
 {% endif %}
 {% for q in draft_questions %}    
-<fieldset> <!-- for making a group -->
-    <legend id="legend_{{q.id}}" style="color:grey"><h1>{{ q.question_text }}</h1></legend>
+<fieldset class="draft_questions_title"> <!-- for making a group -->
+    <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.question_title }}</legend>
     {% for c in q.choice_set.all %}
         <input type="{{q.ctrl_type}}" disabled>
-        <label disabled>{{c.choice_text}}<br>
+        <label disabled>{{c.choice_text}}</label>
     {% endfor %}
     {% if 'tbq' == q.type %}
         <textarea name="text_ans{{q.id}}" " rows="4" cols="50" disabled></textarea><br>
     {% endif %}
     <br>
-    <input type="button" value="Vote" id="like_{{q.id}}" />
-    <label>Count: </label>
+    {% if user.is_authenticated %}
+        <input type="button" value="Vote" id="like_{{q.id}}" style="color:black"/>
+    {% endif %}
+    <label>Count Voted: </label>
     <label id="result{{q.id}}">{{votes|get_val_in_dict:q.id}}</label>
     <br><label id="msg{{q.id}}"></label>
-</fieldset>
-
+</fieldset><br>
 {% endfor %}
 <br>
-<h2>2. Data Monitoring</h2>
+</div>
+<div class="div_type2">
+<h2>Data Monitoring</h2>
 
 {% if questions %}
     <p><b>Questions: {{questions.count}}</b></p>
     <ul>
         {% for q in questions %}        
-        <li>{{q.question_text}}</li>
+        <li>{{q.question_title}}</li>
         {% endfor %}
     </ul>
 {% else %}
@@ -100,8 +101,8 @@ No questions yet. Any user can register customized questions.
 {% else %}
     <p>No answers are available</p>
 {% endif %}
-
-<h2>3. Similarity Test</h2>
+</div>
+<h2>Similarity Test</h2>
 <p>Fill out texts below to calculate similarities</p>
 <form action="{% url 'main:dashboard' %}" method="post">
     {% csrf_token %}
@@ -114,4 +115,4 @@ No questions yet. Any user can register customized questions.
 <span>Similarity: {{compare_result}}</span>
 <hr>
 {{test_msg}}
-{% endblock %}
+{% endblock %} 

@@ -1,0 +1,118 @@
+body {margin:0;}
+/*blue - rgba(0,56,101,255)*/
+/*red - rgba(174,1,1,255)*/
+
+
+.main {
+  padding: 10% 10%;
+  margin-top: 0%;
+}
+
+.menu_td
+{
+  background-color: rgb(0,56,101);
+  text-align: center;
+}
+
+.menu_div
+{  
+  background-color: rgb(0,56,101);
+  top: 0;
+  width: 100%;  
+  border-collapse: collapse;
+}
+
+.menu_div a
+{  
+  display: inline-block;  
+  color: #f0f0f0;
+  text-align: center;
+  padding: 1%;
+  text-decoration: none;
+  font-size: 15px;
+  border-radius: 20px 10px;  
+  border: 1px solid transparent;
+}
+
+.menu_div a:hover {
+  /*background: rgba(174,1,1,255);*/
+  color: rgb(255, 255, 255);
+  border: 1px solid #ffffff;
+  
+}
+
+.menu_select {
+  background: rgba(7, 86, 150, 0.438);
+  color: rgb(255, 255, 255);  
+}
+
+.img_logo {
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0px 10px;
+}
+
+.center {
+  text-align: center;
+  align-items: center;
+}
+
+.left {
+  text-align: left;
+  align-items: left;
+}
+
+.loginbar {   
+  color:rgb(255, 255, 255);
+  margin: 5px 0px;
+}
+
+.loginbar a {
+  color: #ffffff;
+}
+
+.login_input
+{
+  border:0;
+  background: rgb(255, 233, 233);
+  color: black;
+  border: 10px;
+}
+
+.login_button
+{
+  background: rgb(0, 0, 0);
+}
+
+
+.div_type1{
+  color: #28006d;
+  background: rgb(232, 227, 252);
+  padding: 2%;  
+  border-radius: 50px 10px;
+}
+
+.div_type2{
+  color: #480e0e;
+  background: rgb(205, 180, 180);
+  padding: 2%;
+  margin: 0.5% 0%;
+  border-radius: 70px 10px;
+}
+.div_type3{
+  color: #ffffff;
+  background: rgb(23, 0, 97);
+  padding: 2%;  
+  border-radius: 50px 20px;
+}
+
+
+.draft_questions_title{
+  color: rgb(126, 126, 126);
+  border-collapse: collapse;
+}
+
+.draft_questions_body{
+  color: rgb(0, 0, 0);
+  border-collapse: collapse;
+}

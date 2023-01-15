@@ -1,0 +1,90 @@
+{% extends 'profile_base.html' %}
+
+{% block profile_base_head_block %}
+<script>
+    $(document).ready(function()
+    {
+        console.log($('#pf_text_open').is(":checked"))
+        $('#submit').click(function()
+        {
+            $('#result').html('');
+            if(check_validity( ['username','pw','pw_confirm','email']) == false)
+               return;
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'main:registration' %}",
+                data:
+                {                    
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    cmd: "create",
+                    username: $('#username').val(),
+                    password: $('#pw').val(),
+                    email: $('#email').val(),
+                    pf_text: $('#pf_text').val(),
+                    pf_text_open: !!$('#pf_text_open').is(":checked"),
+                    dataType: "json",
+                },
+                success: function (data)
+                {
+                    if(data.success)
+                    {
+                        return window.location.replace("{% url 'main:dashboard' %}");
+                    }
+                    else
+                    {
+                        $('#result').html(data.msg);
+                    }
+
+                },
+                failure: function ()
+                {
+                }
+            });
+        });
+
+        $('#submit').val("Create Account");
+        
+        $('#default_set').click(function()
+        {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'main:registration' %}",
+                data:{                    
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    cmd: "test_user_fill",
+                    username: $('#username').val(),
+                },
+                success: function (data)
+                {
+                    $('#username').val(data.test_user_name);
+                    $('#pw').val(data.pw);
+                    $('#pw_confirm').val(data.pw_confirm);
+                    $('#email').val(data.email);
+                    $('#pf_text').html(data.pf_text);
+                },
+                failure: function ()
+                {
+                }                
+            });            
+        });
+    });
+</script>
+{% endblock %}
+
+{% block profile_title_block %} 
+Registration
+{% endblock %}
+
+{% block profile_front_block %}
+{% if not in_testing %}
+    <input id="default_set" type="submit" value="Fill in new user (For Testing)" />
+{% endif %}
+{% endblock %}
+
+
+{% block profile_rear_block %}
+
+{% endblock %}
+
+

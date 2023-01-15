@@ -10,7 +10,9 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     profile_text = models.CharField(max_length=500)
+    email = models.EmailField(max_length=254)
     admin = models.BooleanField(default=False)
+    profile_text_open = models.BooleanField(default=True)
     def __str__(self):
         return self.user.username
 
@@ -22,7 +24,7 @@ class LastAccUser(models.Model): #temporary for testing - will be removed after 
 # Create your models here.
 class Question(models.Model):
     def __str__(self):
-        return self.question_text
+        return self.question_title
     def was_published_recently(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)        
 
@@ -30,7 +32,9 @@ class Question(models.Model):
 
     type = models.CharField(max_length=32)
     ctrl_type = models.CharField(max_length=16)
-    question_text = models.CharField(max_length=200)    
+    question_title = models.CharField(max_length=256)
+    question_desc = models.CharField(max_length=512)
+
     pub_date = models.DateTimeField('date published')
     priority = models.CharField(max_length=8) 
     match_type = models.CharField(max_length=8)

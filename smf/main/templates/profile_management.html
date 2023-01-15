@@ -1,0 +1,58 @@
+{% extends 'profile_base.html' %}
+
+{% block profile_base_head_block %}
+<script>
+    $(document).ready(function()
+    {
+        $('#submit').val("Update");
+        $('#username').val("{{username}}");        
+        $('#username').prop( "disabled", true );
+        $('#email').val("{{email}}");
+        $('#pf_text').val("{{pf_text}}");
+        console.log('{{pf_text_open}}')
+        $('#pf_text_open').prop('checked', "{{pf_text_open}}" == "True");
+
+        $('#pw').hide();
+        $('#pw_confirm').hide();
+        $('#lb_pw').hide();
+        $('#lb_pw_confirm').hide();       
+
+
+        $('#submit').click(function()
+        {
+
+            $('#result').html('');
+            if(check_validity(['username','email']) == false)
+               return;
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'main:my_account' %}",
+                data:
+                {                    
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    cmd: "update",
+                    username: $('#username').val(),
+                    password: $('#pw').val(),
+                    email: $('#email').val(),
+                    pf_text: $('#pf_text').val(),
+                    pf_text_open: $('#pf_text_open').is(':checked'),
+                    dataType: "json",
+                },
+                success: function (data)
+                {
+                    if(data.msg)
+                    {
+                        $('#result').html(data.msg);                        
+                    }
+                },
+                failure: function ()
+                {
+                }
+            });
+
+            
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% extends 'base_frame.html' %}
+
+{% block head_block %}
+
+{% endblock %} 
+
+{% block body_block %}
+Welcome! The page needs to create an user account. It will direct to the registration page in <label id="timer"></label> seconds.
+
+
+
+<script>
+var count = 5
+var counter = setInterval(timer , 1000)
+document.getElementById("timer").innerHTML= count + " secs";
+
+function timer(){
+   count = count-1
+   if (count <= 0)
+   {
+       clearInterval(counter);
+       return window.location.replace("{% url 'main:registration' %}")
+   }
+   document.getElementById("timer").innerHTML= count + " secs";
+
+}
+</script>
+
+
+{% endblock %} 

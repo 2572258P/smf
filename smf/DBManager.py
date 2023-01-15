@@ -17,7 +17,7 @@ import pandas as pd
 
 
 def generateQuestion(num):
-    q = Question(question_text="Question{}".format(num),pub_date=timezone.now(),type='scq',ctrl_type='radio')
+    q = Question(question_title="Question{}".format(num),pub_date=timezone.now(),type='scq',ctrl_type='radio')
     q.save()
     for i in range(5):
         q.choice_set.create(choice_text="choice {}".format(i+1))
@@ -85,10 +85,7 @@ if __name__ == "__main__":
                 User.objects.all().exclude(username='admin').delete()
                 Question.objects.all().delete()
         else:
-            print('command is not valid - use help')
-
-        
-        
+            print('command is not valid - use help')       
 
 #if(sys.argv[1] == 'deldb'):            
 #    Question.objects.all().delete()
