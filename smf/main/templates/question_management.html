@@ -38,7 +38,7 @@
 <form action="{% url 'main:question_management' %}" method="post">
     {% csrf_token %}
     {% for q in questions %}
-        <input type="checkbox" name="del_{{q.id}}" class="question_items"> <label>{{ q.question_title}}</label><br>
+        <input type="checkbox" name="del_{{q.id}}" class="question_items"> <label>{{ q.title }}</label><br>
     {% endfor %}
     <input type="submit" name="delete" value="Delete" onclick="return confirm_delete()">
 </form>
@@ -54,7 +54,7 @@ No questions on the list
     {% csrf_token %}
     {% for q in questions %}
         <div>
-            <b>Title: {{q.question_title}}</b><br>            
+            <b>Title: {{q.title}}</b><br>
             {% for c in q.choice_set.all %}
                 {{forloop.counter}} ) {{c.choice_text}}<br>
             {% endfor %}

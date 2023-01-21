@@ -24,7 +24,7 @@ class LastAccUser(models.Model): #temporary for testing - will be removed after 
 # Create your models here.
 class Question(models.Model):
     def __str__(self):
-        return self.question_title
+        return self.title
     def was_published_recently(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)        
 
@@ -32,8 +32,8 @@ class Question(models.Model):
 
     type = models.CharField(max_length=32)
     ctrl_type = models.CharField(max_length=16)
-    question_title = models.CharField(max_length=256)
-    question_desc = models.CharField(max_length=512)
+    title = models.CharField(max_length=256)
+    desc = models.CharField(max_length=512)
 
     pub_date = models.DateTimeField('date published')
     priority = models.CharField(max_length=8) 
@@ -53,7 +53,8 @@ class Answer(models.Model):
     answer_text = models.CharField(max_length=1000)
 
 class QuestionVote(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    username = models.CharField(max_length=64)  
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)    
+    username = models.CharField(max_length=64)
+    vote_val = models.IntegerField(default=0)
 
     

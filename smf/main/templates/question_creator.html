@@ -1,25 +1,40 @@
 {% extends 'base_frame.html' %}
 
 {% block head_block %}
-{% load static %}
+<style>
+    .textarea_title {
+        resize: none;
+        width: 90%;
+    }
+    .choice_field {
+        resize: none;
+        width: 50%;
+    }
+    
+    .div_section{
+        background-color: rgb(248, 248, 248);
+        border-radius: 20px 20px;
+        padding: 1%;
+        width: 60%;
+    }
+
+    .bold{
+        font-weight: bold;
+    }
+
+</style>
 
 <script>
     $(document).ready(function()
     {
         $("#menu_qc").addClass("menu_select");
+        $("#qType").val("{{selectedType}}")
     });
-</script>
-
-<script>
-function selectQuestion() 
-{
-  var x = document.getElementById("qType").value;
-  window.location.href = "{% url 'main:question_creator' %}"+x;  
-}
-$(document).ready(function()
-{
-    $("#qType").val("{{selectedType}}")
-});
+    function selectQuestion() 
+    {
+        var x = document.getElementById("qType").value;
+        window.location.href = "{% url 'main:question_creator' %}"+x;  
+    }
 </script>
 
 {% endblock %}
@@ -38,32 +53,48 @@ $(document).ready(function()
 {% csrf_token %}
 
 {% if selectedType == 'tbq'%}
-    <p><label for="html">Q) Text-based Question: (Enter your question below)</label></p>
-    <p><textarea name="tbq_text" id="tbq_text" rows="4" cols="50"></textarea></p>
-    <hr>
+<div = class="div_section">
+        <p style="font-weight:bold">Q) Text-based Question Title: (Enter your question below)</p>
+        <p><textarea name="tbq_text" rows="2" cols="50" class="textarea_title"></textarea></p>
+</div><br>
+<div = class="div_section">
+        <p style="font-weight:bold">Q) Description: (Optional)</p>
+        <p><textarea name="tbq_desc" rows="3" cols="50" class="textarea_title"></textarea></p>
+</div><br>
+    
 {% endif %}
 
 {% if selectedType == 'scq' %}
-    <p><label for="html">Q) Single Choice Question: (Enter your question below)</label>
-    <p><textarea style="width: 85%;" name="scq_text" id="scq_text" rows="4" cols="50"></textarea></p>
-    <label for="html">Add choices for the question: </label>
-{% for i in scq_choice_num %}
-    <p><label>{{ forloop.counter }}: </label>
-    <input style="width: 85%;" type="text" name="scq_c{{ forloop.counter }}" id="scq_c{{forloop.counter}}"></p>
-{% endfor %}
+<div class="div_section">
+    <p class="bold"> Q) Single Choice Question: (Enter your question below)</p>
+    <p><textarea name="scq_text" rows="2" cols="50" class="textarea_title"></textarea></p>    
+</div>
+<br>
+<div class="div_section">
+    <p class="bold">Add choices for the question:</p>
+    {% for i in scq_choice_num %}
+        <p>{{ forloop.counter }}:<input class="choice_field" type="text" name="scq_c{{ forloop.counter }}"></p>
+    {% endfor %}
+</div>
 {% endif %}
 
 {% if selectedType == 'mcq'%}
-<p><label for="html">Q) Multiple Choice Question: (Enter your question below)</label>
-<p><textarea name="mcq_text" id="mcq_text" rows="4" cols="50"></textarea></p> 
+<div = class="div_section">
+    <p class="bold">Q) Multiple Choice Question: (Enter your question below)</p>
+    <p><textarea name="mcq_text" id="mcq_text" rows="2" cols="50" class="textarea_title"></textarea></p> 
+</div>
+<br>
+<div = class="div_section">
 <label for="html">Add choices for the question: </label>
 {% for i in mcq_choice_num %}
     <p><label>{{ forloop.counter }}: </label>
-    <input type="text" name="mcq_c{{ forloop.counter }}" id="mcq_c{{forloop.counter}}"></p>
+    <input class="choice_field" type="text" name="mcq_c{{ forloop.counter }}" id="mcq_c{{forloop.counter}}"></p>
 {% endfor %}
+</div><br>
 {% endif %}
 
-</p>
+
+<div class="div_section">
 <p>Priority:
 <select id="mPri" name="mPri">
     <option value="high">High</option>
@@ -81,17 +112,8 @@ $(document).ready(function()
     <option value="xor">XOR Answer Match</option>
 </select>
 </p>
-<b>Description of Matching Type:</b>
-    <div>
-    1. "Similar Answer Match" increases probability with the similar answers.<br>
-    e.g., A similar answer adds a point(0 ~ 1) by similarity and exact answer add a point 1.<br>
-    2. "Exact Answer Match" simply increases probability only with the same answer.<br>
-    3. "XOR Answer Match" It adds a point only when others have different answers from mine.
-    </div>
 {% endif %}
-
-
-
-<input type="submit" name="Create" value="Create">
+<input type="submit" name="Create" value="Create Question">
+</div>
 </form>
 {% endblock%}

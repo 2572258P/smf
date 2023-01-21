@@ -4,7 +4,7 @@
 <script>
     $(document).ready(function()
     {
-        console.log($('#pf_text_open').is(":checked"))
+        $('#pf_text_open').prop('checked',true)
         $('#submit').click(function()
         {
             $('#result').html('');
@@ -22,7 +22,7 @@
                     password: $('#pw').val(),
                     email: $('#email').val(),
                     pf_text: $('#pf_text').val(),
-                    pf_text_open: !!$('#pf_text_open').is(":checked"),
+                    pf_text_open: $('#pf_text_open').is(":checked"),
                     dataType: "json",
                 },
                 success: function (data)

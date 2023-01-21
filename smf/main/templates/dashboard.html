@@ -6,26 +6,74 @@
 $(document).ready(function()
 {
     {% for dq in draft_questions %}
-        $("#like_{{dq.id}}").click(function()
+        $("#Up_{{dq.id}}").click(function()
         {
             $.ajax({
                 type: "POST",
                 url: "{% url 'main:dashboard' %}",
                 data:{
                     qid: '{{dq.id}}',
+                    vote: 1,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    dataType: "json",
+                },
+                success: function (data)
+                {
+                    //console.log(data.msg);
+                    $("#result_up{{dq.id}}").html(data.result_up);
+                    $("#result_down{{dq.id}}").html(data.result_down);
+                    $("#msg{{dq.id}}").html(data.msg);
+                    switch(data.result_val)
+                    {
+                        case 0:
+                            document.getElementById("Up_{{dq.id}}").style.color = "black";
+                            document.getElementById("Down_{{dq.id}}").style.color = "black";
+                            break;
+                        case 1:
+                            document.getElementById("Up_{{dq.id}}").style.color = "red";
+                            document.getElementById("Down_{{dq.id}}").style.color = "black";
+                            break;
+                    }
+                },
+                failure: function ()
+                {
+                    console.log("data.result_val");
+                }
+            });
+        });
+        $("#Down_{{dq.id}}").click(function()
+        {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'main:dashboard' %}",
+                data:{
+                    qid: '{{dq.id}}',
+                    vote: -1,
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                     dataType: "json",
                 },
                 success: function (data){
                     //console.log(data.msg);
-                    $("#result{{dq.id}}").html(data.result);
+                    $("#result_up{{dq.id}}").html(data.result_up);
+                    $("#result_down{{dq.id}}").html(data.result_down);
                     $("#msg{{dq.id}}").html(data.msg);
+                    switch(data.result_val)
+                    {
+                        case 0:
+                            document.getElementById("Up_{{dq.id}}").style.color = "black";
+                            document.getElementById("Down_{{dq.id}}").style.color = "black";
+                            break;
+                        case -1:
+                            document.getElementById("Up_{{dq.id}}").style.color = "black";
+                            document.getElementById("Down_{{dq.id}}").style.color = "red";
+                            break;
+                    }
                 },
                 failure: function (){
                 }
             });
         });
-    {% endfor %}    
+    {% endfor %}
     $("#menu_db").addClass("menu_select")    
 });
 </script>
@@ -35,6 +83,12 @@ $(document).ready(function()
 
 {% load main_extras %}
 {% block body_block %}
+<style>
+    .vote_button{
+        color:black;
+        width: 55px;
+    }
+</style>
 <div class="div_type1">
 <h2>Draft Questions - Registered by users</h2>
 {% if not draft_questions %}
@@ -42,7 +96,7 @@ No questions yet. Any user can register customized questions.
 {% endif %}
 {% for q in draft_questions %}    
 <fieldset class="draft_questions_title"> <!-- for making a group -->
-    <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.question_title }}</legend>
+    <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.title }}</legend>
     {% for c in q.choice_set.all %}
         <input type="{{q.ctrl_type}}" disabled>
         <label disabled>{{c.choice_text}}</label>
@@ -52,23 +106,37 @@ No questions yet. Any user can register customized questions.
     {% endif %}
     <br>
     {% if user.is_authenticated %}
-        <input type="button" value="Vote" id="like_{{q.id}}" style="color:black"/>
+        <input type="button" value="Up" id="Up_{{q.id}}" class="vote_button"/>
+        <input type="button" value="Down" id="Down_{{q.id}}" class="vote_button"/>
+        {% if my_vote|get_val_in_dict:q.id == 1 %}
+        <script>document.getElementById("Up_{{q.id}}").style.color = "red";</script>
+        {% endif %}
+        {% if my_vote|get_val_in_dict:q.id == 0 %}
+        <script>document.getElementById("Up_{{q.id}}").style.color = "black";</script>
+        <script>document.getElementById("Down_{{q.id}}").style.color = "black";</script>
+        {% endif %}
+        {% if my_vote|get_val_in_dict:q.id == -1 %}
+        <script>document.getElementById("Down_{{q.id}}").style.color = "red";</script>
+        {% endif %}
     {% endif %}
-    <label>Count Voted: </label>
-    <label id="result{{q.id}}">{{votes|get_val_in_dict:q.id}}</label>
+    <label>Up: </label>
+    <label id="result_up{{q.id}}">{{up_vote_count|get_val_in_dict:q.id}}</label>    
+    /
+    <label>Down:</label>
+    <label id="result_down{{q.id}}">{{down_vote_count|get_val_in_dict:q.id}}</label>
     <br><label id="msg{{q.id}}"></label>
 </fieldset><br>
 {% endfor %}
 <br>
 </div>
 <div class="div_type2">
-<h2>Data Monitoring</h2>
+<h2>Data Monitoring&ltFor Admin&gt</h2>
 
 {% if questions %}
     <p><b>Questions: {{questions.count}}</b></p>
     <ul>
         {% for q in questions %}        
-        <li>{{q.question_title}}</li>
+        <li>{{q.title}}</li>
         {% endfor %}
     </ul>
 {% else %}
@@ -102,7 +170,7 @@ No questions yet. Any user can register customized questions.
     <p>No answers are available</p>
 {% endif %}
 </div>
-<h2>Similarity Test</h2>
+<h2>Similarity Test &ltFor Admin&gt</h2>
 <p>Fill out texts below to calculate similarities</p>
 <form action="{% url 'main:dashboard' %}" method="post">
     {% csrf_token %}
@@ -113,6 +181,6 @@ No questions yet. Any user can register customized questions.
     <input type="submit" name="compare" value="Compare">
 </form>
 <span>Similarity: {{compare_result}}</span>
-<hr>
+
 {{test_msg}}
 {% endblock %} 

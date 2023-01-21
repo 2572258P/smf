@@ -43,25 +43,32 @@ def handle_createQuestion(request,question_type,profile):
     mcq_choice_num = range(1,11)
     message = ''
     if scq_text == '' and mcq_text == '' and tbq_text == '':
-        message = 'Enter a question and choices.'
+        if question_type == 'tbq':
+            message = 'Text-Based Question - Enter your question'
+        elif question_type == 'scq':            
+            message = 'Single-Choice Question - Enter a question and choices.'
+        elif question_type == 'mcq':
+            message = 'Multiple-Choice Question - Enter a question and choices.'
+        
     else:
         try:            
             if len(scq_text) > 0:
-                q = Question(approved=profile.admin,type="scq",ctrl_type='radio',question_title=scq_text,pub_date=timezone.now(),priority = priority,match_type = match_type)
+                q = Question(approved=profile.admin,type="scq",ctrl_type='radio',title=scq_text,pub_date=timezone.now(),priority = priority,match_type = match_type)
                 q.save()
                 for i in scq_choice_num:
                     choice_text = request.POST.get("scq_c%i"%i,'')                
                     if choice_text != '':
                         q.choice_set.create(choice_text=choice_text)
             if len(mcq_text) > 0:
-                q = Question(approved=profile.admin,type="mcq",ctrl_type='checkbox',question_title=mcq_text,pub_date=timezone.now(),priority = priority,match_type = match_type)
+                q = Question(approved=profile.admin,type="mcq",ctrl_type='checkbox',title=mcq_text,pub_date=timezone.now(),priority = priority,match_type = match_type)
                 q.save()
                 for i in mcq_choice_num:
                     choice_text = request.POST.get("mcq_c%i"%i,'')
                     if choice_text != '':
                         q.choice_set.create(choice_text=choice_text)
             if len(tbq_text) > 0:
-                q = Question(approved=profile.admin,type="tbq",ctrl_type='textarea',question_title=tbq_text,pub_date=timezone.now(),priority = priority,match_type = match_type)
+                desc = request.POST.get('tbq_desc')
+                q = Question(approved=profile.admin,type="tbq",ctrl_type='textarea',title=tbq_text,desc=desc,pub_date=timezone.now(),priority = priority,match_type = match_type)
                 q.save()
             message = 'New question has been successfully created.'
 

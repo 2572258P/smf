@@ -17,7 +17,7 @@ import pandas as pd
 
 
 def generateQuestion(num):
-    q = Question(question_title="Question{}".format(num),pub_date=timezone.now(),type='scq',ctrl_type='radio')
+    q = Question(="Question{}".format(num),pub_date=timezone.now(),type='scq',ctrl_type='radio')
     q.save()
     for i in range(5):
         q.choice_set.create(choice_text="choice {}".format(i+1))

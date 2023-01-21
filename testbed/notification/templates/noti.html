@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<head>
+
+</head>
+<body>
+    Hi ~~~~~ This is html
+    <form action="{% url 'index' %}" method="post">
+        {% csrf_token %}
+        <input type="submit" name="compare" value="Compare">
+    </form>
+
+    
+</body>
