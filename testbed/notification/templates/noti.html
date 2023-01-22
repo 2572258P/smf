@@ -1,13 +1,37 @@
 <!DOCTYPE html>
 <head>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-    Hi ~~~~~ This is html
-    <form action="{% url 'index' %}" method="post">
-        {% csrf_token %}
-        <input type="submit" name="compare" value="Compare">
-    </form>
 
-    
+
+    <h2>Simple Collapsible</h2>
+    <p>Click on the button to toggle between showing and hiding content.</p>
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo1">Hidden</button><br>
+    <div id="demo1" class="collapse">
+        11111111
+        <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" name="compare" value="Compare">
+        </form>
+    </div>
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo2">Hidden</button><br>
+    <div id="demo2" class="collapse">
+        222222222
+        <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" name="compare" value="Compare">
+        </form>
+    </div>
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo3">Hidden</button><br>
+    <div id="demo3" class="collapse">
+        33333333333
+        <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" name="compare" value="Compare">
+        </form>
+    </div>
 </body>

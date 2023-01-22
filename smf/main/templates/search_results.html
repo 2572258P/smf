@@ -1,13 +1,37 @@
 {% extends 'base_frame.html' %}
+{% load main_extras %}
 
 {% block body_block %}
-<br>
-{% if search_results %}
+<style>
+    .col_but{
+        width: 70%;
+        padding: 5px;
+        
+    }
+</style>
+    {% if search_results %}
+        {% for sr in search_results %}        
+            <button class="btn btn-primary col_but" id = "bt{{sr.username}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{sr.username}}">{{sr.username}} / Accuracy:{{sr.percent}} %</button>
+            {% if forloop.counter0 == 0 %}
+                <script>                    
+                    $("#bt{{sr.username}}").html("My Answers")
+                </script>
+            {% endif %}
 
-{% for sr in search_results %}
-    {{sr.userid}} / {{sr.percent}} %<br>
-{% endfor %}
-{% else %}
-    No one matched.
-{% endif %}
+            <div id="demo{{sr.username}}" class="collapse">
+                <p>
+                    {% for qt in sr.QTs%}
+                    <p>Q) {{qt}}
+                        {% for anss in sr.Anss|get_val_in_list:forloop.counter0 %}
+                            A) <span style="font-weight:bold;">{{anss}}</span>
+                        {% endfor %}
+                    </p>
+                    {% endfor %}
+                    <span style="font-weight: bold;">{{sr.username}} Profile Text: </span>{{sr.profile_text}}
+                </p>
+            </div>        
+        {% endfor %}
+    {% else %}
+        No one matched.
+    {% endif %}
 {% endblock %}

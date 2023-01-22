@@ -46,7 +46,8 @@ def dashboard(request):
 
     sen1 = request.POST.get('sen1','')
     sen2 = request.POST.get('sen2','')
-    context['compare_result'] = STF.calculate_single_similarities(sen1,sen2)
+    comp_result = STF.calculate_single_similarities(sen1,sen2)    
+    context['compare_result'] = comp_result
     
     #load the user logged in the lastest time
     last_user = LastAccUser.objects.all()
@@ -79,7 +80,7 @@ def dashboard(request):
         result_val = prev_val + new_val
         qv.vote_val = result_val            
         qv.save()
-        print(result_val)
+        
         response['result_val'] = result_val
 
         vote_count_up = QuestionVote.objects.filter(question=q).filter(vote_val__gt=0).count()
@@ -108,7 +109,7 @@ def dashboard(request):
             votedQ = QuestionVote.objects.filter(question=dq,username=request.user.username).first()
             
             context['my_vote'][dq.pk] = votedQ.vote_val if votedQ else 0
-        print(context['my_vote'])
+        
         return render(request,'dashboard.html',context)
 
 

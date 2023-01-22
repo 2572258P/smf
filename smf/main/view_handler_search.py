@@ -6,6 +6,11 @@ import time
 from sentence_transformers import SentenceTransformer, util
 from .view_handler_common import  GetWeightByPriority
 
+
+def s_to_f(obj):
+    return round(float(obj),3)
+
+
 class STF():
     """
     Purpose of the class
@@ -51,7 +56,7 @@ class STF():
             return 0
         idx1 = STF.words.index(word1)
         idx2 = STF.words.index(word2)
-        return STF.scores[idx1][idx2]
+        return s_to_f(STF.scores[idx1][idx2])
 
     @staticmethod
     def calculate():
@@ -62,7 +67,7 @@ class STF():
         embeddings2 = STF.model.encode(STF.words, convert_to_tensor=True)
 
         #Compute cosine-similarities
-        STF.scores = util.cos_sim(embeddings1, embeddings2)        
+        STF.scores = util.cos_sim(embeddings1, embeddings2)
     @staticmethod
     def calculate_single_similarities(sen1,sen2):
         #Compute embedding for both lists
@@ -72,7 +77,7 @@ class STF():
         #Compute cosine-similarities
         cosine_scores = util.cos_sim(embeddings1, embeddings2)
 
-        return cosine_scores[0][0]
+        return s_to_f(cosine_scores[0][0])
     @staticmethod
     def calculate_similarities(array1,array2):
         #Compute embedding for both lists
@@ -105,7 +110,7 @@ class STF():
             print("----- End NLP Operation Time: {}s".format(time.time()-startTime))
             i = 0
             for OUP in allOtherUsers:
-                table[tbq.id][OUP.user.username] = simResult[0][i]
+                table[tbq.id][OUP.user.username] = s_to_f(simResult[0][i])
                 i += 1
         return table
 
@@ -146,12 +151,6 @@ class WeightCalculator():
         return 0
 
 
-class Resultinfo():
-    def __init__(self,userid,percent):
-        self.percent = percent
-        self.userid = userid
-    def getPercent(self):
-        return self.percent
 
 def getPercentWithAnswers(mp,op,anss1,anss2):
     totalCount = len(anss1)    
@@ -174,17 +173,53 @@ def gen_table_by_answers(ansQueryForAll):
 
     return result
 
+class SearchEntity:
+    def __init__(self,username,percent):
+        self.percent = percent
+        self.username = username
+        self.profile_text = ""
+        self.QTs = []
+        self.Anss = []
+
+        profile = UserProfile.objects.filter(user=User.objects.filter(username=self.username).first()).first()
+        if profile and profile.profile_text_open == True:
+            self.profile_text = profile.profile_text
+        else:
+            self.profile_text = "This user has disabled the option \"Open Profile Texts In Search\"."
+        
+        for q in Question.objects.all():
+            ans_models = Answer.objects.filter(question_id=q.pk,profile=profile)
+            if ans_models.count() == 0:
+                continue
+            self.QTs.append(q.title)
+            ans_ls = []
+            for am in ans_models:
+                if len(am.answer_text) <= 0: #non-text-based
+                    ch = Choice.objects.filter(pk=am.choice_id).first()
+                    ans_ls.append(ch.choice_text)
+                else:
+                    ans_ls.append(an.answer_text)
+            self.Anss.append(ans_ls)
+        
+
+    def getPercent(self):
+        return self.percent
+
+        
 
 
 def handle_search_result(username):
     myUser = User.objects.get(username=username)
     myProfile = UserProfile.objects.get(user=myUser)
     allUserProfiles = UserProfile.objects.all()
-    resultInfos = []
+    searchEntities = []
 
     STF.Init()
     STF.Update()
     AllAnswerWeightTable_tbq = STF.gen_sim_table_from_tbq(myProfile)
+
+    myEntity = SearchEntity(username,100) 
+    searchEntities.append(myEntity)
 
     myQnATable = gen_table_by_answers(Answer.objects.filter(profile=myProfile))
     for OUP in allUserProfiles: #iterate all other users' profiles and calulation weight with mine
@@ -203,9 +238,9 @@ def handle_search_result(username):
                 accWeight += myQnATable[myQId].calcChoiceWeight(otherQnATable[myQId]) * priorityWeight                
             if myQId in AllAnswerWeightTable_tbq:
                 accWeight += AllAnswerWeightTable_tbq[myQId][OUP.user.username] * priorityWeight
-        
-        
+
         if len(otherQnATable) > 0 and totalWeight > 0:
-            resultInfos.append(Resultinfo(OUP.user.username,accWeight / totalWeight * 100))
-    sr = sorted(resultInfos,key = Resultinfo.getPercent,reverse=True)
+            entity = SearchEntity(OUP.user.username,round(accWeight / totalWeight,2) * 100)
+            searchEntities.append(entity)
+    sr = sorted(searchEntities,key = SearchEntity.getPercent,reverse=True)
     return sr
