@@ -196,7 +196,8 @@ class SearchEntity:
             for am in ans_models:
                 if len(am.answer_text) <= 0: #non-text-based
                     ch = Choice.objects.filter(pk=am.choice_id).first()
-                    ans_ls.append(ch.choice_text)
+                    if ch:
+                        ans_ls.append(ch.choice_text)
                 else:
                     ans_ls.append(an.answer_text)
             self.Anss.append(ans_ls)
