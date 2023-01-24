@@ -199,7 +199,7 @@ class SearchEntity:
                     if ch:
                         ans_ls.append(ch.choice_text)
                 else:
-                    ans_ls.append(an.answer_text)
+                    ans_ls.append(am.answer_text)
             self.Anss.append(ans_ls)
         
 
