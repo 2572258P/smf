@@ -98,6 +98,9 @@
                         <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
                     {% endif %}
                     {{c.choice_text}}</label>
+                    {% if q.choice_set.all.count > 3 %}
+                        <br>
+                    {% endif %}
                 {% endfor %}
                 {% if 'tbq' == q.type %}
                     <p style="font-style: italic;font-size: small;">{{q.desc}}</p>

@@ -7,7 +7,7 @@ const list -n myenv
 # How to run a python server to keep alive even after a terminal closed.
     sudo nohup python3 -u manage.py runserver 0:80
 # How to kill the server executed by nohup
-    pf -ef
+    ps -ef
     kill PID
 
 ----- <Git> -----

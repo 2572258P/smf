@@ -129,7 +129,10 @@ No questions yet. Any user can register customized questions.
     <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.title }}</legend>
     {% for c in q.choice_set.all %}
         <input type="{{q.ctrl_type}}" disabled>
-        <label disabled>{{c.choice_text}}</label>
+        <label disabled>{{c.choice_text}} </label>
+        {% if q.choice_set.all.count > 3 %}
+            <br>
+        {% endif %}
     {% endfor %}
     {% if 'tbq' == q.type %}
         <textarea name="text_ans{{q.id}}" " rows="4" cols="50" disabled></textarea><br>
