@@ -92,7 +92,8 @@ def dashboard(request):
         alluserCount = UserProfile.objects.all().exclude(admin=True).count()
         voteCount = QuestionVote.objects.filter(question=qid).filter(vote_val__gt=0).count();
 
-        if voteCount > alluserCount/2:
+        if voteCount >= 2:
+            q.category = 'cu'
             q.approved = True
             q.save()
 
@@ -108,8 +109,8 @@ def dashboard(request):
             context['down_vote_count'][dq.pk] = QuestionVote.objects.filter(question=dq,vote_val__lt=0).count()
             votedQ = QuestionVote.objects.filter(question=dq,username=request.user.username).first()
             
-            context['my_vote'][dq.pk] = votedQ.vote_val if votedQ else 0
-        
+            context['my_vote'][dq.pk] = votedQ.vote_val if votedQ else 0        
+
         return render(request,'dashboard.html',context)
 
 
@@ -188,23 +189,31 @@ def data_management(request):
         return ShowNotAuthedPage()
     context = {}
 
-    if request.user.is_authenticated:
-        context['questions'] = Question.objects.all().exclude(approved=False)
-        context['answers'] = {}
-        profile = UserProfile.objects.filter(user=request.user).first()
-        if profile:
-            if 'Find' in request.POST:
-                return redirect('main:search_result',userId=request.user.username)
-            elif 'Save' in request.POST:
-                context['message'] = "Data have been successfully saved."        
-                handle_save(request,profile)        
-            else:
-                context['message'] = "Data have been successfully loaded."
-                
-            context['answers'] = handle_load(request,profile)                
-            return render(request,'data_management.html',context)
+    category_pair = {"cc":"Common Questions","cd":"Details","cb":"Behavioral Questions","cu":"Registered by users"}
+    apv_qs = Question.objects.all().exclude(approved=False)
+    context['qs2'] = {}
+    for k,v in category_pair.items():
+        context['qs2'][k] = apv_qs.filter(category=k)
+        print(context['qs2'][k])
+    
+
+    context['category_pair'] = category_pair
+    context['questions'] = Question.objects.all().exclude(approved=False)
+    context['answers'] = {}
+    profile = UserProfile.objects.filter(user=request.user).first()
+    if profile:
+        if 'Find' in request.POST:
+            return redirect('main:search_result',userId=request.user.username)
+        elif 'Save' in request.POST:
+            context['message'] = "Data have been successfully saved."        
+            handle_save(request,profile)        
         else:
-            return HttpResponse("{} User Profile Does not Exist".format(request.user))
+            context['message'] = "Data have been successfully loaded."
+            
+        context['answers'] = handle_load(request,profile)                
+        return render(request,'data_management.html',context)
+    else:
+        return HttpResponse("{} User Profile Does not Exist".format(request.user))
   
 
     

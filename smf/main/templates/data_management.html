@@ -34,6 +34,13 @@
         resize: none;
 
     }
+    
+    .col_button{
+        width: 20%;
+        padding: 5px;
+        
+    }
+
 </style>
 <script>
     let pri_color = {high:"q_high",medium:"q_medium",low:"q_low"}
@@ -70,24 +77,50 @@
         Priority Colour :<span class="q_high">High</span>,<span class='q_medium'>Medium</span>,<span class="q_low">Low</span><br>
         <span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>
     </p>
-    {% for q in questions %}
-    <input type="hidden" name="question{{q.id}}" value="{{q.id}}" id="question{{q.id}}" >
-    <div class="q_frame">
-        <h4 id="title_{{q.id}}">{{ q.title }}</h4>
-        {% for c in q.choice_set.all %}
-            {% if answers|get_list_in_dict:q.id|is_val_in_list:c.id == True %}
-                <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
-            {% else %}
-                <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
-            {% endif %}
-            <label id="choice_{{c.id}}">{{c.choice_text}}</label>
+
+    
+    {% for k,v in qs2.items %}
+        {% if v %}
+        <button class="btn btn-primary col_button" id = "bt_{{k}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{k}}">
+            {{ category_pair|get_val_in_dict:k  }}</button>
+        
+        <p>
+        <div id="demo{{k}}" class="collapse">
+        {% for q in v %}
+            <input type="hidden" name="question{{q.id}}" value="{{q.id}}" id="question{{q.id}}" >
+            <div class="q_frame">
+                <h4 id="title_{{q.id}}">{{ q.title }}</h4>
+                {% for c in q.choice_set.all %}
+                    <label id="choice_{{c.id}}">
+                    {% if answers|get_list_in_dict:q.id|is_val_in_list:c.id == True %}
+                        <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
+                    {% else %}
+                        <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
+                    {% endif %}
+                    {{c.choice_text}}</label>
+                {% endfor %}
+                {% if 'tbq' == q.type %}
+                    <p style="font-style: italic;font-size: small;">{{q.desc}}</p>
+                    <textarea name="text_ans{{q.id}}" id="text_ans{{q.id}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
+                {% endif %}
+                </div>
+            <br>
         {% endfor %}
-        {% if 'tbq' == q.type %}
-            <p style="font-style: italic;font-size: small;">{{q.desc}}</p>
-            <textarea name="text_ans{{q.id}}" id="text_ans{{q.id}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
-        {% endif %}
         </div>
-    <br>
+        </p> 
+        <script>
+            
+                $("#demo{{k}}").collapse({
+                toggle: true
+                });
+        </script>
+        {% endif %}
+    {% endfor %}
+    
+
+
+    {% for q in questions %}
+ 
     
     {% endfor %}
     <br>

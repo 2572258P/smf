@@ -1,9 +1,19 @@
 conda activate myenv
 const list -n myenv
 
+----- <AWS SSH> -----
+# Tips
+- Use Putty when connecting with SSH
+# How to run a python server to keep alive even after a terminal closed.
+    sudo nohup python3 -u manage.py runserver 0:80
+# How to kill the server executed by nohup
+    pf -ef
+    kill PID
+
 ----- <Git> -----
 revert local file before committing
 git reset <pathspec>
+
 
 ----- <System>  -----
 python manage.py runserver

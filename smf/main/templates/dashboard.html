@@ -1,8 +1,11 @@
 {% extends "base_frame.html" %}
+{% load main_extras %}
 
 {% block head_block %}
 <!-- Head_Block -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
+    
 $(document).ready(function()
 {
     {% for dq in draft_questions %}
@@ -74,21 +77,47 @@ $(document).ready(function()
             });
         });
     {% endfor %}
-    $("#menu_db").addClass("menu_select")    
+    $("#menu_db").addClass("menu_select")        
 });
 </script>
 
 {% endblock %} 
 
 
-{% load main_extras %}
+
 {% block body_block %}
+
+<script>
+    // A $( document ).ready() block.
+    $( document ).ready(function() 
+    {
+        setTimeout(function() {
+            $(".slideRightToLeft").addClass('show');
+        }, 100);
+        let hi_sen = ["It's gonna be fine.","Keep a stiff upper lip.","Give yourself some time.","Let me help you find your soul.","You can do it!"," Do you feel studying is hard?","Do you feel lonely?","Chin up!!"];
+        let index = Math.floor(Math.random() * hi_sen.length);
+        
+        $("#hi_msg").html("Study Mates Finder - " + hi_sen[index]);
+        let bc = ["#121352","#c9c7c9","#ff9b0f","#024a3f"];
+        let fc = ["#d8d8f0","#47273a","#4a2d04","#d3f5f0"];
+        
+
+        index = Math.floor(Math.random() * fc.length);
+        $("#hi_div").css("color",fc[index])
+        $("#hi_div").css("background",bc[index])
+        
+    });
+</script>
+
 <style>
     .vote_button{
         color:black;
         width: 55px;
     }
 </style>
+
+<div id="hi_div" class="slideRightToLeft"><span id="hi_msg"></span></div>
+
 <div class="div_type1">
 <h2>Draft Questions - Registered by users</h2>
 {% if not draft_questions %}
@@ -96,6 +125,7 @@ No questions yet. Any user can register customized questions.
 {% endif %}
 {% for q in draft_questions %}    
 <fieldset class="draft_questions_title"> <!-- for making a group -->
+    
     <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.title }}</legend>
     {% for c in q.choice_set.all %}
         <input type="{{q.ctrl_type}}" disabled>

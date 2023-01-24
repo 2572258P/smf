@@ -10,12 +10,10 @@
     }
 </style>
     {% if search_results %}
-        {% for sr in search_results %}        
-            <button class="btn btn-primary col_but" id = "bt{{sr.username}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{sr.username}}">{{sr.username}} / Accuracy:{{sr.percent}} %</button>
+        {% for sr in search_results %}
+            <button class="btn btn-primary col_but" id = "bt{{sr.username}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{sr.username}}">{{sr.username}} / {{sr.percent}} %</button>
             {% if forloop.counter0 == 0 %}
-                <script>                    
-                    $("#bt{{sr.username}}").html("My Answers")
-                </script>
+                <script> $("#bt{{sr.username}}").html("My Answers") </script>
             {% endif %}
 
             <div id="demo{{sr.username}}" class="collapse">

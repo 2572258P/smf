@@ -30,7 +30,8 @@ class Question(models.Model):
 
     approved = models.BooleanField(default=True)
 
-    type = models.CharField(max_length=32)
+    type = models.CharField(max_length=32) #SCQ / MCQ / Text-based ...
+    category = models.CharField(max_length=32) # Common Type / User registered / Details ...
     ctrl_type = models.CharField(max_length=16)
     title = models.CharField(max_length=256)
     desc = models.CharField(max_length=512)

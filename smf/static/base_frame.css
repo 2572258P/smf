@@ -1,7 +1,9 @@
-body {margin:0;}
+
+
+
 /*blue - rgba(0,56,101,255)*/
 /*red - rgba(174,1,1,255)*/
-
+body {margin:0;}
 
 .main {
   padding: 10% 10%;
@@ -123,4 +125,20 @@ body {margin:0;}
 
 textarea {
   resize: none;
+}
+
+.slideRightToLeft {
+  background-color: #16465616;
+  color: white;  
+  padding: 10px 20px;
+  margin-left: 20%;
+  transition: all 1s;  
+  font-size: large;
+  border-radius: 70px 10px;
+}
+
+.slideRightToLeft.show {
+  background-color: #164656;
+  display: block;
+  margin-left: 3%;
 }
