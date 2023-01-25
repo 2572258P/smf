@@ -98,7 +98,7 @@
                         <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
                     {% endif %}
                     {{c.choice_text}}</label>
-                    {% if q.choice_set.all.count > 3 %}
+                    {% if q.choice_set.all.count > 2 %}
                         <br>
                     {% endif %}
                 {% endfor %}

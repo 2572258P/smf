@@ -223,9 +223,6 @@ def search_result(request,userId):
     context = { 'search_results' : result }
     return render(request, 'search_results.html',context)
 
-def results(request, question_id):
-    question = get_object_or_404(Question,pk=question_id)
-    return render(request,'results.html',{'question':question})
 
 def registration(request):
     return handle_registration(request)

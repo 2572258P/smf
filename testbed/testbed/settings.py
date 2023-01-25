@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'AjaxTest.apps.AjaxtestConfig',
     'notification.apps.NotificationConfig',
-    'djangofeature.apps.DjangofeatureConfig'
-    
+    'djangofeature.apps.DjangofeatureConfig',
+    'uploadfile.apps.UploadfileConfig'    
 ]
 
 MIDDLEWARE = [

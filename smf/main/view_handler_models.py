@@ -40,8 +40,8 @@ def handle_createQuestion(request,question_type,profile):
     priority = request.POST.get('mPri','')
     match_type = request.POST.get('mType','smt') #default value 'smt'
 
-    scq_choice_num = range(1,11)
-    mcq_choice_num = range(1,11)
+    scq_choice_num = range(1,21)
+    mcq_choice_num = range(1,21)
     message = ''
     if scq_text == '' and mcq_text == '' and tbq_text == '':
         if question_type == 'tbq':
@@ -49,8 +49,7 @@ def handle_createQuestion(request,question_type,profile):
         elif question_type == 'scq':            
             message = 'Single-Choice Question - Enter a question and choices.'
         elif question_type == 'mcq':
-            message = 'Multiple-Choice Question - Enter a question and choices.'
-        
+            message = 'Multiple-Choice Question - Enter a question and choices.'        
     else:
         try:            
             if len(scq_text) > 0:

@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls), 
     #path('', include('AjaxTest.urls')), 
     path('noti/', include('notification.urls')), 
-    path('df/', include('djangofeature.urls')), 
+    path('df/', include('djangofeature.urls')),
+    path('uf/', include('uploadfile.urls')),
     
 ]
