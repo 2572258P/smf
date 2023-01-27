@@ -12,9 +12,12 @@ urlpatterns = [
     path('data_management/',views.data_management,name='data_management'),    
     path('question_management/',views.question_management,name='question_management'),
     path('question_creator/',views.question_creator,name='question_creator'),
-    path('question_creator/<str:question_type>/',views.question_creator,name='question_creator'),    
-    re_path(r'^search_result/(?P<userId>\w+)',views.search_result,name='search_result'),
-    path('login_requirement/',views.login_requirement,name='login_requirement'),    
+    path('question_creator/<str:question_type>/',views.question_creator,name='question_creator'),
+    re_path(r'^start_searching/(?P<userId>\w+)',views.start_searching,name='start_searching'),
+    path('login_requirement/',views.login_requirement,name='login_requirement'),
+    path('my_mates/',views.my_mates,name='my_mates'),
+    re_path(r'^list_result/(?P<userId>\w+)',views.list_result,name='list_result'),
+    
     
     
 ]

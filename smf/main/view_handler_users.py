@@ -3,11 +3,65 @@ from .view_handler_common import is_ajax
 from django.http import JsonResponse
 from django.shortcuts import render,get_object_or_404,redirect
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile,InvData
 from django.contrib.auth import authenticate,login,logout
+
+
 
 import re
 import random
+
+class mymate_info:
+    def __init__(self,to_pk,msg="",email="",profile_text="",username=""):
+        self.to_pk = to_pk
+        self.email = email
+        self.msg = msg
+        self.profile_text = profile_text
+        self.username = username
+
+def handle_mymates(request):
+    if is_ajax(request):
+        cmd = request.POST.get('cmd')
+        print("cmd")
+        data = {}
+        mp_pk = UserProfile.objects.filter(user=request.user).first().pk
+
+        if cmd == 'cancel':
+            to_pk = request.POST.get('to_pk')
+            inv = InvData.objects.filter(from_pk=mp_pk,to_pk=to_pk,accepted=False).first()
+            if inv:
+                inv.delete()
+        elif cmd == 'accept':            
+            to_pk = request.POST.get('to_pk')
+            inv = InvData.objects.filter(from_pk=to_pk,to_pk=mp_pk,accepted=False).first()
+            if inv:
+                inv.accepted = True
+                inv.save()
+        elif cmd == 'disconnect':
+            to_pk = request.POST.get('to_pk')
+            inv = InvData.objects.filter(from_pk=mp_pk,to_pk=to_pk,accepted=True) | InvData.objects.filter(from_pk=to_pk,to_pk=mp_pk,accepted=True)
+            inv.delete()
+        return JsonResponse(data)
+    else:
+        context = {}
+        mp = UserProfile.objects.filter(user=request.user).first()
+        sent_data = InvData.objects.filter(from_pk=mp.pk,accepted=False)
+        rev_data = InvData.objects.filter(to_pk=mp.pk,accepted=False)
+        acc_data = InvData.objects.filter(from_pk=mp.pk,accepted=True) | InvData.objects.filter(to_pk=mp.pk,accepted=True)
+        context['sent'] = []
+        context['rev']  = []
+        context['acc']  = []
+
+        for sd in sent_data:
+            context['sent'].append(mymate_info(to_pk=sd.to_pk,msg=sd.message))
+        for rv in rev_data:
+            context['rev'].append(mymate_info(to_pk=rv.from_pk,msg=rv.message))
+        for ac in acc_data:
+            connected_pk = ac.to_pk if ac.from_pk == mp.pk else ac.from_pk
+            up = UserProfile.objects.filter(pk=connected_pk).first()
+            context['acc'].append(mymate_info(to_pk=connected_pk,msg=ac.message,email=up.email,profile_text=up.profile_text))
+
+        return render(request, 'my_mates.html',context)
 
 def handle_myaccount(request):    
     if is_ajax(request): #Received

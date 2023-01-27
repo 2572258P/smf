@@ -4,8 +4,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-
-
 # User Info
 class UserProfile(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -57,4 +55,11 @@ class QuestionVote(models.Model):
     username = models.CharField(max_length=64)
     vote_val = models.IntegerField(default=0)
 
-    
+
+class InvData(models.Model):
+    from_pk   = models.IntegerField(default=0)#profile pk
+    to_pk = models.IntegerField(default=0)#profile pk
+    accepted  = models.BooleanField(default=False)
+    message = models.CharField(max_length=256)
+
+

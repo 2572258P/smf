@@ -1,10 +1,12 @@
-from .models import Question,Answer,UserProfile,Choice#,STF
+from .models import Question,Answer,UserProfile,Choice,InvData#,STF
 from collections import defaultdict
 from django.contrib.auth.models import User
 import time
 
 from sentence_transformers import SentenceTransformer, util
 from .view_handler_common import  GetWeightByPriority
+from django.http import JsonResponse
+from django.shortcuts import render
 
 
 def s_to_f(obj):
@@ -103,8 +105,6 @@ class STF():
                 otherAns = Answer.objects.filter(question_id = tbq.id,profile=OUP).first()
                 otherAnsArr.append( otherAns.answer_text if otherAns != None else "")
             print("---- Start NLP Operation -----")
-            print(myAnsArr)
-            print(otherAnsArr)
             startTime = time.time()
             simResult = STF.calculate_similarities(myAnsArr,otherAnsArr)
             print("----- End NLP Operation Time: {}s".format(time.time()-startTime))
@@ -174,14 +174,14 @@ def gen_table_by_answers(ansQueryForAll):
     return result
 
 class SearchEntity:
-    def __init__(self,username,percent):
+    def __init__(self,pk,percent):
         self.percent = percent
-        self.username = username
+        self.pf_pk = pk
         self.profile_text = ""
         self.QTs = []
         self.Anss = []
 
-        profile = UserProfile.objects.filter(user=User.objects.filter(username=self.username).first()).first()
+        profile = UserProfile.objects.filter(pk=self.pf_pk).first()
         if profile and profile.profile_text_open == True:
             self.profile_text = profile.profile_text
         else:
@@ -209,17 +209,18 @@ class SearchEntity:
         
 
 
-def handle_search_result(username):
+def handle_search_result(request,username):
     myUser = User.objects.get(username=username)
     myProfile = UserProfile.objects.get(user=myUser)
     allUserProfiles = UserProfile.objects.all()
     searchEntities = []
+    context = {}
 
     STF.Init()
     STF.Update()
     AllAnswerWeightTable_tbq = STF.gen_sim_table_from_tbq(myProfile)
 
-    myEntity = SearchEntity(username,100) 
+    myEntity = SearchEntity(myProfile.pk,100) 
     searchEntities.append(myEntity)
 
     myQnATable = gen_table_by_answers(Answer.objects.filter(profile=myProfile))
@@ -241,7 +242,47 @@ def handle_search_result(username):
                 accWeight += AllAnswerWeightTable_tbq[myQId][OUP.user.username] * priorityWeight
 
         if len(otherQnATable) > 0 and totalWeight > 0:
-            entity = SearchEntity(OUP.user.username,round(accWeight / totalWeight,2) * 100)
+            entity = SearchEntity(OUP.pk,round(accWeight / totalWeight,2) * 100)
             searchEntities.append(entity)
-    sr = sorted(searchEntities,key = SearchEntity.getPercent,reverse=True)
-    return sr
+
+    context['search_results'] = sorted(searchEntities,key = SearchEntity.getPercent,reverse=True)    
+
+    context['sent'] = {}
+    for s in InvData.objects.filter(from_pk=myProfile.pk,accepted=False):
+        context['sent'][s.to_pk] = s.to_pk
+    context['rev'] = {}
+    for s in InvData.objects.filter(to_pk=myProfile.pk,accepted=False):
+        context['rev'][s.from_pk] = s.from_pk
+
+    context['con'] = {}
+    for s in InvData.objects.filter(from_pk=myProfile.pk,accepted=True) | InvData.objects.filter(to_pk=myProfile.pk,accepted=True):
+        pk = s.from_pk if s.from_pk != myProfile.pk else s.to_pk
+        context['con'][pk] = pk
+        print(pk)
+
+
+    return render(request, 'search_results.html',context)
+
+
+
+from django.core.mail import send_mail
+
+def handle_sending_message(request):
+    data = {}
+    pf_pk = request.POST.get('pf_pk', None)    
+    mp = UserProfile.objects.filter(user=request.user).first()
+    tp = UserProfile.objects.filter(pk=pf_pk).first()
+    if tp:        
+        msg = request.POST.get('msg',"")
+        sent = InvData(from_pk=mp.pk,to_pk=pf_pk,message=msg)        
+        sent.save()
+        body = "A user in SMF service requested you.\n\
+Message:{}\n\
+Please visit our webiste check the \"My Mates\" menu.\n\
+http://18.170.55.54/main/my_mates/".format(msg)
+
+        send_mail('[SMF] Request Message',body, '2572258p@gmail.com', [tp.email])
+    else:
+        print('no user found.')
+    
+    return JsonResponse(data)

@@ -1,6 +1,40 @@
 {% extends 'base_frame.html' %}
 {% load main_extras %}
 
+{% block head_block %}
+<script>
+$(document).ready(function()
+{    
+    {% for sr in search_results %}
+        $("#sendbt_{{sr.pf_pk}}").click(function()
+        {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'main:list_result' 'dummy' %}",
+                    data:{
+                        pf_pk: '{{sr.pf_pk}}',
+                        msg: $("#msgtxt_{{sr.pf_pk}}").val(),
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        dataType: "json",
+                    },
+                    success: function (data)
+                    {
+                        $("#inv_{{sr.pf_pk}}").hide();
+                        $("#inv_bt_{{sr.pf_pk}}").hide();
+                        $("#status_{{sr.pf_pk}}").html("You have sent the message.");                        
+                    },
+                    failure: function ()
+                    {                    
+                    }
+                });
+                
+        });
+    {% endfor %}
+
+});
+</script>
+{% endblock %}
+
 {% block body_block %}
 <style>
     .col_but{
@@ -8,15 +42,19 @@
         padding: 5px;
         
     }
+    .send_div{
+        align-items:flex-end;        
+    }
 </style>
     {% if search_results %}
         {% for sr in search_results %}
-            <button class="btn btn-primary col_but" id = "bt{{sr.username}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{sr.username}}">{{sr.username}} / {{sr.percent}} %</button>
+            <button class="btn btn-primary col_but" id = "rbt_{{sr.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{sr.pf_pk}}">User / {{sr.percent}} %</button>
+            
             {% if forloop.counter0 == 0 %}
-                <script> $("#bt{{sr.username}}").html("My Answers") </script>
+                <script> $("#rbt_{{sr.pf_pk}}").html("My Answers") </script>
             {% endif %}
-
-            <div id="demo{{sr.username}}" class="collapse">
+            
+            <div id="rt_{{sr.pf_pk}}" class="collapse">
                 <p>
                     {% for qt in sr.QTs%}
                     <p>Q) {{qt}}
@@ -25,9 +63,41 @@
                         {% endfor %}
                     </p>
                     {% endfor %}
-                    <span style="font-weight: bold;">{{sr.username}} Profile Text: </span>{{sr.profile_text}}
+                    <span style="font-weight: bold;">Profile Text: </span>{{sr.profile_text}}
                 </p>
-            </div>        
+                {% if forloop.counter0 > 0 %}
+                <button style="padding: 3px 15px; class="btn btn-primary" id = "inv_bt_{{sr.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#inv_{{sr.pf_pk}}"> Invite</button>
+                <span id="status_{{sr.pf_pk}}" style="font-style:italic">Please, tell what you want to study together.(optional)</span><br><br>
+                <div id="inv_{{sr.pf_pk}}" class="collapse">
+                    <p>
+                        <textarea id="msgtxt_{{sr.pf_pk}}" rows="2" cols="100" class="textarea_title"></textarea><br>
+                        <p><button id="sendbt_{{sr.pf_pk}}" style="padding: 3px 15px;">Send</button></p>
+                        
+                        {% if sent|get_val_in_dict:sr.pf_pk %}
+                        <script>
+                            $("#inv_bt_{{sr.pf_pk}}").hide()
+                            $("#status_{{sr.pf_pk}}").html("* You have sent the message already.");
+                        </script>
+                        {% endif %}
+                        {% if rev|get_val_in_dict:sr.pf_pk %}
+                        <script>
+                            $("#inv_bt_{{sr.pf_pk}}").hide()
+                            $("#status_{{sr.pf_pk}}").html("* You have received the message already.");
+                        </script>
+                        {% endif %}
+                        
+                        {% if con|get_val_in_dict:sr.pf_pk %}
+                        <script>
+                            $("#inv_bt_{{sr.pf_pk}}").hide()
+                            $("#status_{{sr.pf_pk}}").html("* You both are connected.");
+                        </script>
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
+    
+            </div>
+            
         {% endfor %}
     {% else %}
         No one matched.

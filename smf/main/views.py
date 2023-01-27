@@ -8,11 +8,11 @@ from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
 
 
-from .models import Question,Choice,LastAccUser,UserProfile,Answer,QuestionVote#,STF
+from .models import Question,Choice,LastAccUser,UserProfile,Answer,QuestionVote
 from .view_handler_common import CheckAuth,ShowNotAuthedPage,is_ajax
 from .view_handler_models import handle_load,handle_save,handle_createQuestion
-from .view_handler_users import handle_registration,handle_myaccount
-from .view_handler_search import handle_search_result,STF
+from .view_handler_users import handle_registration,handle_myaccount,handle_mymates
+from .view_handler_search import handle_search_result,STF,handle_sending_message
 from django.db.models import Q
 
 def login_requirement(request):
@@ -191,10 +191,10 @@ def data_management(request):
 
     category_pair = {"cc":"Common Questions","cd":"Details","cb":"Behavioral Questions","cu":"Registered by users"}
     apv_qs = Question.objects.all().exclude(approved=False)
-    context['qs2'] = {}
+    context['cat_qs'] = {}
     for k,v in category_pair.items():
-        context['qs2'][k] = apv_qs.filter(category=k)
-        print(context['qs2'][k])
+        context['cat_qs'][k] = apv_qs.filter(category=k)
+        print(context['cat_qs'][k])
     
 
     context['category_pair'] = category_pair
@@ -203,7 +203,7 @@ def data_management(request):
     profile = UserProfile.objects.filter(user=request.user).first()
     if profile:
         if 'Find' in request.POST:
-            return redirect('main:search_result',userId=request.user.username)
+            return redirect('main:start_searching',userId=request.user.username)
         elif 'Save' in request.POST:
             context['message'] = "Data have been successfully saved."        
             handle_save(request,profile)        
@@ -216,16 +216,21 @@ def data_management(request):
         return HttpResponse("{} User Profile Does not Exist".format(request.user))
   
 
+def start_searching(request,userId):
+        return render(request,'start_searching.html',{"userId":userId})
     
  
-def search_result(request,userId):
-    result = handle_search_result(userId)
-    context = { 'search_results' : result }
-    return render(request, 'search_results.html',context)
-
+def list_result(request,userId):
+    if is_ajax(request):        
+        return handle_sending_message(request)
+    else:
+        return handle_search_result(request,userId)
 
 def registration(request):
     return handle_registration(request)
 
 def my_account(request):
     return handle_myaccount(request)
+
+def my_mates(request):
+    return handle_mymates(request)

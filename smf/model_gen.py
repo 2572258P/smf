@@ -114,7 +114,7 @@ if __name__ == "__main__":
     "allocate_answers":"allocate_answers",
     "delete_all_users":"delete_all_users",
     "clear_all":"clear_all",
-    "gq":"gq"}
+    "generate_questions":"generate_questions"}
 
 
     if( len(sys.argv) > 1 ):
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         if cmd == 'help':
             print(cmdlist)
         if cmd in cmdlist:
-            if cmd == cmdlist['gq']:
+            if cmd == cmdlist['generate_questions']:
                 generate_questions(sys.argv[2])
             elif cmd == cmdlist['generate_users']:
                 generate_user(int(sys.argv[2]))

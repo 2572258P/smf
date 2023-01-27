@@ -1,0 +1,142 @@
+{% extends 'base_frame.html' %}
+
+{% block head_block %}
+<script>
+$(document).ready(function()
+{
+    $("#menu_mates").addClass("menu_select");
+
+    {% for sd in sent %}
+        $("#cancel_{{sd.to_pk}}").click(function()
+        {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'main:my_mates' %}",
+                    data:{
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        cmd:"cancel",
+                        to_pk: "{{sd.to_pk}}"
+                    },
+                    success: function (data)
+                    {
+                        $("#cancel_msg_{{sd.to_pk}}").html("Cancelled");
+                        $("#cancel_{{sd.to_pk}}").hide();
+                    },
+                    failure: function ()
+                    {                    
+                    }
+                });
+        });
+    {% endfor %}
+
+    {% for rv in rev %}
+        $("#acc_{{rv.to_pk}}").click(function()
+        {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'main:my_mates' %}",
+                    data:{
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        cmd:"accept",
+                        to_pk: "{{rv.to_pk}}"
+                    },
+                    success: function (data)
+                    {
+                        $("#acc_msg_{{rv.to_pk}}").html("Accepted");
+                        $("#acc_{{rv.to_pk}}").hide();
+                    },
+                    failure: function ()
+                    {                    
+                    }
+                });
+        });
+    {% endfor %}
+
+    {% for ac in acc %}
+        $("#dis_{{ac.to_pk}}").click(function()
+        {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'main:my_mates' %}",
+                    data:{
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        cmd:"disconnect",
+                        to_pk: "{{ac.to_pk}}"
+                    },
+                    success: function (data)
+                    {
+                        $("#dis_msg_{{ac.to_pk}}").html("Deleted");
+                        $("#dis_{{ac.to_pk}}").hide();                       
+                    },
+                    failure: function ()
+                    {                    
+                    }
+                });
+        });
+    {% endfor %}
+
+});
+</script>
+
+{% endblock %}
+
+{% block body_block %}
+<style>
+    .basic_bg{
+        background-color:rgb(249, 249, 249);
+        border: 5px 5px;
+        border-radius: 10px; 
+        padding: 1%;
+    }
+
+</style>
+<p>
+<button class="btn btn-primary" type="button" class="btn btn-info" data-toggle="collapse" data-target="#div_sent">Sent ({{sent|length }})</button>
+<div id="div_sent" class="collapse">
+{% for sd in sent %}
+<div class="basic_bg">
+    <p>{{sd.msg}}</p>
+    <button id="cancel_{{sd.to_pk}}">Cancel</button>
+    <span style="font-style:italic;" id="cancel_msg_{{sd.to_pk}}"></span>
+</div><br>
+{% endfor %}
+</div>
+</p>
+
+<p>
+<button class="btn btn-primary" type="button" class="btn btn-info" data-toggle="collapse" data-target="#div_rev">Received ({{rev|length }})</button>
+<div id="div_rev" class="collapse">
+{% for rv in rev %}
+<div class="basic_bg">{{rv.msg}} 
+    <button id="acc_{{rv.to_pk}}">Accept</button>
+    <span style="font-style:italic;" id="acc_msg_{{rv.to_pk}}"></span>
+</div><br>
+{% endfor %}
+</div>
+</p>
+
+<p>
+<button class="btn btn-primary" type="button" class="btn btn-info" data-toggle="collapse" data-target="#div_dis">Connected ({{acc|length }})</button>
+<div id="div_dis" class="collapse">
+{% for ac in acc %}
+<div class="basic_bg">
+    <p>Email: {{ac.email}}</p>
+    <p>Profile Text: {{ac.profile_text}}</p>
+    <p>Sender Message: {{ac.msg}}</p>
+    <button id="dis_{{ac.to_pk}}">Disconnect</button>
+    <span style="font-style:italic;" id="dis_msg_{{ac.to_pk}}"></span>
+</div><br>
+{% endfor %}
+</div>
+</p>
+
+<script>            
+    $("#div_sent").collapse({toggle: true});
+    $("#div_rev").collapse({toggle: true});
+    $("#div_dis").collapse({toggle: true});
+</script>
+
+
+
+
+{% endblock %}

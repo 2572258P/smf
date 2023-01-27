@@ -33,12 +33,10 @@
     textarea{
         resize: none;
 
-    }
-    
-    .col_button{
+    }    
+    .cat_button{
         width: 20%;
-        padding: 5px;
-        
+        padding: 5px;        
     }
 
 </style>
@@ -79,9 +77,9 @@
     </p>
 
     
-    {% for k,v in qs2.items %}
+    {% for k,v in cat_qs.items %}
         {% if v %}
-        <button class="btn btn-primary col_button" id = "bt_{{k}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{k}}">
+        <button class="btn btn-primary cat_button" id = "bt_{{k}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{k}}">
             {{ category_pair|get_val_in_dict:k  }}</button>
         
         <p>
@@ -90,6 +88,7 @@
             <input type="hidden" name="question{{q.id}}" value="{{q.id}}" id="question{{q.id}}" >
             <div class="q_frame">
                 <h4 id="title_{{q.id}}">{{ q.title }}</h4>
+                <p style="font-style: italic;font-size: small;">{{q.desc}}</p>
                 {% for c in q.choice_set.all %}
                     <label id="choice_{{c.id}}">
                     {% if answers|get_list_in_dict:q.id|is_val_in_list:c.id == True %}
@@ -102,8 +101,7 @@
                         <br>
                     {% endif %}
                 {% endfor %}
-                {% if 'tbq' == q.type %}
-                    <p style="font-style: italic;font-size: small;">{{q.desc}}</p>
+                {% if 'tbq' == q.type %}                    
                     <textarea name="text_ans{{q.id}}" id="text_ans{{q.id}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
                 {% endif %}
                 </div>
@@ -111,20 +109,12 @@
         {% endfor %}
         </div>
         </p> 
-        <script>
-            
+        <script>            
                 $("#demo{{k}}").collapse({
-                toggle: true
+                toggle: false
                 });
         </script>
         {% endif %}
-    {% endfor %}
-    
-
-
-    {% for q in questions %}
- 
-    
     {% endfor %}
     <br>
     <input type="submit" name="Save" value="Save Data">

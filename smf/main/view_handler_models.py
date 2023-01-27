@@ -38,6 +38,7 @@ def handle_createQuestion(request,question_type,profile):
     tbq_text = request.POST.get('tbq_text','')
     category = request.POST.get('category','')
     priority = request.POST.get('mPri','')
+    desc = request.POST.get('desc')
     match_type = request.POST.get('mType','smt') #default value 'smt'
 
     scq_choice_num = range(1,21)
@@ -53,21 +54,20 @@ def handle_createQuestion(request,question_type,profile):
     else:
         try:            
             if len(scq_text) > 0:
-                q = Question(approved=profile.admin,type="scq",ctrl_type='radio',title=scq_text,pub_date=timezone.now(),priority = priority,match_type = match_type,category=category)
+                q = Question(approved=profile.admin,type="scq",ctrl_type='radio',title=scq_text,pub_date=timezone.now(),priority = priority,match_type = match_type,category=category,desc=desc)
                 q.save()
                 for i in scq_choice_num:
                     choice_text = request.POST.get("scq_c%i"%i,'')                
                     if choice_text != '':
                         q.choice_set.create(choice_text=choice_text)
             if len(mcq_text) > 0:
-                q = Question(approved=profile.admin,type="mcq",ctrl_type='checkbox',title=mcq_text,pub_date=timezone.now(),priority = priority,match_type = match_type,category=category)
+                q = Question(approved=profile.admin,type="mcq",ctrl_type='checkbox',title=mcq_text,pub_date=timezone.now(),priority = priority,match_type = match_type,category=category,desc=desc)
                 q.save()
                 for i in mcq_choice_num:
                     choice_text = request.POST.get("mcq_c%i"%i,'')
                     if choice_text != '':
                         q.choice_set.create(choice_text=choice_text)
-            if len(tbq_text) > 0:
-                desc = request.POST.get('tbq_desc')
+            if len(tbq_text) > 0:                
                 q = Question(approved=profile.admin,type="tbq",ctrl_type='textarea',title=tbq_text,desc=desc,pub_date=timezone.now(),priority = priority,match_type = match_type,category=category)
                 q.save()
             message = 'New question has been successfully created.'

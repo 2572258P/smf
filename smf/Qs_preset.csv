@@ -4,17 +4,12 @@ type,
 category,
 priority,
 match_type,
-title,What is your main motivation for group studying
-desc,
+title,Please tell me what you think about the benefit of group studying.
+desc,"e.g., Social Activity, Coursework, etc."
 type,mcq
 category,cc
 priority,high
 match_type,emt
-1,
-2,
-3,
-4,
-,
 title,What do you like?
 desc,
 type,scq

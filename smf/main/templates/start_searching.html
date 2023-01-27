@@ -1,0 +1,38 @@
+{% extends 'base_frame.html' %}
+{% load static %}
+{% block head_block %}
+
+<script>
+$(document).ready(function()
+{   
+    var count = 2
+    var counter = setInterval(timer , 1000)
+    document.getElementById("timer").innerHTML= count + " secs";
+    
+    function timer()
+    {
+        count = count-1;
+        if (count <= 0)
+        {
+            clearInterval(counter);
+            window.location.replace("{% url 'main:list_result' userId %}")
+        }
+        document.getElementById("timer").innerHTML= count + " secs";
+    }
+});
+</script>
+{% endblock %}
+
+{% block body_block %}
+<style>
+    .center 
+    {
+      text-align: center;      
+    }
+</style>
+
+<div class="center">
+<img src="{% static 'loading4.gif' %}">
+<h3 style="color: rgb(82, 87, 91);">Processing Results</h3>
+</div>
+{% endblock %}

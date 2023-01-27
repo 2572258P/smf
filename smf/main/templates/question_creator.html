@@ -59,7 +59,7 @@
 </div><br>
 <div = class="div_section">
         <p style="font-weight:bold">Q) Description: (Optional)</p>
-        <p><textarea name="tbq_desc" rows="3" cols="50" class="textarea_title"></textarea></p>
+        <p><textarea name="desc" rows="3" cols="50" class="textarea_title"></textarea></p>
 </div><br>
     
 {% endif %}
@@ -68,8 +68,11 @@
 <div class="div_section">
     <p class="bold"> Q) Single Choice Question: (Enter your question below)</p>
     <p><textarea name="scq_text" rows="2" cols="50" class="textarea_title"></textarea></p>    
-</div>
-<br>
+</div><br>
+<div = class="div_section">
+    <p style="font-weight:bold">Q) Description: (Optional)</p>
+    <p><textarea name="desc" rows="3" cols="50" class="textarea_title"></textarea></p>
+</div><br>
 <div class="div_section">
     <p class="bold">Add choices for the question:</p>
     {% for i in scq_choice_num %}
@@ -82,8 +85,11 @@
 <div = class="div_section">
     <p class="bold">Q) Multiple Choice Question: (Enter your question below)</p>
     <p><textarea name="mcq_text" id="mcq_text" rows="2" cols="50" class="textarea_title"></textarea></p> 
-</div>
-<br>
+</div><br>
+<div = class="div_section">
+    <p style="font-weight:bold">Q) Description: (Optional)</p>
+    <p><textarea name="desc" rows="3" cols="50" class="textarea_title"></textarea></p>
+</div><br>
 <div = class="div_section">
 <label for="html">Add choices for the question: </label>
 {% for i in mcq_choice_num %}
