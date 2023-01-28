@@ -20,3 +20,9 @@ def ShowNotAuthedPage():
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
+def GetNotiMessage(msg):
+    if len(msg) > 0:
+        return msg
+    else:
+        return "No Message Attached."

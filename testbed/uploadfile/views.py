@@ -10,10 +10,8 @@ def is_ajax(request):
 @csrf_exempt
 def index(request):    
     if is_ajax(request):
-        print(request.POST.get('data', None))
         response = {}
         return JsonResponse(response)
     else:
-        print("non-ajax")
         return render(request,"df.html",{})
 # Create your views here.

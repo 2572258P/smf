@@ -66,7 +66,7 @@
     });
 </script>
 
-<form action="{% url 'main:data_management' %}" method="post">
+<form action="{% url 'main:find_mates' %}" method="post">
 {% csrf_token %}
 {% if user.is_authenticated %}
     <h2>{{message}}</h2>
@@ -74,6 +74,8 @@
         <b>&lt;Help&gt;</b><br>
         Priority Colour :<span class="q_high">High</span>,<span class='q_medium'>Medium</span>,<span class="q_low">Low</span><br>
         <span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>
+        <p style="font-style:italic">The system finds your mates as much as you have answered the questions. </p>
+
     </p>
 
     

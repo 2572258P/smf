@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 import time
 
 from sentence_transformers import SentenceTransformer, util
-from .view_handler_common import  GetWeightByPriority
+from .view_handler_common import  GetWeightByPriority,CheckAuth,ShowNotAuthedPage,is_ajax
 from django.http import JsonResponse
-from django.shortcuts import render
-
+from django.shortcuts import render,redirect
+from django.utils import timezone
+from django.core.mail import send_mail
 
 def s_to_f(obj):
     return round(float(obj),3)
@@ -258,14 +259,12 @@ def handle_search_result(request,username):
     for s in InvData.objects.filter(from_pk=myProfile.pk,accepted=True) | InvData.objects.filter(to_pk=myProfile.pk,accepted=True):
         pk = s.from_pk if s.from_pk != myProfile.pk else s.to_pk
         context['con'][pk] = pk
-        print(pk)
 
 
     return render(request, 'search_results.html',context)
 
 
 
-from django.core.mail import send_mail
 
 def handle_sending_message(request):
     data = {}
@@ -274,15 +273,73 @@ def handle_sending_message(request):
     tp = UserProfile.objects.filter(pk=pf_pk).first()
     if tp:        
         msg = request.POST.get('msg',"")
-        sent = InvData(from_pk=mp.pk,to_pk=pf_pk,message=msg)        
+        sent = InvData(from_pk=mp.pk,to_pk=pf_pk,message=msg,time=timezone.localtime(timezone.now()).time() ,date=timezone.localtime(timezone.now()).date())
         sent.save()
-        body = "A user in SMF service requested you.\n\
+        body = "A user in SMF service requested you.\n\n\
 Message:{}\n\
 Please visit our webiste check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format(msg)
+http://18.170.55.54/main/my_mates/".format(inv.message if len(msg) > 0 else "No Message Attached.")
 
-        send_mail('[SMF] Request Message',body, '2572258p@gmail.com', [tp.email])
+        send_mail('[SMF] Request Message',body, 'SMF Notification<2572258p@gmail.com>', [tp.email])
+        tp.has_request = True
+        tp.save()
     else:
         print('no user found.')
     
     return JsonResponse(data)
+
+def handle_load(request,profile):
+    answers = {}
+
+    if profile:
+        for ans in Answer.objects.filter(profile=profile):            
+            if ans.question_id not in answers:
+                answers[ans.question_id] = []
+            if ans.choice_id != -1:
+                answers[ans.question_id].append(ans.choice_id)
+            answers[ans.question_id].append(ans.answer_text)
+    return answers
+    
+def handle_save(request,profile):
+    for q in Question.objects.all():
+        anss = Answer.objects.filter(profile=profile,question_id=q.pk)
+        anss.delete()
+        if q.type == 'scq' or q.type == 'mcq':
+            c_id = "choice" + str(q.pk)
+            if q.type == 'scq':
+                a = Answer(profile=profile,question_id=q.pk,choice_id=request.POST.get(c_id,-1))
+                a.save()
+            elif q.type == 'mcq':
+                for ans in request.POST.getlist(c_id):
+                    a = Answer(profile=profile,question_id=q.pk,choice_id=ans)
+                    a.save()
+        elif q.type == 'tbq':
+            a = Answer(profile=profile,question_id=q.pk,answer_text=request.POST["text_ans%i"%q.id])
+            a.save()
+
+def handle_find_mates(request):
+    if CheckAuth(request) is False:
+        return ShowNotAuthedPage()
+    context = {}
+    category_pair = {"cc":"Common Questions","cd":"Details","cb":"Behavioral Questions","cu":"Registered by users"}
+    apv_qs = Question.objects.all().exclude(approved=False)
+    context['cat_qs'] = {}
+    for k,v in category_pair.items():
+        context['cat_qs'][k] = apv_qs.filter(category=k)
+    context['category_pair'] = category_pair
+    context['questions'] = Question.objects.all().exclude(approved=False)
+    context['answers'] = {}
+    profile = UserProfile.objects.filter(user=request.user).first()
+    if profile:
+        if 'Find' in request.POST:
+            return redirect('main:start_searching',userId=request.user.username)
+        elif 'Save' in request.POST:
+            context['message'] = "Data have been successfully saved."        
+            handle_save(request,profile)        
+        else:
+            context['message'] = "Data have been successfully loaded."
+            
+        context['answers'] = handle_load(request,profile)                
+        return render(request,'find_mates.html',context)
+    else:
+        return HttpResponse("{} User Profile Does not Exist".format(request.user))

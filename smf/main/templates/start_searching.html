@@ -6,8 +6,7 @@
 $(document).ready(function()
 {   
     var count = 2
-    var counter = setInterval(timer , 1000)
-    document.getElementById("timer").innerHTML= count + " secs";
+    var counter = setInterval(timer , 1000)    
     
     function timer()
     {
@@ -16,8 +15,7 @@ $(document).ready(function()
         {
             clearInterval(counter);
             window.location.replace("{% url 'main:list_result' userId %}")
-        }
-        document.getElementById("timer").innerHTML= count + " secs";
+        }        
     }
 });
 </script>
@@ -32,7 +30,7 @@ $(document).ready(function()
 </style>
 
 <div class="center">
-<img src="{% static 'loading4.gif' %}">
+<img src="{% static 'loading5.gif' %}">
 <h3 style="color: rgb(82, 87, 91);">Processing Results</h3>
 </div>
 {% endblock %}

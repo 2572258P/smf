@@ -71,6 +71,10 @@ body {margin:0;}
 .loginbar {   
   color:rgb(255, 255, 255);
   margin: 5px 0px;
+  
+  border: 0;
+  border-style: solid;
+  padding: 0px 30px;
 }
 
 .loginbar a {
@@ -85,9 +89,11 @@ body {margin:0;}
   border: 10px;
 }
 
-.login_button
+.sign_inout
 {
   background: rgb(0, 0, 0);
+  border-radius: 5px 5px;  
+
 }
 
 
@@ -143,3 +149,7 @@ textarea {
   margin-left: 3%;
 }
 
+.has_request_img{
+  height:22px;
+
+}

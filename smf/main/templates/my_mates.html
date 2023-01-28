@@ -42,8 +42,30 @@ $(document).ready(function()
                     },
                     success: function (data)
                     {
-                        $("#acc_msg_{{rv.to_pk}}").html("Accepted");
-                        $("#acc_{{rv.to_pk}}").hide();
+                        $("#rev_msg_{{rv.to_pk}}").html("Accepted");
+                        $("#rev_but_div_{{rv.to_pk}}").hide();
+                    },
+                    failure: function ()
+                    {                    
+                    }
+                });
+        });
+    {% endfor %}
+    {% for rv in rev %}
+        $("#rej_{{rv.to_pk}}").click(function()
+        {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'main:my_mates' %}",
+                    data:{
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        cmd:"reject",
+                        to_pk: "{{rv.to_pk}}"
+                    },
+                    success: function (data)
+                    {
+                        $("#rev_msg_{{rv.to_pk}}").html("Rejected");
+                        $("#rev_but_div_{{rv.to_pk}}").hide();
                     },
                     failure: function ()
                     {                    
@@ -65,7 +87,7 @@ $(document).ready(function()
                     },
                     success: function (data)
                     {
-                        $("#dis_msg_{{ac.to_pk}}").html("Deleted");
+                        $("#dis_msg_{{ac.to_pk}}").html("Disconnected");
                         $("#dis_{{ac.to_pk}}").hide();                       
                     },
                     failure: function ()
@@ -88,14 +110,23 @@ $(document).ready(function()
         border-radius: 10px; 
         padding: 1%;
     }
+    .button_width{
+        width: 10%;
 
+    }
 </style>
 <p>
-<button class="btn btn-primary" type="button" class="btn btn-info" data-toggle="collapse" data-target="#div_sent">Sent ({{sent|length }})</button>
+<button class="btn btn-primary button_width" type="button" data-toggle="collapse" data-target="#div_sent">Requested ({{sent|length }})</button>
 <div id="div_sent" class="collapse">
 {% for sd in sent %}
 <div class="basic_bg">
-    <p>{{sd.msg}}</p>
+    <p>Date: {{sd.date}} / Time: {{sd.time}}</p>
+    {% if sd.msg %}
+        <p>{{sd.msg}}</p>
+    {% else %}
+        <p style="font-style:italic;">No message attached</p>
+    {% endif %}
+    
     <button id="cancel_{{sd.to_pk}}">Cancel</button>
     <span style="font-style:italic;" id="cancel_msg_{{sd.to_pk}}"></span>
 </div><br>
@@ -104,25 +135,41 @@ $(document).ready(function()
 </p>
 
 <p>
-<button class="btn btn-primary" type="button" class="btn btn-info" data-toggle="collapse" data-target="#div_rev">Received ({{rev|length }})</button>
+<button class="btn btn-primary button_width" type="button" data-toggle="collapse" data-target="#div_rev">Received ({{rev|length }})</button>
 <div id="div_rev" class="collapse">
 {% for rv in rev %}
-<div class="basic_bg">{{rv.msg}} 
-    <button id="acc_{{rv.to_pk}}">Accept</button>
-    <span style="font-style:italic;" id="acc_msg_{{rv.to_pk}}"></span>
+<div class="basic_bg">
+    {% if rv.msg %}
+    <p>{{rv.msg}}</p>
+    {% else %}
+        <p style="font-style:italic;">No message attached</p>
+    {% endif %}
+
+    <p>Date: {{rv.date}} / Time: {{rv.time}}</p>
+    <div id="rev_but_div_{{rv.to_pk}}">
+        <button id="acc_{{rv.to_pk}}">Accept</button>
+        <button id="rej_{{rv.to_pk}}">Reject</button>
+    </div>
+    <span style="font-style:italic;" id="rev_msg_{{rv.to_pk}}"></span>
 </div><br>
 {% endfor %}
 </div>
 </p>
 
 <p>
-<button class="btn btn-primary" type="button" class="btn btn-info" data-toggle="collapse" data-target="#div_dis">Connected ({{acc|length }})</button>
+<button class="btn btn-primary button_width" type="button" data-toggle="collapse" data-target="#div_dis">Connected ({{acc|length }})</button>
 <div id="div_dis" class="collapse">
 {% for ac in acc %}
 <div class="basic_bg">
-    <p>Email: {{ac.email}}</p>
+    <p>Date: {{ac.date}} / Time: {{ac.time}}</p>
+    <p>Email: <a href="mailto:{{ac.email}}">{{ac.email}}</a></p>
+    
     <p>Profile Text: {{ac.profile_text}}</p>
-    <p>Sender Message: {{ac.msg}}</p>
+
+    {% if ac.msg %}
+    <p>Message: {{ac.msg}}</p>
+    {% endif %}
+    
     <button id="dis_{{ac.to_pk}}">Disconnect</button>
     <span style="font-style:italic;" id="dis_msg_{{ac.to_pk}}"></span>
 </div><br>

@@ -1,27 +1,42 @@
 {% extends 'base_frame.html' %}
+{% load static %}
 {% load main_extras %}
 
 {% block head_block %}
 <script>
 $(document).ready(function()
-{    
+{
     {% for sr in search_results %}
         $("#sendbt_{{sr.pf_pk}}").click(function()
         {
+            var msg_ = $("#msgtxt_{{sr.pf_pk}}").val();
+            if(msg_.length > 0)
+            {
+                if(msg_[0] == '#')
+                {
+                    msg_ = "";
+                }
+            }
+
+            
+            $("#img_prog_{{sr.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
+            
+
             $.ajax({
                     type: "POST",
                     url: "{% url 'main:list_result' 'dummy' %}",
                     data:{
                         pf_pk: '{{sr.pf_pk}}',
-                        msg: $("#msgtxt_{{sr.pf_pk}}").val(),
+                        msg: msg_,
                         csrfmiddlewaretoken: '{{ csrf_token }}',
                         dataType: "json",
                     },
                     success: function (data)
                     {
-                        $("#inv_{{sr.pf_pk}}").hide();
-                        $("#inv_bt_{{sr.pf_pk}}").hide();
-                        $("#status_{{sr.pf_pk}}").html("You have sent the message.");                        
+                        $("#req_div_{{sr.pf_pk}}").hide();
+                        $("#req_ip_{{sr.pf_pk}}").hide();
+                        $("#img_status_{{sr.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
+                        $("#status_{{sr.pf_pk}}").html("Requesting has been complete.");                        
                     },
                     failure: function ()
                     {                    
@@ -45,6 +60,36 @@ $(document).ready(function()
     .send_div{
         align-items:flex-end;        
     }
+
+    .text_box{        
+        border: 1px;
+        border-style:dotted;
+        display: inline;     
+        color: rgb(187, 187, 187);   
+        font-weight: normal;
+    }
+
+    .img_req{
+        width:60px;        
+    }
+
+    .img_req:hover{
+        width:60px;
+    }
+
+    .img_status{
+        width:43px;
+    }
+
+    .table_div 
+    {
+        width: 60%;
+    }
+    .table_div th {
+        text-align: left;
+        padding: 3px;
+}
+    
 </style>
     {% if search_results %}
         {% for sr in search_results %}
@@ -66,32 +111,50 @@ $(document).ready(function()
                     <span style="font-weight: bold;">Profile Text: </span>{{sr.profile_text}}
                 </p>
                 {% if forloop.counter0 > 0 %}
-                <button style="padding: 3px 15px; class="btn btn-primary" id = "inv_bt_{{sr.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#inv_{{sr.pf_pk}}"> Invite</button>
-                <span id="status_{{sr.pf_pk}}" style="font-style:italic">Please, tell what you want to study together.(optional)</span><br><br>
-                <div id="inv_{{sr.pf_pk}}" class="collapse">
+                
+                <input id = "req_ip_{{sr.pf_pk}}" src="{% static 'group2.png' %}" data-toggle="collapse" data-target="#req_div_{{sr.pf_pk}}" class="img_req" type="image" />
+                <a href="{% url 'main:my_mates' %}"><img id="img_status_{{sr.pf_pk}}" class="img_status"></a>
+                <span id="status_{{sr.pf_pk}}" style="font-style:italic"></span><br>                
+                <div id="req_div_{{sr.pf_pk}}" class="collapse">
                     <p>
-                        <textarea id="msgtxt_{{sr.pf_pk}}" rows="2" cols="100" class="textarea_title"></textarea><br>
-                        <p><button id="sendbt_{{sr.pf_pk}}" style="padding: 3px 15px;">Send</button></p>
-                        
-                        {% if sent|get_val_in_dict:sr.pf_pk %}
+                        <table class="table_div">
+                            <tr>
+                              <th><textarea onfocus="this.value=''" class="form-control text_box" id="msgtxt_{{sr.pf_pk}}" rows="1" class="textarea_title">#(Optional) You can attach an additional message annonmously.</textarea></th>
+                              <th><button id="sendbt_{{sr.pf_pk}}"  type="button" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
+                                <img id="img_prog_{{sr.pf_pk}}" class="img_status"></th>
+                              
+                            </tr>
+                        </table>
                         <script>
-                            $("#inv_bt_{{sr.pf_pk}}").hide()
-                            $("#status_{{sr.pf_pk}}").html("* You have sent the message already.");
+                            let msgs = {
+                                "req":"* Requesting has been complete.",
+                                "rev":"* You have a request from this user.",
+                                "con":"* You both are connected.",
+                            };
+                            let sources = {
+                                "req":"{% static 'check1.jpg' %}",
+                                "rev":"{% static 'mail.png' %}",
+                                "con":"{% static 'hand_shake.jpg' %}",
+                            }
+                            let status = "";
+                            
+                            {% if sent|get_val_in_dict:sr.pf_pk %}
+                                status = 'req';                                
+                            {% endif %}
+                            {% if rev|get_val_in_dict:sr.pf_pk %}
+                                status = 'rev';
+                            {% endif %}
+                            {% if con|get_val_in_dict:sr.pf_pk %}
+                                status = 'con';
+                            {% endif %}
+                            if(status.length > 0)
+                            {
+                                $("#req_ip_{{sr.pf_pk}}").hide()
+                                $("#status_{{sr.pf_pk}}").html(msgs[status]);
+                                $("#img_status_{{sr.pf_pk}}").attr("src",sources[status]);
+                            }
                         </script>
-                        {% endif %}
-                        {% if rev|get_val_in_dict:sr.pf_pk %}
-                        <script>
-                            $("#inv_bt_{{sr.pf_pk}}").hide()
-                            $("#status_{{sr.pf_pk}}").html("* You have received the message already.");
-                        </script>
-                        {% endif %}
-                        
-                        {% if con|get_val_in_dict:sr.pf_pk %}
-                        <script>
-                            $("#inv_bt_{{sr.pf_pk}}").hide()
-                            $("#status_{{sr.pf_pk}}").html("* You both are connected.");
-                        </script>
-                        {% endif %}
+
                     </p>
                 </div>
                 {% endif %}

@@ -10,17 +10,20 @@ from django.urls import reverse
 
 from .models import Question,Choice,LastAccUser,UserProfile,Answer,QuestionVote
 from .view_handler_common import CheckAuth,ShowNotAuthedPage,is_ajax
-from .view_handler_models import handle_load,handle_save,handle_createQuestion
+from .view_handler_models import handle_createQuestion
 from .view_handler_users import handle_registration,handle_myaccount,handle_mymates
-from .view_handler_search import handle_search_result,STF,handle_sending_message
+from .view_handler_search import handle_search_result,STF,handle_sending_message,handle_find_mates
 from django.db.models import Q
+from django.utils import timezone
 
 def login_requirement(request):
     return render(request,'login_requirement.html',{})
 
 
 
-def dashboard(request):
+def dashboard(request):    
+
+
     STF.Init()
     STF.Update()
     context = {}    
@@ -184,36 +187,9 @@ def user_logout(request):
     logout(request)
     return redirect(reverse('main:dashboard'))
 
-def data_management(request):
-    if CheckAuth(request) is False:
-        return ShowNotAuthedPage()
-    context = {}
+def find_mates(request):
+    return handle_find_mates(request)
 
-    category_pair = {"cc":"Common Questions","cd":"Details","cb":"Behavioral Questions","cu":"Registered by users"}
-    apv_qs = Question.objects.all().exclude(approved=False)
-    context['cat_qs'] = {}
-    for k,v in category_pair.items():
-        context['cat_qs'][k] = apv_qs.filter(category=k)
-        print(context['cat_qs'][k])
-    
-
-    context['category_pair'] = category_pair
-    context['questions'] = Question.objects.all().exclude(approved=False)
-    context['answers'] = {}
-    profile = UserProfile.objects.filter(user=request.user).first()
-    if profile:
-        if 'Find' in request.POST:
-            return redirect('main:start_searching',userId=request.user.username)
-        elif 'Save' in request.POST:
-            context['message'] = "Data have been successfully saved."        
-            handle_save(request,profile)        
-        else:
-            context['message'] = "Data have been successfully loaded."
-            
-        context['answers'] = handle_load(request,profile)                
-        return render(request,'data_management.html',context)
-    else:
-        return HttpResponse("{} User Profile Does not Exist".format(request.user))
   
 
 def start_searching(request,userId):

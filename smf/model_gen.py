@@ -113,17 +113,18 @@ if __name__ == "__main__":
     cmdlist = {"generate_users":"generate_users",
     "allocate_answers":"allocate_answers",
     "delete_all_users":"delete_all_users",
-    "clear_all":"clear_all",
+    "delete_all_questions":"delete_all_questions",
     "generate_questions":"generate_questions"}
 
 
     if( len(sys.argv) > 1 ):
         cmd = sys.argv[1]
         if cmd == 'help':
-            print(cmdlist)
+            for v in cmdlist:
+                print(v)
         if cmd in cmdlist:
             if cmd == cmdlist['generate_questions']:
-                generate_questions(sys.argv[2])
+                generate_questions('Qs_preset.csv')
             elif cmd == cmdlist['generate_users']:
                 generate_user(int(sys.argv[2]))
             elif cmd == cmdlist['allocate_answers']:
@@ -131,8 +132,7 @@ if __name__ == "__main__":
             elif cmd == cmdlist['delete_all_users']:
                 User.objects.all().exclude(username='admin').delete()
                 print('all users have been deleted')
-            elif cmd == cmdlist['clear_all']:
-                User.objects.all().exclude(username='admin').delete()
+            elif cmd == cmdlist['delete_all_questions']:                
                 Question.objects.all().delete()
         else:
             print('command is not valid - use help')

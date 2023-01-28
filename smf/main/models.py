@@ -11,8 +11,12 @@ class UserProfile(models.Model):
     email = models.EmailField(max_length=254)
     admin = models.BooleanField(default=False)
     profile_text_open = models.BooleanField(default=True)
+    has_request = models.BooleanField(default=False)
     def __str__(self):
         return self.user.username
+
+#class UpdateNews(models.Model):
+#    from_pk = models.IntegerField(default=-1)
 
 class LastAccUser(models.Model): #temporary for testing - will be removed after completing user session authentication
     lastUser = models.CharField(max_length=32)
@@ -60,6 +64,10 @@ class InvData(models.Model):
     from_pk   = models.IntegerField(default=0)#profile pk
     to_pk = models.IntegerField(default=0)#profile pk
     accepted  = models.BooleanField(default=False)
-    message = models.CharField(max_length=256)
+    message = models.CharField(max_length=512)
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(default=timezone.now)
+
+    
 
 
