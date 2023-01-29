@@ -130,6 +130,17 @@ textarea {
   resize: none;
 }
 
+
+.fadein_effect {
+  opacity: 0.0;
+  transition: all 1s;  
+}
+
+.fadein_effect.show {
+  opacity: 1;  
+}
+
+
 .slideRightToLeft {
   background-color: #16465616;
   color: white;  

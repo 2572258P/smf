@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% load static %}
+<head>    
+    
+</head>
+<body>
+    <script></script>
+</body>
+
+<html>
+   <head> 
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script> 
+<script type="text/javascript" src="{% static 'chart_setting.js' %}"></script>
+   </head> 
+   <body>
+      <div style="width: 500px;"> 
+         <canvas id="myCanvas2"></canvas> 
+      </div>  
+      <script>
+var canvas = $('#myCanvas2').get(0).getContext('2d');
+var doughnutChart = new Chart(canvas, {
+type: 'doughnut',
+data: {
+labels: [
+  "Success",
+  "Failure"
+],
+datasets: [{
+  data: [45, 9],
+  backgroundColor: [
+    "#1ABC9C",
+    "#566573"
+  ],
+  hoverBackgroundColor: [
+    "#148F77",
+    "#273746"
+  ]
+}]
+},
+options: {
+// In options, just use the following line to show all the tooltips
+showAllTooltips: true
+}
+});
+
+</script> 
+
+   </body>
+</html>

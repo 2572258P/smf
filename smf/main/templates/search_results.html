@@ -62,7 +62,7 @@ $(document).ready(function()
         border: 1px;
         border-style:dotted;
         display: inline;     
-        color: rgb(187, 187, 187);   
+        color: rgb(69, 69, 69);   
         font-weight: normal;
     }
 
@@ -80,7 +80,7 @@ $(document).ready(function()
 
     .table_div 
     {
-        width: 60%;
+        width: 800px;
     }
     .table_div th {
         text-align: left;
@@ -116,7 +116,7 @@ $(document).ready(function()
                     <p>
                         <table class="table_div">
                             <tr>
-                              <th><textarea onfocus="this.value=''" class="form-control text_box" id="msgtxt_{{sr.pf_pk}}" rows="1" class="textarea_title">#(Optional) You can attach an additional message annonmously.</textarea></th>
+                              <th><textarea class="form-control text_box" id="msgtxt_{{sr.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Optional) You can attach an additional message annonmously."></textarea></th>
                               <th><button id="sendbt_{{sr.pf_pk}}"  type="button" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
                                 <img id="img_prog_{{sr.pf_pk}}" class="img_status"></th>
                               

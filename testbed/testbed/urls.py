@@ -24,5 +24,6 @@ urlpatterns = [
     path('noti/', include('notification.urls')), 
     path('df/', include('djangofeature.urls')),
     path('uf/', include('uploadfile.urls')),
+    path('graph/', include('graph.urls')),
     
 ]

@@ -2,7 +2,7 @@
 
 {% load main_extras %}
 
-{% block body_block %}
+{% block head_block %}
 <style>
     .q_high{
         color:rgb(225, 1, 1);
@@ -38,8 +38,8 @@
         width: 20%;
         padding: 5px;        
     }
-
 </style>
+
 <script>
     let pri_color = {high:"q_high",medium:"q_medium",low:"q_low"}
     let type_color = {emt:"bold",xor:"q_medium",smt:"q_low"}
@@ -65,6 +65,9 @@
         {% endfor %}
     });
 </script>
+{% endblock %}
+
+{% block body_block %}
 
 <form action="{% url 'main:find_mates' %}" method="post">
 {% csrf_token %}

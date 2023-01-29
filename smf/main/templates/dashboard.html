@@ -87,19 +87,10 @@ $(document).ready(function()
 <script>
     // A $( document ).ready() block.
     $( document ).ready(function() 
-    {
+    {        
         setTimeout(function() {
-            $(".slideRightToLeft").addClass('show');
+            $(".fadein_effect").addClass('show');
         }, 100);
-        let hi_sen = ["It's gonna be fine.","Keep a stiff upper lip.","Give yourself some time.","Let me help you find your soul.","You can do it!"," Do you feel studying is hard?","Are you facing difficult problems?","Chin up!!"];
-        let index = Math.floor(Math.random() * hi_sen.length);
-        
-        $("#hi_msg").html("Study Mates Finder - " + hi_sen[index]);
-        let bc = ["#121352","#c9c7c9","#ff9b0f","#024a3f"];
-        let fc = ["#d8d8f0","#47273a","#4a2d04","#d3f5f0"];
-        index = Math.floor(Math.random() * fc.length);
-        $("#hi_div").css("color",fc[index])
-        $("#hi_div").css("background",bc[index])        
     });
 </script>
 
@@ -165,6 +156,13 @@ $(document).ready(function()
         font-size: 200%;
         font-weight: bold;
     }
+    .fadein_effect {
+        opacity: 0.1;
+        transition: all 10s;
+    }        
+    .fadein_effect.show {
+    opacity: 1;  
+    }
 
 </style>
 
@@ -173,25 +171,27 @@ $(document).ready(function()
     <tr style="height: 200px;"> <!-- Intro -->
         <td  style="width:20%;background-color: rgb(248, 248, 248)">            
         </td>
-        <td style="width:70%;background-color: rgb(248, 248, 248)">
-            <p class="intro_title">We knew, <br>you wanted to study together.</p>
+        <td style="background-repeat: no-repeat;width:75%;background-color: rgb(248, 248, 248);background-image:url({% static 'bg2.png' %});">
+            <p class="intro_title">Let's enjoy studying together.</p>
             <p class="intro_body">
-                We believe you can find your soul.<br><br>
+                We believe you will find soulmates for your study.<br><br>
                 <div align="right">
                     <p class="intro_body">
-                        We can help you.
+                        Ready?
                     </p>
                 </div>
             </p>
         </td>
-        <td  style="width:10%;background-color: rgb(237, 237, 237);">
+        <td  style="width:5%;background-color: rgb(255, 255, 255);">
         </td>
     </tr>
+    
     <tr style="height: 250px;">
-        <td  style="width:20%;background-color: rgb(81, 0, 0);">
+        
+        <td style="width:20%;background-color: rgb(81, 0, 0);">
         </td>
         <td  style="width:60%;background-color:rgb(3, 50, 70);">
-            <img src="{% static 'no_stranger.png'%}" style="height:250;opacity: 1.0">
+            <img class="fadein_effect" src="{% static 'no_stranger.png'%}" style="height:250;">
         </td>
         <td  style="width:20%;background-color:rgb(3, 50, 70);">
         </td>
@@ -205,7 +205,7 @@ $(document).ready(function()
             {% endif %}
             {% for q in draft_questions %}
                 <fieldset class="draft_questions_title">     
-                <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.title }}</legend>
+                <legend id="legend_{{q.id}}" style="width:700px">{{ forloop.counter }}. {{ q.title }}</legend>
                 {% for c in q.choice_set.all %}
                     <input type="{{q.ctrl_type}}" disabled>
                     <label disabled>{{c.choice_text}} </label>

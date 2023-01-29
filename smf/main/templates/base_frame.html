@@ -1,7 +1,7 @@
 <html>
 <head>
     {% load static %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'base_frame.css' %}">
@@ -66,15 +66,16 @@ Study Mate Finder - Find your soulmate
                     Study Mates Finder
                 </div>
                 <div class = "div_side_menu" style="float:left; width:20%;">
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated %}                    
+                    {% if has_request %}
+                    <a href="{% url 'main:my_mates' %}"><img class="has_request_img" src="{% static 'mail4.png' %}" /></a>&nbsp&nbsp          
+                    {% endif %}
                     <a href="{% url 'main:logout' %}" class="sign_in_out">Sign-Out</a>
                 {% else %}
                     <a href="{% url 'main:sign_in_page' %}" class="sign_in_out">Sign-In</a>
                 {% endif %}
                     | <a href="{% url 'main:about_us' %}">About Us</a>
                 </div>
-
-
             </td>
         </tr>
         <tr>
