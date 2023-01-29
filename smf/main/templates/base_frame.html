@@ -15,17 +15,185 @@ Study Mate Finder - Find your soulmate
 </head>
 
 <body>
-    <table style="width:100%;    
-    position: fixed;
-    overflow: hidden;
-    padding:0;    
-    border-collapse: collapse;
-    top:0;
-    margin: 0;
+    <style>
+        .tb{
+            width: 100%;            
+            border: 1px;
+            border-style: solid;
+            border-color: rgb(0, 0, 0);
+            background-color: rgba(0,56,101,255);
+            color: white;
+        }
+        .tb_th{            
+            border: 1px;
+            border-style: solid;
+            border-color: rgb(0, 0, 0);
+            
+        }
+        .tb_td{
+            border:1px;
+            border-style: solid;
+            border-color: rgb(0, 0, 0);
+            color: white;
+        }
+        .letter_title
+        {
+            color: white;
+            font-size: large;
+            font-family:Snell Roundhand, cursive;
+        }
+        .div_side_menu
+        {
+            color:white;
+        }
+        .div_side_menu a
+        {            
+            color:rgb(212, 212, 212);
+        }
+        .div_side_menu a:hover
+        {
+            color:rgb(255, 255, 255);
+            text-decoration: none;
+        }
+    </style>
+
+    <table class="tb" style="height: 130px; position: fixed;">
+        <th class="tb_th"></th>
+        <tr style="height: 25px;">
+            <td class="tb_td">
+                <div style="float:left; width:20%;">&nbsp</div>
+                <div class="letter_title" style="float:left; width:60%;" align="center">                    
+                    Study Mates Finder
+                </div>
+                <div class = "div_side_menu" style="float:left; width:20%;">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'main:logout' %}" class="sign_in_out">Sign-Out</a>
+                {% else %}
+                    <a href="{% url 'main:sign_in_page' %}" class="sign_in_out">Sign-In</a>
+                {% endif %}
+                    | <a href="{% url 'main:about_us' %}">About Us</a>
+                </div>
+
+
+            </td>
+        </tr>
+        <tr>
+            <td class="tb_td">
+                <div style="float:left; width:20%;"><a href="{% url 'main:dashboard' %}">
+                    <img src="{% static 'uog_logo.jpg' %}" class="img_logo"></a>                    
+                </div>
+                <div style="float:left; width:60%;" align="center">
+                    <div class="menu_div">
+                        <a href="{% url 'main:dashboard' %}" id="menu_db" style="transition: 0.8s">Home</a>                        
+                        <a href="{% url 'main:find_mates' %}" id="menu_dmg" style="transition: 0.8s">Find Mates</a>
+                        <a href="{% url 'main:my_mates' %}" id="menu_mates" style="transition: 0.8s">My Mates</a>                
+                        <a href="{% url 'main:question_management' %}" id="menu_qmg" style="transition: 0.8s">Question Management</a>
+                        <a href="{% url 'main:question_creator' %}" id="menu_qc" style="transition: 0.8s">Question Creator</a>
+                        {% if user.is_authenticated %}                    
+                            <a href="{% url 'main:my_account' %}" id="menu_account" style="transition: 0.8s">My Account</a>                    
+                        {% else %}
+                            <a href="{% url 'main:registration' %}" id="menu_reg" style="transition: 0.8s">Create Account</a> 
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="float:left; width:20%;">
+                    &nbsp;
+                </div>
+            </td>
+        </tr>
+        <tr style="height: 10px;background-color: rgb(78, 0, 0);">
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+    </table>
+    <div style="padding-top: 130px;">
+        {% block body_block_no_pad %}
+        {% endblock %}
+        <div style="padding-left:15%;padding-top:5%;padding-right: 15%;padding-bottom: 3%; ">
+            {% block body_block %}
+            {% endblock %}
+        </div>
+    </div>
+    <!--
+    <div align="center">
+        The University of Glasgow is a registered Scottish charity: Registration Number SC004401
+    </div>-->
+
+
+    <!--
+    <table style="padding-top: 130px; height:960px; background-color: rgb(189, 189, 189);color: white;">
+        <th></th>
+        <tr class="custom_1">
+            <td>
+                1
+            </td>
+        </tr>
+        <tr style="vertical-align:top">
+            <td>
+                1
+            </td>
+        </tr>
+        <tr style="vertical-align:top">
+            <td>
+                1
+            </td>
+        </tr>
+        <tr style="vertical-align:top">
+            <td>
+                1
+            </td>
+        </tr>
+    </table>
+    -->
+
+
+    <!--
+    <table>
+        <th id="top_most">
+            <div style="width:20%;float:left;">11</div>
+            <div style="width:60%;float:left" align="center">22</div>
+            <div style="width:20%;float:left;">33</div>
+        </th>
+        <tr>
+            <td id="LogoAndMenu">
+                <div style="width:230px;float:left;">
+                    <a href="{% url 'main:dashboard' %}"><img src="{% static 'uog_logo.jpg' %}" class="img_logo"></a>
+                </div>
+                <div style="padding-top: 1%;padding-left: 25%;" align="left">
+                    <div class="menu_div">                    
+                        <a href="{% url 'main:dashboard' %}" id="menu_db" style="transition: 0.8s">Home</a>                        
+                        <a href="{% url 'main:find_mates' %}" id="menu_dmg" style="transition: 0.8s">Find Mates</a>
+                        <a href="{% url 'main:my_mates' %}" id="menu_mates" style="transition: 0.8s">My Mates</a>                
+                        <a href="{% url 'main:question_management' %}" id="menu_qmg" style="transition: 0.8s">Question Management</a>
+                        <a href="{% url 'main:question_creator' %}" id="menu_qc" style="transition: 0.8s">Question Creator</a>
+                    </div>
+                </div>                
+            </td>
+        </tr>
+        <tr>
+            <td style="background-color:rgb(162, 0, 0); padding-top: 15px;">
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-top: 10px;">
+            </td>
+        </tr>
+        <tr id="body">
+            <td style="padding-top: 10px; background-color: white;">                
+            </td>
+        </tr>
+    </table>
+    </div> -->
+
+<!--
+    <table style="width:100%; position: fixed; overflow: hidden; padding:0;   
+    border-collapse: collapse;top:0;margin:0;
     background-color: rgba(0,56,101,255);
     table-layout:fixed">
         <tr>
-            <th style="width:10%;margin:10% 10px;padding: 1px;"></th>
+            <th style="width:10%;margin:10% 10px;padding: 0px;"></th>
         </tr>
         <tr>
             <td>
@@ -76,8 +244,7 @@ Study Mate Finder - Find your soulmate
 
     
     <div class="main">        
-        {% block body_block %}
-        {% endblock %}        
+
     </div>
-    
+    -->
 </body>

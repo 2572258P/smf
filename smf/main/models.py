@@ -10,13 +10,13 @@ class UserProfile(models.Model):
     profile_text = models.CharField(max_length=500)
     email = models.EmailField(max_length=254)
     admin = models.BooleanField(default=False)
-    profile_text_open = models.BooleanField(default=True)
-    has_request = models.BooleanField(default=False)
+    profile_text_open = models.BooleanField(default=True)    
     def __str__(self):
         return self.user.username
 
-#class UpdateNews(models.Model):
-#    from_pk = models.IntegerField(default=-1)
+class Update(models.Model):
+    profile = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
+    to_pk = models.IntegerField(default=-1)
 
 class LastAccUser(models.Model): #temporary for testing - will be removed after completing user session authentication
     lastUser = models.CharField(max_length=32)

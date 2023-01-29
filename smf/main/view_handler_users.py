@@ -3,7 +3,7 @@ from .view_handler_common import is_ajax,GetNotiMessage
 from django.http import JsonResponse
 from django.shortcuts import render,get_object_or_404,redirect
 from django.contrib.auth.models import User
-from .models import UserProfile,InvData
+from .models import UserProfile,InvData,Update
 from django.contrib.auth import authenticate,login,logout
 from django.utils import timezone
 
@@ -23,6 +23,13 @@ class mymate_info:
 
 from django.core.mail import send_mail
 
+def GetBodyText(Inv):
+    return "Congratulations! your request has been accepted by the other user. \n\n\
+Message:{}\n\
+Please visit our webiste and check the \"My Mates\" menu.\n\
+http://18.170.55.54/main/my_mates/".format( Inv.message if len(Inv.message) > 0 else "No Message Attached.")
+
+
 def handle_mymates(request):
     if is_ajax(request):
         cmd = request.POST.get('cmd')
@@ -39,20 +46,19 @@ def handle_mymates(request):
             inv = InvData.objects.filter(from_pk=to_pk,to_pk=mp_pk,accepted=False).first()
             mp = UserProfile.objects.filter(user=request.user).first()
             tp = UserProfile.objects.filter(pk=to_pk).first()
-
             if inv:
                 inv.accepted = True
-                body = "Congratulations! your request has been accepted by the other user. \n\n\
-Message:{}\n\
-Please visit our webiste and check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format( inv.message if len(inv.message) > 0 else "No Message Attached.")
+                body = GetBodyText(inv)
                 send_mail('[SMF] Your request has been accepted.',body, 'SMF Notification<2572258p@gmail.com>', [tp.email])
 
                 inv.date = timezone.localtime(timezone.now()).date()
                 inv.time = time=timezone.localtime(timezone.now()).time()
                 inv.save()
-                
-            
+
+                up = Update(profile=mp,to_pk=to_pk)
+                up.save()
+                up = Update(profile=tp,to_pk=mp_pk)
+                up.save()
         elif cmd == 'reject':
             to_pk = request.POST.get('to_pk')
             inv = InvData.objects.filter(from_pk=to_pk,to_pk=mp_pk,accepted=False).first()
@@ -81,10 +87,12 @@ http://18.170.55.54/main/my_mates/".format( inv.message if len(inv.message) > 0 
             connected_pk = ac.to_pk if ac.from_pk == mp.pk else ac.from_pk
             up = UserProfile.objects.filter(pk=connected_pk).first()
             context['acc'].append(mymate_info(date=str(ac.date),time=ac.time.strftime('%I:%H %p'),to_pk=connected_pk,msg=ac.message,email=up.email,profile_text=up.profile_text))
+        
 
-        if mp.has_request == True:
-            mp.has_request = False
-            mp.save()
+        context['updates'] = {}
+        for ud in Update.objects.filter(profile=mp).all():
+            context['updates'][ud.to_pk] = ud.to_pk
+        Update.objects.filter(profile=mp).delete()
 
         return render(request, 'my_mates.html',context)
 
@@ -113,9 +121,10 @@ def handle_myaccount(request):
 
 
 def handle_registration(request):
-
+    print("entry")
     response = {}
-    if is_ajax(request) and request.POST.get('cmd') == 'create':        
+    if is_ajax(request) and request.POST.get('cmd') == 'create':
+        print("ajax")
         check_username = request.POST.get('check_username')        
         new_username = request.POST.get('username')
         password = request.POST.get('password')        

@@ -1,6 +1,8 @@
 {% extends 'base_frame.html' %}
 
 {% block head_block %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <script>
     function is_empty(id)
     {
@@ -42,51 +44,72 @@
 {% block profile_front_block %} {% endblock %}
 
 <style>
-    .reg_tr
+    .div_body
     {
-        height: 40px;
-        color: rgb(0, 0, 0);        
+        padding-left: 10%;
     }
-    .reg_lb
-    {
-        text-align: right;
-    }    
+    .div_body table{
+        border: 0;
+        border-style:solid;
+        width: 700px;        
+    }
+    .div_body td{
+        border: 0;
+        border-style:solid;
+        padding-top: 5;
+        padding-bottom: 5;
+        padding-right: 5;
+    }
+    .div_body tr{
+        border: 0;
+        border-style:solid;        
+    }
+
+    
 </style>
-<form id="user_form" method="post" action="{% url 'main:registration' %}" encryption="multipart/form-data">
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    {{ profile_form.as_p }}
-</form>
-
-<table style="background-color: rgb(243, 243, 243);">
-    <tr class="reg_tr">
-        <td class="reg_lb"><span id="lb_username">User name</span></td>
-        <td>&nbsp</td>
-        <td><input type="text" id="username"></td>
-    </tr>
-    <tr class="reg_tr">
-        <td class="reg_lb"><span id="lb_pw">Password</span></td><td>&nbsp</td><td><input type="password" id="pw"></td>
-    </tr>
-    <tr class="reg_tr">
-        <td class="reg_lb"><span id="lb_pw_confirm">Password Confirm</span></td><td>&nbsp</td><td><input type="password" id="pw_confirm"></td>
-    </tr>
-    <tr class="reg_tr">
-        <td class="reg_lb"><span id="lb_email">Email Address</span></td><td>&nbsp</td><td><input type="email" id="email"></td>
-    </tr>
-    <tr class="reg_tr">
-        <td class="reg_lb">Profile Texts</span></td> <td>&nbsp</td> <td><textarea id="pf_text" rows="4" cols="50" ></textarea></td>
-    </tr>
-    <tr class="reg_tr">
-        <td class="reg_lb"></td> <td>&nbsp</td><td><span style="font-size: small;">* (Recommended) Anything you want to say to other users. <br>Your Profile texts contribute to Natural Language Processing for accurate match results.</span></td>
-    </tr>
-    <tr class="reg_tr">
-        <td class="reg_lb">Open Profile Texts In Search</td> <td>&nbsp</td><td> <input type="checkbox" id="pf_text_open" >
-            <span style="font-size: small;">* It is recommended being checked that other users can see the profile texts </span></td>
-    </tr>    
-</table>
-<br>
-
-<input id="submit" type="submit" name="submit" />
-<span id="result" />
+<div class="div_body">
+    <table>
+        <tr>
+            <td></td>
+            <td class="center"><h3 id="title">Title</h3><hr></td>
+        </tr>
+        <div class="form-group" style="width:90%">
+        <tr>
+            <td style="width: 40%;"><div align="right"><label id="lb_username">Username:</label></div></td>
+            <td><input type="text" class="form-control" name="username" id="username"></td>
+        </tr>
+        <tr>
+            <td><div align="right"><label id="lb_pw">Password:</label></div></td>
+            <td><input type="password" class="form-control" name="pw" id="pw"></td>
+        </tr>
+        <tr>
+            <td><div align="right"><label id="lb_pw_confirm">Password Confirm:</label></div></td>
+            <td><input type="password" class="form-control" name="pw_confirm" id="pw_confirm"></td>
+        </tr>
+        <tr>
+            <td><div align="right"><label id="lb_email">Email Address:</label></div></td>
+            <td><input type="text" class="form-control" name="email" id="email"></td>
+        </tr>
+        <tr>
+            <td><div align="right"><label>Profile Texts:</label></div></td>
+            <td>
+                <textarea id="pf_text" class="form-control" rows="4" cols="50" ></textarea>
+            </td>
+        </tr>
+            <td><div align="right"><label>Open Profile Texts In Search:</label></div></td>
+            <td>
+                <input type="checkbox" id="pf_text_open">
+                <span style="font-size: small;">* (Recommended) Anything you want to say to other users.
+                    Your Profile texts contribute to Natural Language Processing for accurate match results.</span>
+            </td>
+        <tr>
+            <td></td>
+            <td> 
+                <input id="submit" type="submit" name="submit" />&nbsp<span id="result"></span>
+            </td>
+        </tr>        
+        </div>
+    </table>
+</div>
 
 {% endblock %}

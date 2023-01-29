@@ -1,15 +1,20 @@
 {% extends 'profile_base.html' %}
 
 {% block profile_base_head_block %}
+
+
 <script>
     $(document).ready(function()
-    {
+    {        
+        $('#title').html("Create Your New SMF Account");
+
         $('#pf_text_open').prop('checked',true)
         $('#submit').click(function()
         {
+            
             $('#result').html('');
-            if(check_validity( ['username','pw','pw_confirm','email']) == false)
-               return;
+            if(check_validity( ['username','pw','pw_confirm','email']) == false)               
+               return;            
 
             $.ajax({
                 type: "POST",
@@ -44,6 +49,8 @@
         });
 
         $('#submit').val("Create Account");
+
+        
         
         $('#default_set').click(function()
         {

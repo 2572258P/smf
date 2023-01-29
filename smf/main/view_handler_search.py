@@ -1,4 +1,4 @@
-from .models import Question,Answer,UserProfile,Choice,InvData#,STF
+from .models import Question,Answer,UserProfile,Choice,InvData,Update#,STF
 from collections import defaultdict
 from django.contrib.auth.models import User
 import time
@@ -263,26 +263,27 @@ def handle_search_result(request,username):
 
     return render(request, 'search_results.html',context)
 
+def GetBodyText(Inv):
+    return "A user in SMF service requested you.\n\n\
+Message:{}\n\
+Please visit our webiste check the \"My Mates\" menu.\n\
+http://18.170.55.54/main/my_mates/".format(Inv.message if len(Inv.message) > 0 else "No Message Attached.")
 
 
 
 def handle_sending_message(request):
     data = {}
-    pf_pk = request.POST.get('pf_pk', None)    
+    to_pk = request.POST.get('pf_pk', None)    
     mp = UserProfile.objects.filter(user=request.user).first()
-    tp = UserProfile.objects.filter(pk=pf_pk).first()
+    tp = UserProfile.objects.filter(pk=to_pk).first()
     if tp:        
         msg = request.POST.get('msg',"")
-        sent = InvData(from_pk=mp.pk,to_pk=pf_pk,message=msg,time=timezone.localtime(timezone.now()).time() ,date=timezone.localtime(timezone.now()).date())
-        sent.save()
-        body = "A user in SMF service requested you.\n\n\
-Message:{}\n\
-Please visit our webiste check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format(inv.message if len(msg) > 0 else "No Message Attached.")
-
+        Inv = InvData(from_pk=mp.pk,to_pk=to_pk,message=msg,time=timezone.localtime(timezone.now()).time() ,date=timezone.localtime(timezone.now()).date())
+        Inv.save()
+        body = GetBodyText(Inv)
         send_mail('[SMF] Request Message',body, 'SMF Notification<2572258p@gmail.com>', [tp.email])
-        tp.has_request = True
-        tp.save()
+        up = Update(profile=tp,to_pk=mp.pk)
+        up.save()
     else:
         print('no user found.')
     
@@ -319,7 +320,9 @@ def handle_save(request,profile):
 
 def handle_find_mates(request):
     if CheckAuth(request) is False:
+        print("show auth page")
         return ShowNotAuthedPage()
+
     context = {}
     category_pair = {"cc":"Common Questions","cd":"Details","cb":"Behavioral Questions","cu":"Registered by users"}
     apv_qs = Question.objects.all().exclude(approved=False)

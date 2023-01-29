@@ -19,7 +19,8 @@ from django.utils import timezone
 def login_requirement(request):
     return render(request,'login_requirement.html',{})
 
-
+def sign_in_page(request):
+    return render(request,'sign_in.html',{})
 
 def dashboard(request):    
 
@@ -209,4 +210,6 @@ def my_account(request):
     return handle_myaccount(request)
 
 def my_mates(request):
+    if CheckAuth(request) is False:
+        return ShowNotAuthedPage()
     return handle_mymates(request)

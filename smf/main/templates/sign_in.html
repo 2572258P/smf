@@ -1,0 +1,44 @@
+{% extends 'base_frame.html' %}
+{% block body_block%}
+<style>
+    .body_content
+    {
+        padding: 10%;
+    }
+    .body_content table{
+        width: 50%;
+        height: 20%;
+    
+    }
+</style>
+
+
+
+<form action="{% url 'main:login' %}" method="post" style="display: inline;">
+{% csrf_token %}
+<div class="body_content" align="center">
+<table class="border border-primary">
+    <tr>
+        <td class="center">
+            <h3>Use your SMF Account</h3><hr>
+        </td> 
+    </tr>
+    <tr>        
+        <td style="padding-left: 10px;">
+            <div class="form-group" style="width:90%">
+                <label>Username:</label>
+                <input type="text" class="form-control" name="username">
+                <label>Password:</label>
+                <input type="password" class="form-control" name="password">
+            </div> 
+        </td>
+    </tr>
+    <tr>
+        <td class="center">
+            <input type="submit" name="login" value="Sign in"> | or <a href="{% url 'main:registration'%}">Sign-up</a>
+        </td>        
+    </tr>
+</table>
+</form>
+</div>
+{% endblock %}

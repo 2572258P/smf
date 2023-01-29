@@ -16,11 +16,8 @@ $(document).ready(function()
                 {
                     msg_ = "";
                 }
-            }
-
-            
+            }            
             $("#img_prog_{{sr.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
-            
 
             $.ajax({
                     type: "POST",

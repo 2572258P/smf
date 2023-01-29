@@ -92,8 +92,7 @@ body {margin:0;}
 .sign_inout
 {
   background: rgb(0, 0, 0);
-  border-radius: 5px 5px;  
-
+  border-radius: 5px 5px;
 }
 
 
@@ -117,8 +116,6 @@ body {margin:0;}
   padding: 2%;  
   border-radius: 50px 20px;
 }
-
-
 .draft_questions_title{
   color: rgb(126, 126, 126);
   border-collapse: collapse;
@@ -150,6 +147,6 @@ textarea {
 }
 
 .has_request_img{
-  height:22px;
+  height:25px;
 
 }

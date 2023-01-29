@@ -1,5 +1,8 @@
 {% extends 'base_frame.html' %}
 
+{% load main_extras %}
+{% load static %}
+
 {% block head_block %}
 <script>
 $(document).ready(function()
@@ -32,6 +35,7 @@ $(document).ready(function()
     {% for rv in rev %}
         $("#acc_{{rv.to_pk}}").click(function()
         {
+            $("#img_loading_{{rv.to_pk}}").show();            
             $.ajax({
                     type: "POST",
                     url: "{% url 'main:my_mates' %}",
@@ -44,6 +48,7 @@ $(document).ready(function()
                     {
                         $("#rev_msg_{{rv.to_pk}}").html("Accepted");
                         $("#rev_but_div_{{rv.to_pk}}").hide();
+                        $("#img_loading_{{rv.to_pk}}").hide();
                     },
                     failure: function ()
                     {                    
@@ -66,6 +71,7 @@ $(document).ready(function()
                     {
                         $("#rev_msg_{{rv.to_pk}}").html("Rejected");
                         $("#rev_but_div_{{rv.to_pk}}").hide();
+                        
                     },
                     failure: function ()
                     {                    
@@ -111,8 +117,15 @@ $(document).ready(function()
         padding: 1%;
     }
     .button_width{
-        width: 10%;
+        width: 15%;
 
+    }
+    .img_new{
+        width: 15px;
+    }
+    .img_loading{
+        width: 25px;
+        
     }
 </style>
 <p>
@@ -139,16 +152,23 @@ $(document).ready(function()
 <div id="div_rev" class="collapse">
 {% for rv in rev %}
 <div class="basic_bg">
-    {% if rv.msg %}
-    <p>{{rv.msg}}</p>
-    {% else %}
-        <p style="font-style:italic;">No message attached</p>
-    {% endif %}
+    <p>
+        {% if updates|get_val_in_dict:rv.to_pk %}
+            <img class="img_new" src="{% static 'new3.png' %}">
+            <span style="font-weight: bold;">New Request</span>
+        {% endif %}
+        {% if rv.msg %}
+            {{rv.msg}}
+        {% else %}    
+            <span style="font-style:italic;">No message attached</span>
+        {% endif %}
+    </p>
 
     <p>Date: {{rv.date}} / Time: {{rv.time}}</p>
     <div id="rev_but_div_{{rv.to_pk}}">
         <button id="acc_{{rv.to_pk}}">Accept</button>
         <button id="rej_{{rv.to_pk}}">Reject</button>
+        <img id="img_loading_{{rv.to_pk}}" hidden="hidden" class="img_loading" src="{% static 'loading4.gif' %}" >
     </div>
     <span style="font-style:italic;" id="rev_msg_{{rv.to_pk}}"></span>
 </div><br>
@@ -161,9 +181,11 @@ $(document).ready(function()
 <div id="div_dis" class="collapse">
 {% for ac in acc %}
 <div class="basic_bg">
-    <p>Date: {{ac.date}} / Time: {{ac.time}}</p>
-    <p>Email: <a href="mailto:{{ac.email}}">{{ac.email}}</a></p>
-    
+    {% if updates|get_val_in_dict:ac.to_pk %}
+        <img class="img_new" src="{% static 'new4.png' %}"><span style="font-weight: bold;">New Mate</span>
+    {% endif %}
+    <p>Date: {{ac.date}} / Time: {{ac.time}}
+    <p>Email: <a href="mailto:{{ac.email}}">{{ac.email}}</a></p>    
     <p>Profile Text: {{ac.profile_text}}</p>
 
     {% if ac.msg %}

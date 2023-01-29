@@ -17,4 +17,6 @@ urlpatterns = [
     path('login_requirement/',views.login_requirement,name='login_requirement'),
     path('my_mates/',views.my_mates,name='my_mates'),
     re_path(r'^list_result/(?P<userId>\w+)',views.list_result,name='list_result'),
+    path('sign_in_page/',views.sign_in_page,name='sign_in_page'),
+    path('about_us/',views.dashboard,name='about_us'),
 ]

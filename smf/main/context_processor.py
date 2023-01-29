@@ -1,12 +1,12 @@
-from .models import UserProfile
+from .models import UserProfile,Update
 
 
 def main_cp(request):
     context = {}
     if request.user.is_authenticated:
-        mypf = UserProfile.objects.filter(user=request.user).first()
-        if mypf:
-            context['has_request'] = mypf.has_request
+        mp = UserProfile.objects.filter(user=request.user).first()
+        if mp:
+            context['has_request'] = True if Update.objects.filter(profile=mp).count() > 0 else False
     else:
         context['has_request'] = False
     return context

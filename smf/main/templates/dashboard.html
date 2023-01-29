@@ -1,6 +1,7 @@
 {% extends "base_frame.html" %}
 {% load main_extras %}
 
+{% load static %}
 {% block head_block %}
 <!-- Head_Block -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -80,13 +81,9 @@ $(document).ready(function()
     $("#menu_db").addClass("menu_select")        
 });
 </script>
-
 {% endblock %} 
 
-
-
-{% block body_block %}
-
+{% block body_block_no_pad %}
 <script>
     // A $( document ).ready() block.
     $( document ).ready(function() 
@@ -100,12 +97,9 @@ $(document).ready(function()
         $("#hi_msg").html("Study Mates Finder - " + hi_sen[index]);
         let bc = ["#121352","#c9c7c9","#ff9b0f","#024a3f"];
         let fc = ["#d8d8f0","#47273a","#4a2d04","#d3f5f0"];
-        
-
         index = Math.floor(Math.random() * fc.length);
         $("#hi_div").css("color",fc[index])
-        $("#hi_div").css("background",bc[index])
-        
+        $("#hi_div").css("background",bc[index])        
     });
 </script>
 
@@ -114,57 +108,143 @@ $(document).ready(function()
         color:black;
         width: 55px;
     }
+    *{
+    box-sizing: border-box;
+    }
+
+    /* Create two equal columns that floats next to each other */
+    .column {
+    float: left;  
+    padding: 10px;    
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+    content: "";
+    display: table;
+    clear: both;
+    }
+
+    p.intro_title {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 300%;
+        font-weight: bold;
+    }
+    p.intro_body{
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 150%;
+        font-weight: bold;
+        color: rgb(124, 124, 124);
+    }
+    .intro{
+        background-color: rgb(248, 248, 248);
+        height: 250px;
+    }
+    .stranger{
+        background-color: rgb(8,84,116);
+        height: 200px;
+    }
+    .body_content
+    {
+        height: 200px;        
+    }
+    p.body_title{
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 150%;
+        font-weight: bold;
+    }
+    p.body_content{
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 100%;
+        font-weight: bold;
+        color: rgb(124, 124, 124);
+    }
+
+    p.draft_title{
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 200%;
+        font-weight: bold;
+    }
+
 </style>
 
-<div id="hi_div" class="slideRightToLeft"><span id="hi_msg"></span></div>
-
-<div class="div_type1">
-<h2>Draft Questions - Registered by users</h2>
-{% if not draft_questions %}
-No questions yet. Regular users can register customized questions.
-{% endif %}
-{% for q in draft_questions %}    
-<fieldset class="draft_questions_title"> <!-- for making a group -->
-    
-    <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.title }}</legend>
-    {% for c in q.choice_set.all %}
-        <input type="{{q.ctrl_type}}" disabled>
-        <label disabled>{{c.choice_text}} </label>
-        {% if q.choice_set.all.count > 3 %}
+<table style="width: 100%;">
+    <th></th>
+    <tr style="height: 200px;"> <!-- Intro -->
+        <td  style="width:20%;background-color: rgb(248, 248, 248)">            
+        </td>
+        <td style="width:70%;background-color: rgb(248, 248, 248)">
+            <p class="intro_title">We knew, <br>you wanted to study together.</p>
+            <p class="intro_body">
+                We believe you can find your soul.<br><br>
+                <div align="right">
+                    <p class="intro_body">
+                        We can help you.
+                    </p>
+                </div>
+            </p>
+        </td>
+        <td  style="width:10%;background-color: rgb(237, 237, 237);">
+        </td>
+    </tr>
+    <tr style="height: 250px;">
+        <td  style="width:20%;background-color: rgb(81, 0, 0);">
+        </td>
+        <td  style="width:60%;background-color:rgb(3, 50, 70);">
+            <img src="{% static 'no_stranger.png'%}" style="height:250;opacity: 1.0">
+        </td>
+        <td  style="width:20%;background-color:rgb(3, 50, 70);">
+        </td>
+    </tr>
+        <td  style="width:20%;background-color: rgb(255, 255, 255);">
+        </td>
+        <td  style="width:60%;background-color: rgb(255, 255, 255);padding-top: 50;">
+            <p class="draft_title">Draft Questions - Registered by users</p>
+            {% if not draft_questions %}
+                No questions yet. Regular users can register customized questions.
+            {% endif %}
+            {% for q in draft_questions %}
+                <fieldset class="draft_questions_title">     
+                <legend id="legend_{{q.id}}" class="draft_questions_body">{{ forloop.counter }}. {{ q.title }}</legend>
+                {% for c in q.choice_set.all %}
+                    <input type="{{q.ctrl_type}}" disabled>
+                    <label disabled>{{c.choice_text}} </label>
+                    {% if q.choice_set.all.count > 3 %}
+                        <br>
+                    {% endif %}
+                {% endfor %}
+                {% if 'tbq' == q.type %}
+                    <textarea name="text_ans{{q.id}}" " rows="4" cols="50" disabled></textarea><br>
+                {% endif %}
+                <br>
+                {% if user.is_authenticated %}
+                    <input type="button" value="Up" id="Up_{{q.id}}" class="vote_button"/>
+                    <input type="button" value="Down" id="Down_{{q.id}}" class="vote_button"/>
+                    {% if my_vote|get_val_in_dict:q.id == 1 %}
+                    <script>document.getElementById("Up_{{q.id}}").style.color = "red";</script>
+                    {% endif %}
+                    {% if my_vote|get_val_in_dict:q.id == 0 %}
+                    <script>document.getElementById("Up_{{q.id}}").style.color = "black";</script>
+                    <script>document.getElementById("Down_{{q.id}}").style.color = "black";</script>
+                    {% endif %}
+                    {% if my_vote|get_val_in_dict:q.id == -1 %}
+                    <script>document.getElementById("Down_{{q.id}}").style.color = "red";</script>
+                    {% endif %}
+                {% endif %}
+                <label>Up: </label>
+                <label id="result_up{{q.id}}">{{up_vote_count|get_val_in_dict:q.id}}</label>    
+                /
+                <label>Down:</label>
+                <label id="result_down{{q.id}}">{{down_vote_count|get_val_in_dict:q.id}}</label>
+                <br><label id="msg{{q.id}}"></label>
+            </fieldset><br>
+            {% endfor %}
             <br>
-        {% endif %}
-    {% endfor %}
-    {% if 'tbq' == q.type %}
-        <textarea name="text_ans{{q.id}}" " rows="4" cols="50" disabled></textarea><br>
-    {% endif %}
-    <br>
-    {% if user.is_authenticated %}
-        <input type="button" value="Up" id="Up_{{q.id}}" class="vote_button"/>
-        <input type="button" value="Down" id="Down_{{q.id}}" class="vote_button"/>
-        {% if my_vote|get_val_in_dict:q.id == 1 %}
-        <script>document.getElementById("Up_{{q.id}}").style.color = "red";</script>
-        {% endif %}
-        {% if my_vote|get_val_in_dict:q.id == 0 %}
-        <script>document.getElementById("Up_{{q.id}}").style.color = "black";</script>
-        <script>document.getElementById("Down_{{q.id}}").style.color = "black";</script>
-        {% endif %}
-        {% if my_vote|get_val_in_dict:q.id == -1 %}
-        <script>document.getElementById("Down_{{q.id}}").style.color = "red";</script>
-        {% endif %}
-    {% endif %}
-    <label>Up: </label>
-    <label id="result_up{{q.id}}">{{up_vote_count|get_val_in_dict:q.id}}</label>    
-    /
-    <label>Down:</label>
-    <label id="result_down{{q.id}}">{{down_vote_count|get_val_in_dict:q.id}}</label>
-    <br><label id="msg{{q.id}}"></label>
-</fieldset><br>
-{% endfor %}
-<br>
-</div>
-<div class="div_type2">
-<h2>Data Monitoring&ltFor Admin&gt</h2>
-
+            <br>
+            <br>
+{% if user.is_authenticated %}
+<div style="color: rgb(0, 0, 0);">
+<h2>Data Monitoring&ltFor Debugging&gt</h2>
 {% if questions %}
     <p><b>Questions: {{questions.count}}</b></p>
     <ul>
@@ -202,8 +282,7 @@ No questions yet. Regular users can register customized questions.
 {% else %}
     <p>No answers are available</p>
 {% endif %}
-</div>
-<h2>Similarity Test &ltFor Admin&gt</h2>
+<h2>Similarity Test &ltFor Debugging&gt</h2>
 <p>Fill out texts below to calculate similarities</p>
 <form action="{% url 'main:dashboard' %}" method="post">
     {% csrf_token %}
@@ -216,4 +295,12 @@ No questions yet. Regular users can register customized questions.
 <span>Similarity: {{compare_result}}</span>
 
 {{test_msg}}
-{% endblock %} 
+        </td>
+        <td  style="width:20%;background-color: rgb(255, 255, 255);">
+        </td>
+        <tr>
+        </tr>
+</table>
+</div>
+{% endif %}
+{% endblock %}
