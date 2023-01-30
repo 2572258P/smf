@@ -12,7 +12,8 @@ import re
 import random
 
 class mymate_info:
-    def __init__(self,to_pk,date="",time="",msg="",email="",profile_text="",username=""):
+    def __init__(self,to_pk,date="",time="",msg="",email="",profile_text="",username="",percent=0):
+        self.percent = percent
         self.to_pk = to_pk
         self.email = email
         self.msg = msg
@@ -25,9 +26,10 @@ from django.core.mail import send_mail
 
 def GetBodyText(Inv):
     return "Congratulations! your request has been accepted by the other user. \n\n\
-Message:{}\n\
+Message: {}\n\
+Match Percent: {}%\n\
 Please visit our webiste and check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format( Inv.message if len(Inv.message) > 0 else "No Message Attached.")
+http://18.170.55.54/main/my_mates/".format( Inv.message if len(Inv.message) > 0 else "No Message Attached.",Inv.percent)
 
 
 def handle_mymates(request):
@@ -80,13 +82,13 @@ def handle_mymates(request):
         context['acc']  = []
 
         for sd in sent_data:
-            context['sent'].append(mymate_info(date=str(sd.date),time=sd.time.strftime('%I:%H %p'),to_pk=sd.to_pk,msg=sd.message))
+            context['sent'].append(mymate_info(date=str(sd.date),time=sd.time.strftime('%I:%H %p'),to_pk=sd.to_pk,msg=sd.message,percent=sd.percent))
         for rv in rev_data:
-            context['rev'].append(mymate_info(date=str(rv.date),time=rv.time.strftime('%I:%H %p'),to_pk=rv.from_pk,msg=rv.message))
+            context['rev'].append(mymate_info(date=str(rv.date),time=rv.time.strftime('%I:%H %p'),to_pk=rv.from_pk,msg=rv.message,percent=rv.percent))
         for ac in acc_data:
             connected_pk = ac.to_pk if ac.from_pk == mp.pk else ac.from_pk
             up = UserProfile.objects.filter(pk=connected_pk).first()
-            context['acc'].append(mymate_info(date=str(ac.date),time=ac.time.strftime('%I:%H %p'),to_pk=connected_pk,msg=ac.message,email=up.email,profile_text=up.profile_text))
+            context['acc'].append(mymate_info(date=str(ac.date),time=ac.time.strftime('%I:%H %p'),to_pk=connected_pk,msg=ac.message,email=up.email,profile_text=up.profile_text,percent=ac.percent))
         
 
         context['updates'] = {}

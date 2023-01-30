@@ -265,9 +265,10 @@ def handle_search_result(request,username):
 
 def GetBodyText(Inv):
     return "A user in SMF service requested you.\n\n\
-Message:{}\n\
+Message: {}\n\
+Match Percent: {}%\n\
 Please visit our webiste check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format(Inv.message if len(Inv.message) > 0 else "No Message Attached.")
+http://18.170.55.54/main/my_mates/".format(Inv.message if len(Inv.message) > 0 else "No Message Attached.",Inv.percent)
 
 
 
@@ -278,7 +279,8 @@ def handle_sending_message(request):
     tp = UserProfile.objects.filter(pk=to_pk).first()
     if tp:        
         msg = request.POST.get('msg',"")
-        Inv = InvData(from_pk=mp.pk,to_pk=to_pk,message=msg,time=timezone.localtime(timezone.now()).time() ,date=timezone.localtime(timezone.now()).date())
+        percent = float(request.POST.get('percent',0))
+        Inv = InvData(percent=percent,from_pk=mp.pk,to_pk=to_pk,message=msg,time=timezone.localtime(timezone.now()).time() ,date=timezone.localtime(timezone.now()).date())
         Inv.save()
         body = GetBodyText(Inv)
         send_mail('[SMF] Request Message',body, 'SMF Notification<2572258p@gmail.com>', [tp.email])
@@ -302,7 +304,7 @@ def handle_load(request,profile):
     return answers
     
 def handle_save(request,profile):
-    for q in Question.objects.all():
+    for q in Question.objects.all().filter(approved=True):
         anss = Answer.objects.filter(profile=profile,question_id=q.pk)
         anss.delete()
         if q.type == 'scq' or q.type == 'mcq':
@@ -315,8 +317,10 @@ def handle_save(request,profile):
                     a = Answer(profile=profile,question_id=q.pk,choice_id=ans)
                     a.save()
         elif q.type == 'tbq':
-            a = Answer(profile=profile,question_id=q.pk,answer_text=request.POST["text_ans%i"%q.id])
-            a.save()
+            text_ans = request.POST["text_ans%i"%q.pk]
+            if len(text_ans) > 0:
+                a = Answer(profile=profile,question_id=q.pk,answer_text=text_ans)
+                a.save()
 
 def handle_find_mates(request):
     if CheckAuth(request) is False:
@@ -330,7 +334,7 @@ def handle_find_mates(request):
     for k,v in category_pair.items():
         context['cat_qs'][k] = apv_qs.filter(category=k)
     context['category_pair'] = category_pair
-    context['questions'] = Question.objects.all().exclude(approved=False)
+    context['questions'] = apv_qs
     context['answers'] = {}
     profile = UserProfile.objects.filter(user=request.user).first()
     if profile:

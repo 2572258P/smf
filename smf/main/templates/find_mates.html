@@ -90,24 +90,25 @@
         <p>
         <div id="demo{{k}}" class="collapse">
         {% for q in v %}
-            <input type="hidden" name="question{{q.id}}" value="{{q.id}}" id="question{{q.id}}" >
+            <input type="hidden" name="question{{q.pk}}" value="{{q.pk}}" id="question{{q.pk}}" >
             <div class="q_frame">
-                <h4 id="title_{{q.id}}">{{ q.title }}</h4>
+                <h4 id="title_{{q.pk}}">{{ q.title }}</h4>
                 <p style="font-style: italic;font-size: small;">{{q.desc}}</p>
                 {% for c in q.choice_set.all %}
-                    <label id="choice_{{c.id}}">
-                    {% if answers|get_list_in_dict:q.id|is_val_in_list:c.id == True %}
-                        <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
+                    <label id="choice_{{c.pk}}">
+                    {% if answers|get_list_in_dict:q.pk|is_val_in_list:c.pk == True %}
+                        <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.pk}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
                     {% else %}
-                        <input type="{{q.ctrl_type}}" name="choice{{q.id}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
+                        <input type="{{q.ctrl_type}}" name="choice{{q.pk}}" value="{{ c.pk }}" id="choice{{ forloop.counter }}" >
                     {% endif %}
                     {{c.choice_text}}</label>
                     {% if q.choice_set.all.count > 2 %}
                         <br>
                     {% endif %}
                 {% endfor %}
-                {% if 'tbq' == q.type %}                    
-                    <textarea name="text_ans{{q.id}}" id="text_ans{{q.id}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
+                {% if 'tbq' == q.type %}
+                    <script>console.log("text_ans{{q.pk}}");</script>
+                    <textarea name="text_ans{{q.pk}}" id="text_ans{{q.pk}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
                 {% endif %}
                 </div>
             <br>

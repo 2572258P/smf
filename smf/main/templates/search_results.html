@@ -18,14 +18,14 @@ $(document).ready(function()
                 }
             }            
             $("#img_prog_{{sr.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
-
             $.ajax({
                     type: "POST",
                     url: "{% url 'main:list_result' 'dummy' %}",
                     data:{
                         pf_pk: '{{sr.pf_pk}}',
-                        msg: msg_,
+                        msg: msg_,                        
                         csrfmiddlewaretoken: '{{ csrf_token }}',
+                        percent: $("#percent_{{sr.pf_pk}}").html(),
                         dataType: "json",
                     },
                     success: function (data)
@@ -90,7 +90,7 @@ $(document).ready(function()
 </style>
     {% if search_results %}
         {% for sr in search_results %}
-            <button class="btn btn-primary col_but" id = "rbt_{{sr.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{sr.pf_pk}}">User / {{sr.percent}} %</button>
+            <button class="btn btn-primary col_but" id = "rbt_{{sr.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{sr.pf_pk}}">User / <span id="percent_{{sr.pf_pk}}">{{sr.percent}}</span> %</button>
             
             {% if forloop.counter0 == 0 %}
                 <script> $("#rbt_{{sr.pf_pk}}").html("My Answers") </script>
@@ -123,17 +123,17 @@ $(document).ready(function()
                             </tr>
                         </table>
                         <script>
-                            let msgs = {
+                            var msgs = {
                                 "req":"* Requesting has been complete.",
                                 "rev":"* You have a request from this user.",
                                 "con":"* You both are connected.",
                             };
-                            let sources = {
+                            var sources = {
                                 "req":"{% static 'check1.jpg' %}",
                                 "rev":"{% static 'mail.png' %}",
                                 "con":"{% static 'hand_shake.jpg' %}",
                             }
-                            let status = "";
+                            var status = "";
                             
                             {% if sent|get_val_in_dict:sr.pf_pk %}
                                 status = 'req';                                

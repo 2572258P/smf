@@ -22,9 +22,7 @@ def login_requirement(request):
 def sign_in_page(request):
     return render(request,'sign_in.html',{})
 
-def dashboard(request):    
-
-
+def dashboard(request):
     STF.Init()
     STF.Update()
     context = {}    

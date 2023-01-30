@@ -139,6 +139,7 @@ $(document).ready(function()
     {% else %}
         <p style="font-style:italic;">No message attached</p>
     {% endif %}
+    <p>Match Percent: <span style="font-weight: bold;">{{sd.percent}} %</span></p>
     
     <button id="cancel_{{sd.to_pk}}">Cancel</button>
     <span style="font-style:italic;" id="cancel_msg_{{sd.to_pk}}"></span>
@@ -159,10 +160,11 @@ $(document).ready(function()
         {% endif %}
         {% if rv.msg %}
             {{rv.msg}}
-        {% else %}    
+        {% else %}
             <span style="font-style:italic;">No message attached</span>
         {% endif %}
     </p>
+    <p>Match Percent: <span style="font-weight: bold;">{{rv.percent}} %</span></p>
 
     <p>Date: {{rv.date}} / Time: {{rv.time}}</p>
     <div id="rev_but_div_{{rv.to_pk}}">
@@ -191,6 +193,7 @@ $(document).ready(function()
     {% if ac.msg %}
     <p>Message: {{ac.msg}}</p>
     {% endif %}
+    <p>Match Percent: <span style="font-weight: bold;">{{ac.percent}} %</span></p>
     
     <button id="dis_{{ac.to_pk}}">Disconnect</button>
     <span style="font-style:italic;" id="dis_msg_{{ac.to_pk}}"></span>

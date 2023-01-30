@@ -67,6 +67,7 @@ class InvData(models.Model):
     message = models.CharField(max_length=512)
     date = models.DateField(default=timezone.now)
     time = models.TimeField(default=timezone.now)
+    percent = models.FloatField(default=0)
 
     
 
