@@ -13,7 +13,7 @@ from main.models import Question,Answer,UserProfile,Choice
 from django.utils import timezone
 import time
 from django.contrib.auth.models import User
-import pandas as pd
+#import pandas as pd
 import csv
 
 
@@ -49,7 +49,7 @@ def allocate_random_answer(users):
         anss.delete()
         for q in Question.objects.all():
             if q.type == 'tbq':
-                dataset = pd.read_csv("dataset/dataset.csv")
+                #dataset = pd.read_csv("dataset/dataset.csv")
                 randIndex = random.randint(0,len(dataset['review/text'])-1)
                 text = dataset['review/text'][randIndex][:32]
                 print(text)
