@@ -1,4 +1,5 @@
 ﻿title,
+gen_key,
 desc,
 type,
 category,
@@ -6,6 +7,7 @@ priority,
 match_type,
 ,
 title,What course level are you studying at the university?
+gen_key,wcl
 desc,
 type,scq
 category,cc
@@ -19,6 +21,7 @@ match_type,smt
 6,Other
 ,
 title,Where do you prefer to study?
+gen_key,wdps
 desc,
 type,mcq
 category,cc
@@ -30,6 +33,7 @@ match_type,emt
 4,Outside
 ,
 title,What do you like?
+gen_key,wdl_tale
 desc,
 type,scq
 category,cc
@@ -39,6 +43,7 @@ match_type,xor
 2,Learning
 ,
 title,What do you like?
+gen_key,wdl_tali
 desc,
 type,scq
 category,cc
@@ -48,14 +53,16 @@ match_type,xor
 2,Listening
 ,
 title,Please tell me what you think about the benefit of group studying.
+gen_key,tm_ben
 desc,"e.g., Social Activity, Coursework, etc."
 type,tbq
 category,cc
 priority,high
 match_type,emt
 ,
-title,"Please, choose the courses that you want to study together. (Computing Science - LV1)"
-desc,
+title,Computing Science - LV1
+gen_key,courses_lv1
+desc,"Please, choose the courses that you want to study together."
 type,mcq
 category,cd
 priority,high
@@ -75,8 +82,9 @@ match_type,emt
 13,WEB APPLICATION SYSTEMS COMPSCI1023
 14,WORKPLACE ASSESSMENT YEAR 1 COMPSCI1024
 ,
-title,"Please, choose the courses that you want to study together. (Computing Science - LV2)"
-desc,
+title,Computing Science - LV2
+gen_key,courses_lv2
+desc,"Please, choose the courses that you want to study together. "
 type,mcq
 category,cd
 priority,high
@@ -97,8 +105,9 @@ match_type,emt
 14,WEB APPLICATION DEVELOPMENT 2 COMPSCI2021
 15,WORKPLACE ASSESSMENT YEAR 2 COMPSCI2033
 ,
-title,"Please, choose the courses that you want to study together. (Computing Science - LV3)"
-desc,
+title,Computing Science - LV3
+gen_key,courses_lv3
+desc,"Please, choose the courses that you want to study together."
 type,mcq
 category,cd
 priority,high
@@ -107,8 +116,9 @@ match_type,emt
 2,TEAM PROJECT 3 COMPSCI3004
 3,WORKPLACE ASSESSMENT YEAR 3 COMPSCI3011
 ,
-title,"Please, choose the courses that you want to study together. (Computing Science - LV4)"
-desc,
+title,omputing Science - LV4
+gen_key,courses_lv4
+desc,"Please, choose the courses that you want to study together. "
 type,mcq
 category,cd
 priority,high
@@ -160,8 +170,9 @@ match_type,emt
 45,WORKPLACE ASSESSMENT YEAR 4 COMPSCI4085P
 46,WORKPLACE PROJECT SUPPLEMENT COMPSCI4093P
 ,
-title,"Please, choose the courses that you want to study together. (Computing Science - LV5)"
-desc,
+title,Computing Science - LV5
+gen_key,courses_lv5
+desc,"Please, choose the courses that you want to study together. "
 type,mcq
 category,cd
 priority,high
@@ -217,3 +228,11 @@ match_type,emt
 49,TEXT AS DATA FOR MSC COMPSCI5106
 50,WEB SCIENCE (M) COMPSCI5078
 51,WEB SCIENCE FOR MSC COMPSCI5107
+,
+title,What was the best moment in the past?
+gen_key,hdb_1
+desc,Any short or long answer is possible.
+type,tbq
+category,cb
+priority,high
+match_type,emt

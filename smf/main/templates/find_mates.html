@@ -78,10 +78,8 @@
         Priority Colour :<span class="q_high">High</span>,<span class='q_medium'>Medium</span>,<span class="q_low">Low</span><br>
         <span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>
         <p style="font-style:italic">The system finds your mates as much as you have answered the questions. </p>
-
     </p>
 
-    
     {% for k,v in cat_qs.items %}
         {% if v %}
         <button class="btn btn-primary cat_button" id = "bt_{{k}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{k}}">
@@ -93,8 +91,9 @@
             <input type="hidden" name="question{{q.pk}}" value="{{q.pk}}" id="question{{q.pk}}" >
             <div class="q_frame">
                 <h4 id="title_{{q.pk}}">{{ q.title }}</h4>
-                <p style="font-style: italic;font-size: small;">{{q.desc}}</p>
+                <p style="font-style: italic;font-size:95%;">{{q.desc}}</p>
                 {% for c in q.choice_set.all %}
+                    <script>console.log("???");</script>
                     <label id="choice_{{c.pk}}">
                     {% if answers|get_list_in_dict:q.pk|is_val_in_list:c.pk == True %}
                         <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.pk}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
@@ -107,7 +106,6 @@
                     {% endif %}
                 {% endfor %}
                 {% if 'tbq' == q.type %}
-                    <script>console.log("text_ans{{q.pk}}");</script>
                     <textarea name="text_ans{{q.pk}}" id="text_ans{{q.pk}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
                 {% endif %}
                 </div>

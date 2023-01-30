@@ -328,7 +328,7 @@ def handle_find_mates(request):
         return ShowNotAuthedPage()
 
     context = {}
-    category_pair = {"cc":"Common Questions","cd":"Details","cb":"Behavioral Questions","cu":"Registered by users"}
+    category_pair = {"cc":"Common Questions","cd":"Details","cb":"Psychology","cu":"Registered by users"}
     apv_qs = Question.objects.all().exclude(approved=False)
     context['cat_qs'] = {}
     for k,v in category_pair.items():

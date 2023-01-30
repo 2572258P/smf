@@ -73,11 +73,21 @@ def generate_questions(filename):
         for row in csvreader:
             r0 = row[0]
             r1 = row[1]            
+            
             if r0 == 'title':
                 if r1:
                     print("Started to create - {}".format(r1))
                     NewQ = Question(title=r1,pub_date=timezone.now())
                     NewQ.save()
+            elif r0 == 'gen_key':
+                if r1:
+                    if Question.objects.filter(gen_key=r1).first():
+                        print("#the question is already in the database.")
+                        NewQ.delete() 
+                        NewQ = None
+                    else:
+                        NewQ.gen_key = r1
+                        NewQ.save()
             elif r0 == 'desc':
                 if NewQ and r1:
                     NewQ.desc = r1
@@ -103,7 +113,7 @@ def generate_questions(filename):
                     NewQ.match_type = r1
                     NewQ.save()
             else:
-                if NewQ and r1:                    
+                if NewQ and r1:
                     NewQ.choice_set.create(choice_text=r1)
 
 

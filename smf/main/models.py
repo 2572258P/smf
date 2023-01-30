@@ -30,6 +30,7 @@ class Question(models.Model):
     def was_published_recently(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)        
 
+    gen_key = models.CharField(max_length=16,default='')
     approved = models.BooleanField(default=True)
 
     type = models.CharField(max_length=32) #SCQ / MCQ / Text-based ...
@@ -41,6 +42,7 @@ class Question(models.Model):
     pub_date = models.DateTimeField('date published')
     priority = models.CharField(max_length=8) 
     match_type = models.CharField(max_length=8)
+    
 
 class Choice(models.Model):
     def __str__(self):
