@@ -11,4 +11,5 @@ def main_cp(request):
 
     else:
         context['has_request'] = False
+        context['is_admin'] = False
     return context
