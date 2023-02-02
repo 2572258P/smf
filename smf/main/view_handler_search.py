@@ -309,11 +309,11 @@ def handle_save(request,profile):
         anss.delete()
         if q.type == 'scq' or q.type == 'mcq':
             c_id = "choice" + str(q.pk)
-            if q.type == 'scq':
+            if q.type == 'scq' and request.POST.get(c_id):
                 a = Answer(profile=profile,question_id=q.pk,choice_id=request.POST.get(c_id,-1))
                 a.save()
             elif q.type == 'mcq':
-                for ans in request.POST.getlist(c_id):
+                for ans in request.POST.getlist(c_id):                    
                     a = Answer(profile=profile,question_id=q.pk,choice_id=ans)
                     a.save()
         elif q.type == 'tbq':
@@ -322,31 +322,46 @@ def handle_save(request,profile):
                 a = Answer(profile=profile,question_id=q.pk,answer_text=text_ans)
                 a.save()
 
+
+def get_per_ans(mp):
+    apv_qs = Question.objects.all().exclude(approved=False) # Get all questions except unapproved Qs
+    #Count I have answered
+    total_qs_count = apv_qs.count()
+    my_anss = Answer.objects.filter(profile=mp)
+    ass_count = 0
+    duplicated = {}
+    for ans in my_anss:
+        if Question.objects.filter(pk=ans.question_id).first() and ans.question_id not in duplicated:
+            duplicated[ans.question_id] = ans.question_id
+            ass_count += 1
+    return int(ass_count / total_qs_count * 100)
+
 def handle_find_mates(request):
     if CheckAuth(request) is False:
-        print("show auth page")
         return ShowNotAuthedPage()
 
-    context = {}
-    category_pair = {"cc":"Common Questions","cd":"Details","cb":"Psychology","cu":"Registered by users"}
-    apv_qs = Question.objects.all().exclude(approved=False)
-    context['cat_qs'] = {}
-    for k,v in category_pair.items():
-        context['cat_qs'][k] = apv_qs.filter(category=k)
-    context['category_pair'] = category_pair
-    context['questions'] = apv_qs
-    context['answers'] = {}
-    profile = UserProfile.objects.filter(user=request.user).first()
-    if profile:
-        if 'Find' in request.POST:
-            return redirect('main:start_searching',userId=request.user.username)
-        elif 'Save' in request.POST:
-            context['message'] = "Data have been successfully saved."        
-            handle_save(request,profile)        
-        else:
-            context['message'] = "Data have been successfully loaded."
-            
-        context['answers'] = handle_load(request,profile)                
-        return render(request,'find_mates.html',context)
-    else:
+    apv_qs = Question.objects.all().exclude(approved=False) # Get all questions except unapproved Qs
+    mp = UserProfile.objects.filter(user=request.user).first()
+    if not mp:
         return HttpResponse("{} User Profile Does not Exist".format(request.user))
+    #Total count of approved quetions
+
+    if is_ajax(request): #Saving        
+        mp = UserProfile.objects.filter(user=request.user).first()
+        handle_save(request,mp)
+        data = {"per_ans":get_per_ans(mp)}
+        return JsonResponse(data)
+    else: #Only for loading
+        context = {}
+        #labelling for categories    
+        category_pair = {"cc":"Common Questions","cd":"Details","cb":"Psychology","cu":"Registered by users"}        
+        context['cat_qs'] = {}
+        for k,v in category_pair.items():
+            context['cat_qs'][k] = apv_qs.filter(category=k)
+        context['category_pair'] = category_pair
+        context['questions'] = apv_qs
+        context['answers'] = {}        
+        context['message'] = "Data have been successfully loaded."                
+        context['answers'] = handle_load(request,mp)
+        context['per_ans'] = get_per_ans(mp)
+        return render(request,'find_mates.html',context)

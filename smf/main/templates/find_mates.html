@@ -41,44 +41,102 @@
 </style>
 
 <script>
+
+    function bar_color(value)
+    {
+        let per = value;
+        $("#per_bar").css('width', per+'%');
+        $("#per_num").html(value + '%');
+        if(per < 40){
+            $("#per_bar").css('background-color', 'rgb(188, 188, 188)');
+        }
+        else if(per == 100){
+            $("#per_bar").css('background-color', 'rgb(4, 209, 59)');
+        }
+        else
+        {
+            $("#per_bar").css('background-color', 'rgb(3, 158, 45)');
+        }
+    }
+
     let pri_color = {high:"q_high",medium:"q_medium",low:"q_low"}
     let type_color = {emt:"bold",xor:"q_medium",smt:"q_low"}
     $(document).ready(function()
     {
         $("#menu_dmg").addClass("menu_select");
+
         {% for q in questions %}
             document.getElementById("title_{{q.id}}").classList.add(pri_color["{{q.priority}}"]);
             {% for c in q.choice_set.all %}                
                 if("{{q.match_type}}" == 'emt')
-                {
                     document.getElementById("choice_{{c.id}}").classList.add('c_emt');
-                }
                 else if("{{q.match_type}}" == 'xor')
-                {
                     document.getElementById("choice_{{c.id}}").classList.add('c_xor');
-                }
                 else
+                    document.getElementById("choice_{{c.id}}").classList.add('c_smt');                    
+            {% endfor %}            
+        {% endfor %}        
+        
+        $("#save_btn").click(function(e)
+        {
+            e.preventDefault();
+            var frm = $('#my_form');
+            sr_data = frm.serialize();
+            
+            $.ajax({
+                type: frm.attr('method'),
+                url: frm.attr('action'),
+                data:sr_data,
+                success: function (data)
                 {
-                    document.getElementById("choice_{{c.id}}").classList.add('c_smt');
-                }                                
-            {% endfor %}
-        {% endfor %}
+                    $("#save_msg").html("Your data successfully have been saved.");
+                    setTimeout(function(){$("#save_msg").html("");}, 3000);
+                    console.log(data.per_ans);
+                    bar_color(data.per_ans);                    
+                },
+                failure: function ()
+                {                    
+                }
+            });
+        });
+
+        $("#find_btn").click(function(e)
+        {
+            e.preventDefault();
+            window.location.href = "{% url 'main:start_searching' user.username %}";            
+        });
+
+        
+        
     });
 </script>
 {% endblock %}
 
 {% block body_block %}
 
-<form action="{% url 'main:find_mates' %}" method="post">
+<form id="my_form" action="{% url 'main:find_mates' %}" method="post">
 {% csrf_token %}
 {% if user.is_authenticated %}
+    <input type="hidden" name="test_name" value="test_value">
     <h2>{{message}}</h2>
     <p>
         <b>&lt;Help&gt;</b><br>
         Priority Colour :<span class="q_high">High</span>,<span class='q_medium'>Medium</span>,<span class="q_low">Low</span><br>
-        <span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>
-        <p style="font-style:italic">The system finds your mates as much as you have answered the questions. </p>
+        <span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>        
     </p>
+    <br>
+    
+    <div class="row"> 
+        <span class="col-sm-1" style="font-weight:bold;width: 130px;">Accuracy rate:</span>
+        <div class="progress" class="col-sm-9" style="width:500px">
+        <div id="per_bar"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:{{per_ans}}%;">
+            <span id="per_num">{{per_ans}}</span>
+        </div>
+        </div>
+    </div>
+    <script>bar_color("{{per_ans}}")</script>    
+    <p style="font-style:italic">As you answer more questions, it will increase the accuracy rate. </p><br>
+
 
     {% for k,v in cat_qs.items %}
         {% if v %}
@@ -93,7 +151,6 @@
                 <h4 id="title_{{q.pk}}">{{ q.title }}</h4>
                 <p style="font-style: italic;font-size:95%;">{{q.desc}}</p>
                 {% for c in q.choice_set.all %}
-                    <script>console.log("???");</script>
                     <label id="choice_{{c.pk}}">
                     {% if answers|get_list_in_dict:q.pk|is_val_in_list:c.pk == True %}
                         <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.pk}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
@@ -113,17 +170,13 @@
         {% endfor %}
         </div>
         </p> 
-        <script>            
-                $("#demo{{k}}").collapse({
-                toggle: false
-                });
-        </script>
         {% endif %}
     {% endfor %}
     <br>
-    <input type="submit" name="Save" value="Save Data">
-    <input type="submit" name="Find" value="Find Mates">
-    </form>
+    <input type="submit" id="save_btn" name="Save" value="Save Data">
+    <input type="submit" id="find_btn" value="Find Mates">
+</form>
+<span id="save_msg" style="font-weight: bold;"></span>
 
 {% else %}
     <p>Login is required for this page.</p>
