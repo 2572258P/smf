@@ -14,7 +14,7 @@ $(document).ready(function()
         {
             $.ajax({
                     type: "POST",
-                    url: "{% url 'main:my_mates' %}",
+                    url: "{% url 'main:page_mymates' %}",
                     data:{
                         csrfmiddlewaretoken: '{{ csrf_token }}',
                         cmd:"cancel",
@@ -38,7 +38,7 @@ $(document).ready(function()
             $("#img_loading_{{rv.to_pk}}").show();            
             $.ajax({
                     type: "POST",
-                    url: "{% url 'main:my_mates' %}",
+                    url: "{% url 'main:page_mymates' %}",
                     data:{
                         csrfmiddlewaretoken: '{{ csrf_token }}',
                         cmd:"accept",
@@ -61,7 +61,7 @@ $(document).ready(function()
         {
             $.ajax({
                     type: "POST",
-                    url: "{% url 'main:my_mates' %}",
+                    url: "{% url 'main:page_mymates' %}",
                     data:{
                         csrfmiddlewaretoken: '{{ csrf_token }}',
                         cmd:"reject",
@@ -85,7 +85,7 @@ $(document).ready(function()
         {
             $.ajax({
                     type: "POST",
-                    url: "{% url 'main:my_mates' %}",
+                    url: "{% url 'main:page_mymates' %}",
                     data:{
                         csrfmiddlewaretoken: '{{ csrf_token }}',
                         cmd:"disconnect",

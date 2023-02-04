@@ -1,22 +1,29 @@
 from django.urls import path,re_path
-from main import views
-
 app_name = 'main'
 
+from main.views import view_Home,view_Signin,view_Base,view_Registration,view_MyAccount,\
+view_FindMates,view_QuestionEditor,view_QuestionSubmit,view_SearchStart,view_SearchResult,\
+view_MyMates,view_SigninRequirement
+
 urlpatterns = [
-    path('',views.dashboard,name='dashboard'),    
-    path('reg/',views.registration,name='registration'),
-    path('my_account/',views.my_account,name='my_account'),
-    path('login/',views.user_login,name='login'),
-    path('logout/',views.user_logout,name='logout'),
-    path('find_mates/',views.find_mates,name='find_mates'),    
-    path('question_management/',views.question_management,name='question_management'),
-    path('question_creator/',views.question_creator,name='question_creator'),
-    path('question_creator/<str:question_type>/',views.question_creator,name='question_creator'),
-    re_path(r'^start_searching/(?P<userId>\w+)',views.start_searching,name='start_searching'),
-    path('login_requirement/',views.login_requirement,name='login_requirement'),
-    path('my_mates/',views.my_mates,name='my_mates'),
-    re_path(r'^list_result/(?P<userId>\w+)',views.list_result,name='list_result'),
-    path('sign_in_page/',views.sign_in_page,name='sign_in_page'),
-    path('about_us/',views.dashboard,name='about_us'),
+    path('',view_Home.loadpage,name='home'),
+    path('page_signin/',view_Signin.loadpage,name='page_signin'),
+    path('signin/',view_Base.signin,name='login'),
+    path('signout/',view_Base.signout,name='signout'),
+    path('page_registration/',view_Registration.loadpage,name='page_registration'),
+    path('page_myaccount/',view_MyAccount.loadpage,name='page_myaccount'),
+    path('page_mymates/',view_MyMates.loadpage,name='page_mymates'),
+    path('page_findmates/',view_FindMates.loadpage,name='page_findmates'),
+    path('page_question_editor/',view_QuestionEditor.loadpage,name='page_question_editor'),
+    path('page_question_submit/',view_QuestionSubmit.loadpage,name='page_question_submit'),
+    path('page_question_submit/<str:question_type>/',view_QuestionSubmit.loadpage,name='page_question_submit'),
+    re_path(r'^page_search_start/(?P<userId>\w+)',view_SearchStart.loadpage,name='page_search_start'),
+    re_path(r'^page_search_result/(?P<username>\w+)',view_SearchResult.loadpage,name='page_search_result'),
+    path('about_us/',view_Home.loadpage,name='about_us'),
+    path('page_signin_requirement/',view_SigninRequirement.loadpage,name='page_signin_requirement'),
+    
+    
+
+
+
 ]

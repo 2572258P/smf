@@ -35,10 +35,10 @@
 <h3 id="msg_del">{{ msg_delete }}</h3>
 
 {% if questions.count > 0 %}
-<form action="{% url 'main:question_management' %}" method="post">
+<form action="{% url 'main:page_question_editor' %}" method="post">
     {% csrf_token %}
     {% for q in questions %}
-        <label><input type="checkbox" name="del_{{q.id}}" class="question_items"> {{ q.title }}</label><br>
+        <label><input type="checkbox" name="del_{{q.pk}}" class="question_items"> {{ q.title }}</label><br>
     {% endfor %}
     <input type="submit" name="delete" value="Delete" onclick="return confirm_delete()">
 </form>
@@ -50,7 +50,7 @@ No questions on the list
 {% if questions.count > 0 %}
     <div><u>* Since those questions below have distributed to the participants, setting only additional properties is allowed. </u></div>
     <br>
-    <form action="{% url 'main:question_management' %}" method="post">
+    <form action="{% url 'main:page_question_editor' %}" method="post">
     {% csrf_token %}
     {% for q in questions %}
         <div>
@@ -60,36 +60,37 @@ No questions on the list
             {% endfor %}
             Type: {{q.type}}</b><br>
             Category:
-            <select id="cat_{{q.id}}" name="cat_{{q.id}}">
+            <select id="cat_{{q.pk}}" name="cat_{{q.pk}}">
                 <option value="cc">Common</option>
                 <option value="cd">Detail</option>
                 <option value="cb">Bevioural</option>
             </select><br>
             {%if q.category == "cu" %} <!-- User Registered -->
                 <script>
-                    $("#cat_{{q.id}}").prop('disabled', true)
+                    $("#cat_{{q.pk}}").prop('disabled', true)
                 </script>
                 <span>This question was registered by a user</span>
             {% endif %}
             Priority:
-            <select id="mPri_{{q.id}}" name="mPri_{{q.id}}">
+            <select id="mPri_{{q.pk}}" name="mPri_{{q.pk}}">
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
             </select><br>
             Type Of Match:
-            <select id="mType_{{q.id}}" name="mType_{{q.id}}">
+            <select id="mType_{{q.pk}}" name="mType_{{q.pk}}">
                 <option value="smt">Similar Answer Match</option>
                 <option value="emt">Exact Answer Match</option>
                 <option value="xor">XOR Answer Match</option>
             </select>            
             <script>
-                document.getElementById("mPri_{{q.id}}").value = "{{q.priority}}"
-                document.getElementById("mType_{{q.id}}").value = "{{q.match_type}}"
+                document.getElementById("cat_{{q.pk}}").value = "{{q.category}}"
+                document.getElementById("mPri_{{q.pk}}").value = "{{q.priority}}"
+                document.getElementById("mType_{{q.pk}}").value = "{{q.match_type}}"
             </script>
         </div>    
     {%if msg_dic %}
-        <h3 style="color:red" id="msg_update">{{ msg_dic|get_val_in_dict:q.id }}</h3>
+        <h3 style="color:red" id="msg_update">{{ msg_dic|get_val_in_dict:q.pk }}</h3>
     {% endif %}
     <br>
     {% endfor %}

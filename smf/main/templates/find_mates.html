@@ -103,7 +103,7 @@
         $("#find_btn").click(function(e)
         {
             e.preventDefault();
-            window.location.href = "{% url 'main:start_searching' user.username %}";            
+            window.location.href = "{% url 'main:page_search_start' user.username %}";            
         });
 
         
@@ -114,7 +114,7 @@
 
 {% block body_block %}
 
-<form id="my_form" action="{% url 'main:find_mates' %}" method="post">
+<form id="my_form" action="{% url 'main:page_findmates' %}" method="post">
 {% csrf_token %}
 {% if user.is_authenticated %}
     <input type="hidden" name="test_name" value="test_value">

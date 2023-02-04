@@ -5,42 +5,43 @@
 {% block head_block %}
 <script>
 $(document).ready(function()
-{
-    {% for sr in search_results %}
-        $("#sendbt_{{sr.pf_pk}}").click(function()
+{   
+    {% for sr in search_entities %}        
+    $("#sendbt_{{sr.pf_pk}}").click(function()
+    {
+        
+        var msg_ = $("#msgtxt_{{sr.pf_pk}}").val();
+        if(msg_.length > 0)
         {
-            var msg_ = $("#msgtxt_{{sr.pf_pk}}").val();
-            if(msg_.length > 0)
+            if(msg_[0] == '#')
             {
-                if(msg_[0] == '#')
+                msg_ = "";
+            }
+        }            
+        $("#img_prog_{{sr.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
+        $.ajax({
+                type: "POST",
+                url: "{% url 'main:page_search_result' 'dummy' %}",
+                data:{
+                    pf_pk: '{{sr.pf_pk}}',
+                    msg: msg_,                        
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    percent: $("#percent_{{sr.pf_pk}}").html(),
+                    dataType: "json",
+                },
+                success: function (data)
                 {
-                    msg_ = "";
+                    $("#req_div_{{sr.pf_pk}}").hide();
+                    $("#req_ip_{{sr.pf_pk}}").hide();
+                    $("#img_status_{{sr.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
+                    $("#status_{{sr.pf_pk}}").html("Requesting has been complete.");                        
+                },
+                failure: function ()
+                {                    
                 }
-            }            
-            $("#img_prog_{{sr.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
-            $.ajax({
-                    type: "POST",
-                    url: "{% url 'main:list_result' 'dummy' %}",
-                    data:{
-                        pf_pk: '{{sr.pf_pk}}',
-                        msg: msg_,                        
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        percent: $("#percent_{{sr.pf_pk}}").html(),
-                        dataType: "json",
-                    },
-                    success: function (data)
-                    {
-                        $("#req_div_{{sr.pf_pk}}").hide();
-                        $("#req_ip_{{sr.pf_pk}}").hide();
-                        $("#img_status_{{sr.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
-                        $("#status_{{sr.pf_pk}}").html("Requesting has been complete.");                        
-                    },
-                    failure: function ()
-                    {                    
-                    }
-                });
-                
-        });
+            });
+            
+    });
     {% endfor %}
 
 });
@@ -88,37 +89,41 @@ $(document).ready(function()
 }
     
 </style>
-    {% if search_results %}
-        {% for sr in search_results %}
-            <button class="btn btn-primary col_but" id = "rbt_{{sr.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{sr.pf_pk}}">User / <span id="percent_{{sr.pf_pk}}">{{sr.percent}}</span> %</button>
+    {% if search_entities %}
+        {% for se in search_entities %}
+            <button class="btn btn-primary col_but" id = "rbt_{{se.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{se.pf_pk}}">User / <span id="percent_{{se.pf_pk}}">{{se.percent}}</span> %</button>
             
             {% if forloop.counter0 == 0 %}
-                <script> $("#rbt_{{sr.pf_pk}}").html("My Answers") </script>
+                <script> $("#rbt_{{se.pf_pk}}").html("My Answers") </script>
             {% endif %}
-            
-            <div id="rt_{{sr.pf_pk}}" class="collapse">
+            <div id="rt_{{se.pf_pk}}" class="collapse">
+                
+                {% for k,v in se.cat_info.items %}
+                <span>{{v.label}} : {{v.per}}%</span>
+                {% endfor %}
+
                 <p>
-                    {% for qt in sr.QTs%}
+                    {% for qt in se.QTs%}
                     <p>Q) {{qt}}
-                        {% for anss in sr.Anss|get_val_in_list:forloop.counter0 %}
+                        {% for anss in se.Anss|get_val_in_list:forloop.counter0 %}
                             A) <span style="font-weight:bold;">{{anss}}</span>
                         {% endfor %}
                     </p>
                     {% endfor %}
-                    <span style="font-weight: bold;">Profile Text: </span>{{sr.profile_text}}
+                    <span style="font-weight: bold;">Profile Text: </span>{{se.profile_text}}
                 </p>
                 {% if forloop.counter0 > 0 %}
                 
-                <input id = "req_ip_{{sr.pf_pk}}" src="{% static 'group2.png' %}" data-toggle="collapse" data-target="#req_div_{{sr.pf_pk}}" class="img_req" type="image" />
-                <a href="{% url 'main:my_mates' %}"><img id="img_status_{{sr.pf_pk}}" class="img_status"></a>
-                <span id="status_{{sr.pf_pk}}" style="font-style:italic"></span><br>                
-                <div id="req_div_{{sr.pf_pk}}" class="collapse">
+                <input id = "req_ip_{{se.pf_pk}}" src="{% static 'group2.png' %}" data-toggle="collapse" data-target="#req_div_{{se.pf_pk}}" class="img_req" type="image" />
+                <a href="{% url 'main:page_mymates' %}"><img id="img_status_{{se.pf_pk}}" class="img_status"></a>
+                <span id="status_{{se.pf_pk}}" style="font-style:italic"></span><br>                
+                <div id="req_div_{{se.pf_pk}}" class="collapse">
                     <p>
                         <table class="table_div">
                             <tr>
-                              <th><textarea class="form-control text_box" id="msgtxt_{{sr.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Optional) You can attach an additional message annonmously."></textarea></th>
-                              <th><button id="sendbt_{{sr.pf_pk}}"  type="button" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
-                                <img id="img_prog_{{sr.pf_pk}}" class="img_status"></th>
+                              <th><textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Message Optional) Request will be sent to the user annonmously"></textarea></th>
+                              <th><button id="sendbt_{{se.pf_pk}}"  type="button" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
+                                <img id="img_prog_{{se.pf_pk}}" class="img_status"></th>
                               
                             </tr>
                         </table>
@@ -135,20 +140,20 @@ $(document).ready(function()
                             }
                             var status = "";
                             
-                            {% if sent|get_val_in_dict:sr.pf_pk %}
+                            {% if sent|get_val_in_dict:se.pf_pk %}
                                 status = 'req';                                
                             {% endif %}
-                            {% if rev|get_val_in_dict:sr.pf_pk %}
+                            {% if rev|get_val_in_dict:se.pf_pk %}
                                 status = 'rev';
                             {% endif %}
-                            {% if con|get_val_in_dict:sr.pf_pk %}
+                            {% if con|get_val_in_dict:se.pf_pk %}
                                 status = 'con';
                             {% endif %}
                             if(status.length > 0)
                             {
-                                $("#req_ip_{{sr.pf_pk}}").hide()
-                                $("#status_{{sr.pf_pk}}").html(msgs[status]);
-                                $("#img_status_{{sr.pf_pk}}").attr("src",sources[status]);
+                                $("#req_ip_{{se.pf_pk}}").hide()
+                                $("#status_{{se.pf_pk}}").html(msgs[status]);
+                                $("#img_status_{{se.pf_pk}}").attr("src",sources[status]);
                             }
                         </script>
 

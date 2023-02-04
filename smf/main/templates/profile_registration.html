@@ -18,7 +18,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "{% url 'main:registration' %}",
+                url: "{% url 'main:page_registration' %}",
                 data:
                 {                    
                     csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -34,7 +34,7 @@
                 {
                     if(data.success)
                     {
-                        return window.location.replace("{% url 'main:dashboard' %}");
+                        return window.location.replace("{% url 'main:home' %}");
                     }
                     else
                     {
@@ -48,15 +48,13 @@
             });
         });
 
-        $('#submit').val("Create Account");
-
-        
+        $('#submit').val("Create Account");       
         
         $('#default_set').click(function()
         {
             $.ajax({
                 type: "POST",
-                url: "{% url 'main:registration' %}",
+                url: "{% url 'main:page_registration' %}",
                 data:{                    
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                     cmd: "test_user_fill",

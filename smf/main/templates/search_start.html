@@ -14,7 +14,7 @@ $(document).ready(function()
         if (count <= 0)
         {
             clearInterval(counter);
-            window.location.replace("{% url 'main:list_result' userId %}")
+            window.location.replace("{% url 'main:page_search_result' userId %}")
         }        
     }
 });

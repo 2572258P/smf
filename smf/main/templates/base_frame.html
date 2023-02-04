@@ -72,16 +72,16 @@ Study Mate Finder - Find your soulmate
             <td class="tb_td">
                 <div style="float:left; width:20%;">&nbsp</div>
                 <div class="letter_title" style="float:left; width:60%;" align="center">                                        
-                    <a href="{% url 'main:dashboard' %}">Study Mates Finder</a>
+                    <a href="{% url 'main:home' %}">Study Mates Finder</a>
                 </div>
                 <div class = "div_side_menu" style="float:left; width:20%;">
                 {% if user.is_authenticated %}                    
                     {% if has_request %}
-                    <a href="{% url 'main:my_mates' %}"><img class="has_request_img" src="{% static 'mail4.png' %}" /></a>&nbsp&nbsp          
+                    <a href="{% url 'main:page_mymates' %}"><img class="has_request_img" src="{% static 'mail4.png' %}" /></a>&nbsp&nbsp          
                     {% endif %}
-                    <a href="{% url 'main:logout' %}" class="sign_in_out">Sign-Out</a>
+                    <a href="{% url 'main:signout' %}" class="sign_in_out">Sign-Out</a>
                 {% else %}
-                    <a href="{% url 'main:sign_in_page' %}" class="sign_in_out">Sign-In</a>
+                    <a href="{% url 'main:page_signin' %}" class="sign_in_out">Sign-In</a>
                 {% endif %}
                     | <!-- <a href="{% url 'main:about_us' %}">About Us</a> -->
                     <Span>About Us</Span>
@@ -90,22 +90,22 @@ Study Mate Finder - Find your soulmate
         </tr>
         <tr>
             <td class="tb_td">
-                <div style="float:left; width:20%;"><a href="{% url 'main:dashboard' %}">
+                <div style="float:left; width:20%;"><a href="{% url 'main:home' %}">
                     <img src="{% static 'uog_logo.jpg' %}" class="img_logo"></a>                    
                 </div>
                 <div style="float:left; width:60%;" align="center">
                     <div class="menu_div">
-                        <a href="{% url 'main:dashboard' %}" id="menu_db" style="transition: 0.8s">Home</a>                        
-                        <a href="{% url 'main:find_mates' %}" id="menu_dmg" style="transition: 0.8s">Find Mates</a>
-                        <a href="{% url 'main:my_mates' %}" id="menu_mates" style="transition: 0.8s">My Mates</a>
+                        <a href="{% url 'main:home' %}" id="menu_db" style="transition: 0.8s">Home</a>                        
+                        <a href="{% url 'main:page_findmates' %}" id="menu_dmg" style="transition: 0.8s">Find Mates</a>
+                        <a href="{% url 'main:page_mymates' %}" id="menu_mates" style="transition: 0.8s">My Mates</a>
                         {% if user.is_authenticated and is_admin %}
-                            <a href="{% url 'main:question_management' %}" id="menu_qmg" style="transition: 0.8s">Question Management</a>
+                            <a href="{% url 'main:page_question_editor' %}" id="menu_qmg" style="transition: 0.8s">Question Editor</a>
                         {% endif %}
-                        <a href="{% url 'main:question_creator' %}" id="menu_qc" style="transition: 0.8s">Submit Question</a>                       
+                        <a href="{% url 'main:page_question_submit' %}" id="menu_qc" style="transition: 0.8s">Submit Question</a>
                         {% if user.is_authenticated %}
-                            <a href="{% url 'main:my_account' %}" id="menu_account" style="transition: 0.8s">My Account</a>                    
+                            <a href="{% url 'main:page_myaccount' %}" id="menu_account" style="transition: 0.8s">My Account</a>                    
                         {% else %}
-                            <a href="{% url 'main:registration' %}" id="menu_reg" style="transition: 0.8s">Create Account</a> 
+                            <a href="{% url 'main:page_registration' %}" id="menu_reg" style="transition: 0.8s">Create Account</a> 
                         {% endif %}
                     </div>
                 </div>

@@ -30,7 +30,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "{% url 'main:my_account' %}",
+                url: "{% url 'main:page_myaccount' %}",
                 data:
                 {                    
                     csrfmiddlewaretoken: '{{ csrf_token }}',

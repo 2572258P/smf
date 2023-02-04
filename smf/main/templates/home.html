@@ -14,7 +14,7 @@ $(document).ready(function()
         {
             $.ajax({
                 type: "POST",
-                url: "{% url 'main:dashboard' %}",
+                url: "{% url 'main:home' %}",
                 data:{
                     qid: '{{dq.id}}',
                     vote: 1,
@@ -49,7 +49,7 @@ $(document).ready(function()
         {
             $.ajax({
                 type: "POST",
-                url: "{% url 'main:dashboard' %}",
+                url: "{% url 'main:home' %}",
                 data:{
                     qid: '{{dq.id}}',
                     vote: -1,
@@ -290,7 +290,7 @@ $(document).ready(function()
 {% endif %}
 <h2>Similarity Test &ltFor Debugging&gt</h2>
 <p>Fill out texts below to calculate similarities</p>
-<form action="{% url 'main:dashboard' %}" method="post">
+<form action="{% url 'main:home' %}" method="post">
     {% csrf_token %}
     <p><label for="html">Q) Sentence1: (Enter any sentences below)</label></p>
     <p><textarea name="sen1" id="sen1" rows="2" cols="50"></textarea></p>

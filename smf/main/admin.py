@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Question,Choice,Answer,UserProfile,LastAccUser,InvData
+from .models.models import Question,Choice,Answer,UserProfile,LastAccUser,InvData
+
 
 
 admin.site.register(Question)

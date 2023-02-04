@@ -7,7 +7,7 @@
 
 {% block body_block %}
 <p">
-Welcome! The page access needs to sign in. It will redirect to the Registration Page.
+Welcome! The page access needs to sign in. It will redirect to the sign-in Page.
 <span id="timer"></span>
 </p>
 
@@ -22,7 +22,7 @@ function timer(){
    if (count <= 0)
    {
        clearInterval(counter);
-       return window.location.replace("{% url 'main:registration' %}")
+       return window.location.replace("{% url 'main:page_signin' %}")
    }
    document.getElementById("timer").innerHTML= count + " secs";
 

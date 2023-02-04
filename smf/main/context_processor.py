@@ -1,4 +1,4 @@
-from .models import UserProfile,Update
+from .models.models import UserProfile,Update
 
 
 def main_cp(request):
