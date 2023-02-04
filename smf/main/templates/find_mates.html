@@ -42,20 +42,23 @@
 
 <script>
 
-    function bar_color(value)
+    function bar_color(id_bar,id_num,value)
     {
+        id_bar = "#" + id_bar;
+        id_num = "#" + id_num;
+
         let per = value;
-        $("#per_bar").css('width', per+'%');
-        $("#per_num").html(value + '%');
+        $(id_bar).css('width', per+'%');
+        $(id_num).html(value + '%');
         if(per < 40){
-            $("#per_bar").css('background-color', 'rgb(188, 188, 188)');
+            $(id_bar).css('background-color', 'rgb(188, 188, 188)');
         }
         else if(per == 100){
-            $("#per_bar").css('background-color', 'rgb(4, 209, 59)');
+            $(id_bar).css('background-color', 'rgb(4, 209, 59)');
         }
         else
         {
-            $("#per_bar").css('background-color', 'rgb(3, 158, 45)');
+            $(id_bar).css('background-color', 'rgb(3, 158, 45)');
         }
     }
 
@@ -91,8 +94,11 @@
                 {
                     $("#save_msg").html("Your data successfully have been saved.");
                     setTimeout(function(){$("#save_msg").html("");}, 3000);
-                    console.log(data.per_ans);
-                    bar_color(data.per_ans);                    
+                    bar_color(data.per_ans);
+                    for(key in data.cat_infos)
+                    {
+                        console.log(data.cat_infos[key]);
+                    }
                 },
                 failure: function ()
                 {                    
@@ -126,15 +132,21 @@
     </p>
     <br>
     
-    <div class="row"> 
-        <span class="col-sm-1" style="font-weight:bold;width: 130px;">Accuracy rate:</span>
+    
+    {% for label,per in cat_infos.items %}
+    <div class="row">
+        <span class="col-sm-1" style="font-weight:bold;width: 130px;">{{label}}</span>
         <div class="progress" class="col-sm-9" style="width:500px">
-        <div id="per_bar"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:{{per_ans}}%;">
-            <span id="per_num">{{per_ans}}</span>
+        <div id="per_bar_{{label}}"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:{{per}}%;">
+            <span id="per_num_{{label}}">{{per}}</span>
         </div>
         </div>
     </div>
-    <script>bar_color("{{per_ans}}")</script>    
+    <script>bar_color("per_bar_{{label}}","per_num_{{label}}","{{per}}")</script>
+    {% endfor %}
+    
+
+    
     <p style="font-style:italic">As you answer more questions, it will increase the accuracy rate. </p><br>
 
 

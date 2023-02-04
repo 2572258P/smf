@@ -26,17 +26,21 @@ def get_cat_infos(mp):
     my_anss = Answer.objects.filter(profile=mp)
     ass_count = 0
     duplicated = {}
-    cat_infos = {}
+    cat_info_objs = {}
     for ans in my_anss:
         #check whether the answer is duplicated in the same questions, which can happen in MCQ-type questions.
         q = Question.objects.filter(pk=ans.question_id).first()
         if q and ans.question_id not in duplicated:            
             duplicated[ans.question_id] = ans.question_id
             ass_count += 1
-            if cat_infos not in q.category:
-                cat_infos[q.category] = CategoryInfo(GetCategoryLabel(q.category))
-                cat_infos[q.category].totalScore = total_qs_count
-            cat_infos[q.category].score += 1
+            if q.category not in cat_info_objs:
+                cat_info_objs[q.category] = CategoryInfo(q.category)
+                cat_info_objs[q.category].totalScore = total_qs_count
+            cat_info_objs[q.category].addPoint(1)
+    
+    cat_infos = {}
+    for k,ci in cat_info_objs.items():
+        cat_infos[ GetCategoryLabel(ci.label) ] = ci.per
     return cat_infos
 
 def load(request,profile):
@@ -83,8 +87,13 @@ def loadpage(request):
     if is_ajax(request): #Saving
         mp = UserProfile.objects.filter(user=request.user).first()
         save(request,mp)
-        data = {"per_ans":get_per_ans(mp)}
-        data = {"cat_infos":get_cat_infos(mp)}
+
+        cat_infos = get_cat_infos(mp)
+        if 'Details' in cat_infos:
+            cat_infos['Details'] = 100
+        
+        data = {"per_ans":get_per_ans(mp), "cat_infos":cat_infos }
+        
         return JsonResponse(data)
     else: #Only for loading
         context = {}
@@ -99,4 +108,8 @@ def loadpage(request):
         context['message'] = "Data have been successfully loaded."                
         context['answers'] = load(request,mp)
         context['per_ans'] = get_per_ans(mp)
+        cat_infos = get_cat_infos(mp)
+        if 'Details' in cat_infos:
+            cat_infos['Details'] = 100
+        context['cat_infos'] = cat_infos
         return render(request,'find_mates.html',context)

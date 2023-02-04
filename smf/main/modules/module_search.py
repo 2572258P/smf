@@ -68,8 +68,10 @@ class CategoryInfo:
         self.label = label
     def CalcPercentage(self):
         self.per = int(self.score / self.totalScore * 100)
-        print("totalScore:",self.totalScore)
-        print("score:",self.score)
+    def addPoint(self,point):
+        self.score += point
+        self.per = int(self.score / self.totalScore * 100)
+
 
 
 class SearchEntity:
