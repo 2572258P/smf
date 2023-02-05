@@ -84,7 +84,7 @@ def loadpage(request):
         for ac in acc_data:
             connected_pk = ac.to_pk if ac.from_pk == mp.pk else ac.from_pk
             up = UserProfile.objects.filter(pk=connected_pk).first()
-            context['acc'].append(mymate_info(date=str(ac.date),time=ac.time.strftime('%I:%H %p'),to_pk=connected_pk,msg=ac.message,email=up.email,profile_text=up.profile_text,percent=ac.percent))
+            context['acc'].append(mymate_info(username=up.user.username,date=str(ac.date),time=ac.time.strftime('%I:%H %p'),to_pk=connected_pk,msg=ac.message,email=up.email,profile_text=up.profile_text,percent=ac.percent))
         
 
         context['updates'] = {}

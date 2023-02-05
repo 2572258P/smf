@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.urls import reverse
 
-from main.models.models import Question,Answer,UserProfile,LastAccUser
+from main.models.models import Question,Answer,UserProfile
     
 def GetNotiMessage(msg):
     if len(msg) > 0:
@@ -37,11 +37,18 @@ def signin(request):
         user = authenticate(username=username,password=password)
         if user:
             if user.is_active:
-                login(request,user)
+                #Attempt login
+                login(request,user)                
 
-                LastAccUser.objects.all().delete()
-                lastUser = LastAccUser(lastUser=username)                
-                lastUser.save()
+                #Delete invalid answers
+                mup = UserProfile.objects.filter(user=user).first()
+                if mup:
+                    anss = Answer.objects.filter(profile=mup)                    
+                    for ans in anss:                        
+                        if not Question.objects.filter(pk=ans.question_id).first():
+                            print("deleted:",ans.pk)
+                            ans.delete()
+
 
                 return redirect(reverse('main:home'))
             else:

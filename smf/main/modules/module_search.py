@@ -2,6 +2,7 @@
 
 from main.models.models import Question,Answer,UserProfile,InvData,Choice
 from .module_common import GetCategoryLabel
+from .module_NLP import NLP
 
 class WeightCalculator():
     def __init__(self,match_type):
@@ -67,10 +68,11 @@ class CategoryInfo:
         self.per = 0
         self.label = label
     def CalcPercentage(self):
-        self.per = int(self.score / self.totalScore * 100)
+        self.per = round(self.score / self.totalScore * 100,1)
     def addPoint(self,point):
         self.score += point
-        self.per = int(self.score / self.totalScore * 100)
+        self.per = round(self.score / self.totalScore * 100,1) if self.totalScore > 0 else 0
+        
 
 
 
@@ -91,14 +93,22 @@ class SearchEntity:
 
     def getPercent(self):
         return self.percent
-    def generateAll(self,pk,percent,mp):
+    def getAccPoint(self):
+        return self.accPoint
+    def generateAll(self,other_pk,percent,mp,accPoint,totalPoint):
         self.percent = percent
-        self.pf_pk = pk
+        self.pf_pk = other_pk
         self.profile_text = ""
         self.QTs = []
         self.Anss = []
+        self.username = ""
+        self.accPoint = accPoint
+        self.totalPoint = totalPoint
 
         profile = UserProfile.objects.filter(pk=self.pf_pk).first()
+        if InvData.objects.filter(from_pk=mp.pk,to_pk=other_pk,accepted=True).first() or InvData.objects.filter(from_pk=other_pk,to_pk=mp.pk,accepted=True).first():
+            self.username = profile.user.username
+        
         if profile and profile.profile_text_open == True:
             self.profile_text = profile.profile_text
         else:

@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer, util
 from main.models.models import Question,Choice,UserProfile,Answer
+import time
 
 def s_to_f(obj):
     return round(float(obj),3)

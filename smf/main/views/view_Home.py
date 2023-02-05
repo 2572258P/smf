@@ -1,8 +1,10 @@
 from django.http import HttpResponse,JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from django.db.models import Q
+
 from .view_Base import is_ajax
-from main.models.models import Question,Answer,UserProfile,Choice,LastAccUser
+from main.models.models import Question,Answer,UserProfile,Choice,QuestionVote
 from main.modules.module_NLP import NLP
 
 
@@ -35,11 +37,6 @@ def loadpage(request):
     comp_result = NLP.calculate_single_similarities(sen1,sen2)    
     context['compare_result'] = comp_result
     
-    #load the user logged in the lastest time
-    last_user = LastAccUser.objects.all()
-    context['last_user'] = last_user[0] if last_user.count() > 0 else ""
-  
-
     if is_ajax(request): # Handling from ajax request
         response = {}
         qid = request.POST.get('qid', None)

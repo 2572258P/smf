@@ -43,7 +43,7 @@ def loadpage(request):
         return JsonResponse(response)
     elif is_ajax(request) and request.POST.get('cmd') == 'test_user_fill':
 
-        profile_auto_texts = ['I want to study with you','I love talking wit others','I want to be a friend of yours.']
+        profile_auto_texts = ['I want to study with you','I love talking with others','I want to be a friend of yours.']
 
         user_count = User.objects.all().count()
         response['test_user_name'] = 'user' + str(user_count)

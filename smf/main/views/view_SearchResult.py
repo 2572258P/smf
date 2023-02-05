@@ -26,7 +26,7 @@ def handle_sending_message(request):
     to_pk = request.POST.get('pf_pk', None)    
     mp = UserProfile.objects.filter(user=request.user).first()
     tp = UserProfile.objects.filter(pk=to_pk).first()
-    if tp:        
+    if tp:
         msg = request.POST.get('msg',"")
         percent = float(request.POST.get('percent',0))
         Inv = InvData(percent=percent,from_pk=mp.pk,to_pk=to_pk,message=msg,time=timezone.localtime(timezone.now()).time() ,date=timezone.localtime(timezone.now()).date())
@@ -50,41 +50,44 @@ def handle_search_result(request,username):
     context = {}
 
     AllAnswerWeightTable_tbq = NLP.gen_sim_table_from_tbq(myProfile)
-
-    me = SearchEntity() 
-    me.generateAll(myProfile.pk,100,myProfile)    
-    searchEntities.append(me)
+    myse = SearchEntity() 
+    myse.generateAll(myProfile.pk,100,myProfile,100,100)
+    searchEntities.append(myse)
 
     myQnATable = gen_table_by_answers(Answer.objects.filter(profile=myProfile))
     
     for oup in allUserProfiles: #iterate all other users' profiles and calulation weight with mine
         if oup.user.username == username or oup.user.username == 'admin': #except myself and admin
             continue
-        otherQnATable = gen_table_by_answers(Answer.objects.filter(profile=oup))
-        accWeight = 0
-        totalWeight = 0
+        otherQnATable = gen_table_by_answers(Answer.objects.filter(profile=oup))        
+        accPoint = 0
+        totalPoint = 0
         ose = SearchEntity()
 
         for myQId in myQnATable.keys():
             qo = Question.objects.filter(pk=myQId).first()
 
             priorityWeight = GetWeightByPriority(qo.priority) if qo != None else 0
-            totalWeight = totalWeight + priorityWeight
+            totalPoint = totalPoint + priorityWeight
             ose.addCatTotalScore(qo.category,priorityWeight)
 
             score = 0
             if myQId in otherQnATable: #if the other users have the same questions with me
                 score = myQnATable[myQId].calcChoiceWeight(otherQnATable[myQId]) * priorityWeight                
             if myQId in AllAnswerWeightTable_tbq:
-                score = AllAnswerWeightTable_tbq[myQId][OUP.user.username] * priorityWeight
-            accWeight += score
+                score = AllAnswerWeightTable_tbq[myQId][oup.user.username] * priorityWeight
+            accPoint += score
             ose.addCatScore(qo.category,score)
 
-        if len(otherQnATable) > 0 and totalWeight > 0:
-            ose.generateAll(OUP.pk,round(accWeight / totalWeight,2) * 100,myProfile)
+            
+        if len(otherQnATable) > 0 and totalPoint > 0:
+            accPoint = round(accPoint,2)
+            percent = round(accPoint / totalPoint * 100,2)
+            totalPoint = round(totalPoint,2)
+            ose.generateAll(oup.pk,percent,myProfile,accPoint,totalPoint)
             searchEntities.append(ose)
     
-    context['search_entities'] = sorted(searchEntities,key = SearchEntity.getPercent,reverse=True)    
+    context['search_entities'] = sorted(searchEntities,key = SearchEntity.getAccPoint,reverse=True)    
 
     
     #Status with others
@@ -94,7 +97,6 @@ def handle_search_result(request,username):
     context['rev'] = {}
     for s in InvData.objects.filter(to_pk=myProfile.pk,accepted=False):
         context['rev'][s.from_pk] = s.from_pk
-
     context['con'] = {}
     for s in InvData.objects.filter(from_pk=myProfile.pk,accepted=True) | InvData.objects.filter(to_pk=myProfile.pk,accepted=True):
         pk = s.from_pk if s.from_pk != myProfile.pk else s.to_pk

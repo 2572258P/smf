@@ -9,7 +9,7 @@ import sys
 
 django.setup()
 
-from main.models import Question,Answer,UserProfile,Choice
+from main.models.models import Question,Answer,UserProfile,Choice
 from django.utils import timezone
 import time
 from django.contrib.auth.models import User
@@ -115,7 +115,6 @@ def generate_questions(filename):
             else:
                 if NewQ and r1:
                     NewQ.choice_set.create(choice_text=r1)
-
 
 
 

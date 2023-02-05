@@ -4,13 +4,56 @@
 
 {% block head_block %}
 <script>
+function bar_color(id_bar,id_num,value)
+{
+    id_bar = "#" + id_bar;
+    id_num = "#" + id_num;
+
+    let per = value;
+    $(id_bar).css('width', per+'%');
+    $(id_num).html(value + '%');
+    if(per < 40){
+        $(id_bar).css('background-color', 'rgb(188, 188, 188)');
+    }
+    else if(per == 100){
+        $(id_bar).css('background-color', 'rgb(4, 209, 59)');
+    }
+    else{
+        $(id_bar).css('background-color', 'rgb(1, 120, 33)');
+    }
+}
+
 $(document).ready(function()
 {   
-    {% for sr in search_entities %}        
-    $("#sendbt_{{sr.pf_pk}}").click(function()
-    {
+    
+
+    {% for se in search_entities %}
+
+    
+    {% if forloop.counter0 > 0 %} /* Because 0 is my data*/
+        /* Add events to result div(s) when they toggle*/
+        {% for k,v in se.cat_info.items %}
+            $('#rt_{{se.pf_pk}}').on('show.bs.collapse', function (e) 
+            {
+                setTimeout(function(){
+                    bar_color("per_bar_{{se.pf_pk}}_{{v.label}}","per_num_{{se.pf_pk}}_{{v.label}}","{{v.per}}");
+                }, 300);
+            });
+            $('#rt_{{se.pf_pk}}').on('hidden.bs.collapse', function (e) 
+            {
+                bar_color("per_bar_{{se.pf_pk}}_{{v.label}}","per_num_{{se.pf_pk}}_{{v.label}}",0);
+            });
+        {% endfor %}
+
+        setTimeout(() => {
+            $("#rbt_{{se.pf_pk}}").click();            
+        }, 100);
         
-        var msg_ = $("#msgtxt_{{sr.pf_pk}}").val();
+    {% endif %}
+
+    $("#sendbt_{{se.pf_pk}}").click(function()
+    { 
+        var msg_ = $("#msgtxt_{{se.pf_pk}}").val();
         if(msg_.length > 0)
         {
             if(msg_[0] == '#')
@@ -18,23 +61,22 @@ $(document).ready(function()
                 msg_ = "";
             }
         }            
-        $("#img_prog_{{sr.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
+        $("#img_prog_{{se.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
         $.ajax({
                 type: "POST",
                 url: "{% url 'main:page_search_result' 'dummy' %}",
                 data:{
-                    pf_pk: '{{sr.pf_pk}}',
+                    pf_pk: '{{se.pf_pk}}',
                     msg: msg_,                        
                     csrfmiddlewaretoken: '{{ csrf_token }}',
-                    percent: $("#percent_{{sr.pf_pk}}").html(),
+                    percent: $("#percent_{{se.pf_pk}}").html(),
                     dataType: "json",
                 },
                 success: function (data)
                 {
-                    $("#req_div_{{sr.pf_pk}}").hide();
-                    $("#req_ip_{{sr.pf_pk}}").hide();
-                    $("#img_status_{{sr.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
-                    $("#status_{{sr.pf_pk}}").html("Requesting has been complete.");                        
+                    $("#req_menu_div_{{se.pf_pk}}").hide();
+                    $("#img_status_{{se.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
+                    $("#status_{{se.pf_pk}}").html("* Requesting has been complete.");                        
                 },
                 failure: function ()
                 {                    
@@ -43,23 +85,47 @@ $(document).ready(function()
             
     });
     {% endfor %}
-
 });
+
+
 </script>
 {% endblock %}
 
 {% block body_block %}
 <style>
     .col_but{
-        width: 70%;
+        width: 100%;
         padding: 5px;
-        
     }
+    .result_bg
+    {
+        width: 100%;
+        padding: 10;
+        padding-top: 5;
+        margin-top: 5;
+        margin-bottom: 5;
+        background-color: rgb(247, 247, 247);
+        border: 5px 5px;
+        border-radius: 10px; 
+    }
+    .result_bg2
+    {
+        width: 100%;
+        padding: 10;
+        padding-top: 5;
+        margin-top: 5;
+        margin-bottom: 5;
+        background-color: rgb(250, 250, 250);
+        border: 5px 5px;
+        border-radius: 10px; 
+    }
+
     .send_div{
         align-items:flex-end;        
     }
 
     .text_box{        
+        width: 100%;
         border: 1px;
         border-style:dotted;
         display: inline;     
@@ -68,100 +134,143 @@ $(document).ready(function()
     }
 
     .img_req{
-        width:60px;        
+        width:30px;        
     }
 
     .img_req:hover{
-        width:60px;
+        width:31px;
     }
 
     .img_status{
-        width:43px;
+        height: 30;
     }
 
-    .table_div 
-    {
-        width: 800px;
+    .table_ret{        
+        font-weight: normal;
+        font-size: 14px;
     }
-    .table_div th {
-        text-align: left;
-        padding: 3px;
-}
+    .table_ret td,tr{
+        border: 0px solid;
+    }
     
 </style>
     {% if search_entities %}
-        {% for se in search_entities %}
-            <button class="btn btn-primary col_but" id = "rbt_{{se.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{se.pf_pk}}">User / <span id="percent_{{se.pf_pk}}">{{se.percent}}</span> %</button>
-            
-            {% if forloop.counter0 == 0 %}
-                <script> $("#rbt_{{se.pf_pk}}").html("My Answers") </script>
-            {% endif %}
-            <div id="rt_{{se.pf_pk}}" class="collapse">
-                
-                {% for k,v in se.cat_info.items %}
-                <span>{{v.label}} : {{v.per}}%</span>
-                {% endfor %}
+        {% for se in search_entities %}                   
+            <table class="table_ret">
+                <tr> <!-- 1st Line -->
+                    <td style="width: 650px;"> <!-- Result Bar Button -->
+                    <button class="btn btn-primary col_but" id = "rbt_{{se.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{se.pf_pk}}, #rt_prg_{{se.pf_pk}}">
+                        <span id="username_{{se.pk}}">Unknown User</span> | <span>Point ( {{se.accPoint}} / {{se.totalPoint}} ) </span></button>
+                    </td>
+                    {% if se.username %}
+                    <script>
+                        $("#username_{{se.pk}}").html("{{se.username}}");
+                    </script>
+                    {% endif %}
 
-                <p>
-                    {% for qt in se.QTs%}
-                    <p>Q) {{qt}}
-                        {% for anss in se.Anss|get_val_in_list:forloop.counter0 %}
-                            A) <span style="font-weight:bold;">{{anss}}</span>
-                        {% endfor %}
-                    </p>
-                    {% endfor %}
-                    <span style="font-weight: bold;">Profile Text: </span>{{se.profile_text}}
-                </p>
-                {% if forloop.counter0 > 0 %}
-                
-                <input id = "req_ip_{{se.pf_pk}}" src="{% static 'group2.png' %}" data-toggle="collapse" data-target="#req_div_{{se.pf_pk}}" class="img_req" type="image" />
-                <a href="{% url 'main:page_mymates' %}"><img id="img_status_{{se.pf_pk}}" class="img_status"></a>
-                <span id="status_{{se.pf_pk}}" style="font-style:italic"></span><br>                
-                <div id="req_div_{{se.pf_pk}}" class="collapse">
-                    <p>
-                        <table class="table_div">
-                            <tr>
-                              <th><textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Message Optional) Request will be sent to the user annonmously"></textarea></th>
-                              <th><button id="sendbt_{{se.pf_pk}}"  type="button" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
-                                <img id="img_prog_{{se.pf_pk}}" class="img_status"></th>
-                              
-                            </tr>
-                        </table>
-                        <script>
-                            var msgs = {
-                                "req":"* Requesting has been complete.",
-                                "rev":"* You have a request from this user.",
-                                "con":"* You both are connected.",
-                            };
-                            var sources = {
-                                "req":"{% static 'check1.jpg' %}",
-                                "rev":"{% static 'mail.png' %}",
-                                "con":"{% static 'hand_shake.jpg' %}",
-                            }
-                            var status = "";
+                    <td style="width: 500;"> <!-- Status -->
+                    <a href="{% url 'main:page_mymates' %}"><img id="img_status_{{se.pf_pk}}" class="img_status"></a>
+                        <span id="status_{{se.pf_pk}}" style="font-style:italic;font-size:small;"></span>
+                    </td>
+                </tr>
+                <tr> <!-- 2nd Line -->
+                    <td style=""> <!-- Body Text -->
+                        <div id="rt_{{se.pf_pk}}" class="collapse" style="padding-top:10">
+                            {% if forloop.counter0 == 0 %}
+                                <script> 
+                                    $("#rbt_{{se.pf_pk}}").html("Show My Answers");
+                                    $("#acc_label_{{se.pf_pk}}").html("You have answered:");
+                                </script>
+                            {% endif %}
                             
-                            {% if sent|get_val_in_dict:se.pf_pk %}
-                                status = 'req';                                
+                            <div class="result_bg">
+                            <p>
+                                {% for qt in se.QTs%}
+                                <p>Q) {{qt}}<br>                    
+                                    {% for anss in se.Anss|get_val_in_list:forloop.counter0 %}
+                                        {% if forloop.counter0 <= 4 %}
+                                            A) <span>{{anss}}</span>
+                                        {% endif %}
+                                        {% if forloop.counter0 == 5 %}
+                                            <span>... ...</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                                {% endfor %}
+                                <span>Profile Text: </span>{{se.profile_text}}
+                            </p>
+                            </div>
+                            {% if forloop.counter0 > 0 %}
+                            <div id="req_menu_div_{{se.pf_pk}}">
+                            <input id = "req_ip_{{se.pf_pk}}" src="{% static 'group2.png' %}" data-toggle="collapse" data-target="#req_div_{{se.pf_pk}}" class="img_req" type="image" />
+                            <div id="req_div_{{se.pf_pk}}" class="collapse">
+                                <table style="width: 100%;">
+                                    <td style="width: 60%;">
+                                        <textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Message Optional) Request will be sent to the user annonmously"></textarea>
+                                    </td>
+                                    <td>
+                                        <button id="sendbt_{{se.pf_pk}}"  type="button" style="border: 1;border-style: solid;margin-left: 3;" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
+                                        <img id="img_prog_{{se.pf_pk}}" class="img_status">
+                                    </td>
+                                </table>
+                            </div>
+                            </div>
                             {% endif %}
-                            {% if rev|get_val_in_dict:se.pf_pk %}
-                                status = 'rev';
-                            {% endif %}
-                            {% if con|get_val_in_dict:se.pf_pk %}
-                                status = 'con';
-                            {% endif %}
-                            if(status.length > 0)
-                            {
-                                $("#req_ip_{{se.pf_pk}}").hide()
-                                $("#status_{{se.pf_pk}}").html(msgs[status]);
-                                $("#img_status_{{se.pf_pk}}").attr("src",sources[status]);
-                            }
-                        </script>
+                        </div>
+                    </td>
+                    
+                    <td style="padding:10;vertical-align:top">
+                        {% if forloop.counter0 > 0 %}
+                        <div id="rt_prg_{{se.pf_pk}}" class="collapse result_bg2" style="padding:10">
+                        <p>Overall Accuracy Rate: <span id="percent_{{se.pf_pk}}">{{se.percent}}</span>%</p>
 
-                    </p>
-                </div>
-                {% endif %}
-    
-            </div>
+                        <p id="acc_label_{{se.pf_pk}}" style="font-weight: bold;">By categories:</p>
+                        {% for k,v in se.cat_info.items %}                
+                            <div class="row" style="border-style:solid;border:0;height: 30px;">
+                                <div align="right"><span class="col-sm-1" style="width: 30%;">{{v.label}}:</span></div>
+                                <div class="progress" class="col-sm-9" style="width:60%">
+                                <div id="per_bar_{{se.pf_pk}}_{{v.label}}"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:0%;">
+                                    <span id="per_num_{{se.pf_pk}}_{{v.label}}"></span>
+                                </div>
+                                </div>
+                            </div>                                
+                        {% endfor %}
+                        </div>
+                        {% endif %}
+                    </td>                    
+                </tr>
+            </table>
+        
+        <script> //Handling for icon type selection and message
+            var msgs = {
+            "req":"* Requesting has been complete.",
+            "rev":"* You have a request from this user.",
+            "con":"* You both are connected.",
+            };
+            var sources = {
+                "req":"{% static 'check1.jpg' %}",
+                "rev":"{% static 'mail.png' %}",
+                "con":"{% static 'hand_shake.jpg' %}",
+            }
+            var status = "";
+            
+            {% if sent|get_val_in_dict:se.pf_pk %}
+                status = 'req';
+            {% endif %}
+            {% if rev|get_val_in_dict:se.pf_pk %}
+                status = 'rev';
+            {% endif %}
+            {% if con|get_val_in_dict:se.pf_pk %}
+                status = 'con';
+            {% endif %}
+            
+            if(status.length > 0)
+            {
+                $("#req_menu_div_{{se.pf_pk}}").hide();
+                $("#status_{{se.pf_pk}}").html(msgs[status]);
+                $("#img_status_{{se.pf_pk}}").attr("src",sources[status]);
+            }
+        </script>
             
         {% endfor %}
     {% else %}

@@ -38,6 +38,12 @@
         width: 20%;
         padding: 5px;        
     }
+    .fake-link {
+        color:black;
+        text-decoration:underline;
+        cursor: pointer;
+    }
+
 </style>
 
 <script>
@@ -49,16 +55,15 @@
 
         let per = value;
         $(id_bar).css('width', per+'%');
-        $(id_num).html(value + '%');
+        $(id_num).html(per + '%');
         if(per < 40){
             $(id_bar).css('background-color', 'rgb(188, 188, 188)');
         }
         else if(per == 100){
             $(id_bar).css('background-color', 'rgb(4, 209, 59)');
         }
-        else
-        {
-            $(id_bar).css('background-color', 'rgb(3, 158, 45)');
+        else{
+            $(id_bar).css('background-color', 'rgb(1, 120, 33)');
         }
     }
 
@@ -66,8 +71,16 @@
     let type_color = {emt:"bold",xor:"q_medium",smt:"q_low"}
     $(document).ready(function()
     {
-        $("#menu_dmg").addClass("menu_select");
+        setTimeout(function()
+        {
+            {% for label,per in cat_infos.items %}
+                bar_color("per_bar_"+"{{label}}","per_num_"+"{{label}}", "{{per}}");
+            {% endfor %}
+        },300);
 
+
+           
+        $("#menu_dmg").addClass("menu_select");
         {% for q in questions %}
             document.getElementById("title_{{q.id}}").classList.add(pri_color["{{q.priority}}"]);
             {% for c in q.choice_set.all %}                
@@ -94,10 +107,9 @@
                 {
                     $("#save_msg").html("Your data successfully have been saved.");
                     setTimeout(function(){$("#save_msg").html("");}, 3000);
-                    bar_color(data.per_ans);
-                    for(key in data.cat_infos)
-                    {
-                        console.log(data.cat_infos[key]);
+                    
+                    for(key in data.cat_infos){
+                        bar_color("per_bar_"+key,"per_num_"+key, data.cat_infos[key]);                        
                     }
                 },
                 failure: function ()
@@ -112,8 +124,44 @@
             window.location.href = "{% url 'main:page_search_start' user.username %}";            
         });
 
+        {% for k,v in cat_qs.items %}
+            {% for q in v %}            
+                {% if q.type == 'scq' %}
+                    $("#clear_"+"{{q.pk}}").click(function(e)
+                    {
+                        {% for c in q.choice_set.all %}
+                            $("#q_{{q.pk}}_choice{{ forloop.counter }}").prop('checked', false);
+                        {% endfor %}
+                    });
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
         
-        
+        {% for k,v in cat_qs.items %}
+            {% for q in v %}            
+                {% if q.type == 'mcq' %}
+                    $("#select_all_"+"{{q.pk}}").click(function(e)
+                    {
+                        {% for c in q.choice_set.all %}
+                            $("#q_{{q.pk}}_choice{{ forloop.counter }}").prop('checked', true);
+                        {% endfor %}
+                    });
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+        {% for k,v in cat_qs.items %}
+            {% for q in v %}            
+                {% if q.type == 'mcq' %}
+                    $("#deselect_all_"+"{{q.pk}}").click(function(e)
+                    {
+                        {% for c in q.choice_set.all %}
+                            $("#q_{{q.pk}}_choice{{ forloop.counter }}").prop('checked', false);
+                        {% endfor %}
+                    });
+                {% endif %}
+            {% endfor %}
+        {% endfor %}        
     });
 </script>
 {% endblock %}
@@ -126,35 +174,36 @@
     <input type="hidden" name="test_name" value="test_value">
     <h2>{{message}}</h2>
     <p>
-        <b>&lt;Help&gt;</b><br>
+        <b>&lt;Question Attributes&gt;</b><br>
         Priority Colour :<span class="q_high">High</span>,<span class='q_medium'>Medium</span>,<span class="q_low">Low</span><br>
-        <span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>        
+        Question Type :<span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>        
     </p>
     <br>
     
     
     {% for label,per in cat_infos.items %}
-    <div class="row">
-        <span class="col-sm-1" style="font-weight:bold;width: 130px;">{{label}}</span>
-        <div class="progress" class="col-sm-9" style="width:500px">
-        <div id="per_bar_{{label}}"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:{{per}}%;">
-            <span id="per_num_{{label}}">{{per}}</span>
-        </div>
-        </div>
-    </div>
-    <script>bar_color("per_bar_{{label}}","per_num_{{label}}","{{per}}")</script>
+        <div class="row" style="border-style:solid;border:0;height: 30px;">
+            <div align="right"><span class="col-sm-1" style="width: 180px;">{{label}}:</span></div>        
+            <div class="progress" class="col-sm-9" style="width:500px">
+                <div id="per_bar_{{label}}"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:0%;">
+                    <span id="per_num_{{label}}">0</span>
+                </div>
+            </div>
+        </div>    
     {% endfor %}
-    
 
+    <br>
+    <p>
+        <span style="font-weight: bold;">The system uses your answers up to the answers you have finished.</span><br>        
+        <span>e.g., If you only care about the location for studying, you can answer only questions about it.</span>
+    </p><br>
     
-    <p style="font-style:italic">As you answer more questions, it will increase the accuracy rate. </p><br>
 
 
     {% for k,v in cat_qs.items %}
         {% if v %}
         <button class="btn btn-primary cat_button" id = "bt_{{k}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{k}}">
-            {{ category_pair|get_val_in_dict:k  }}</button>
-        
+            {{ category_pair|get_val_in_dict:k  }}</button>        
         <p>
         <div id="demo{{k}}" class="collapse">
         {% for q in v %}
@@ -165,15 +214,27 @@
                 {% for c in q.choice_set.all %}
                     <label id="choice_{{c.pk}}">
                     {% if answers|get_list_in_dict:q.pk|is_val_in_list:c.pk == True %}
-                        <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.pk}}" value="{{ c.id }}" id="choice{{ forloop.counter }}" >
+                        <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.pk}}" value="{{ c.pk }}" id="q_{{q.pk}}_choice{{ forloop.counter }}" >
                     {% else %}
-                        <input type="{{q.ctrl_type}}" name="choice{{q.pk}}" value="{{ c.pk }}" id="choice{{ forloop.counter }}" >
+                        <input type="{{q.ctrl_type}}" name="choice{{q.pk}}" value="{{ c.pk }}" id="q_{{q.pk}}_choice{{ forloop.counter }}" >
                     {% endif %}
                     {{c.choice_text}}</label>
                     {% if q.choice_set.all.count > 2 %}
                         <br>
                     {% endif %}
                 {% endfor %}
+                {% if 'scq' == q.type %}
+                        <br>
+                        <span class="fake-link" id="clear_{{q.pk}}">Clear Choice</span>
+                {% endif %}
+
+                {% if 'mcq' == q.type %}
+                <br>
+                    <span class="fake-link" id="select_all_{{q.pk}}">Select All Choices</span> | 
+                    <span class="fake-link" id="deselect_all_{{q.pk}}">Deselect All Choices</span>
+                {% endif %}
+
+
                 {% if 'tbq' == q.type %}
                     <textarea name="text_ans{{q.pk}}" id="text_ans{{q.pk}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
                 {% endif %}

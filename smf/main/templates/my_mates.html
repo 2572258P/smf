@@ -139,7 +139,7 @@ $(document).ready(function()
     {% else %}
         <p style="font-style:italic;">No message attached</p>
     {% endif %}
-    <p>Match Percent: <span style="font-weight: bold;">{{sd.percent}} %</span></p>
+    <p>Overall Accuracy Rate: <span style="font-weight: bold;">{{sd.percent}} %</span></p>
     
     <button id="cancel_{{sd.to_pk}}">Cancel</button>
     <span style="font-style:italic;" id="cancel_msg_{{sd.to_pk}}"></span>
@@ -164,7 +164,7 @@ $(document).ready(function()
             <span style="font-style:italic;">No message attached</span>
         {% endif %}
     </p>
-    <p>Match Percent: <span style="font-weight: bold;">{{rv.percent}} %</span></p>
+    <p>Overall Accuracy Rate: <span style="font-weight: bold;">{{rv.percent}} %</span></p>
 
     <p>Date: {{rv.date}} / Time: {{rv.time}}</p>
     <div id="rev_but_div_{{rv.to_pk}}">
@@ -186,14 +186,15 @@ $(document).ready(function()
     {% if updates|get_val_in_dict:ac.to_pk %}
         <img class="img_new" src="{% static 'new4.png' %}"><span style="font-weight: bold;">New Mate</span>
     {% endif %}
-    <p>Date: {{ac.date}} / Time: {{ac.time}}
+    <p>Username: {{ac.username}}</p>
+    <p>Date: {{ac.date}} / Time: {{ac.time}}</p>
     <p>Email: <a href="mailto:{{ac.email}}">{{ac.email}}</a></p>    
     <p>Profile Text: {{ac.profile_text}}</p>
 
     {% if ac.msg %}
     <p>Message: {{ac.msg}}</p>
     {% endif %}
-    <p>Match Percent: <span style="font-weight: bold;">{{ac.percent}} %</span></p>
+    <p>Overall Accuracy Rate: <span style="font-weight: bold;">{{ac.percent}} %</span></p>
     
     <button id="dis_{{ac.to_pk}}">Disconnect</button>
     <span style="font-style:italic;" id="dis_msg_{{ac.to_pk}}"></span>
@@ -202,13 +203,10 @@ $(document).ready(function()
 </div>
 </p>
 
-<script>            
+<script>
     $("#div_sent").collapse({toggle: true});
     $("#div_rev").collapse({toggle: true});
     $("#div_dis").collapse({toggle: true});
 </script>
-
-
-
 
 {% endblock %}

@@ -13,6 +13,6 @@ def GetCategoryLabel(letters):
     if letters == 'cc':
         return 'Common'
     elif letters == 'cd':
-        return 'Details'
+        return 'Courses'
     elif letters == 'cb':
         return 'Pychology'

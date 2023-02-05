@@ -27,6 +27,10 @@ def get_cat_infos(mp):
     ass_count = 0
     duplicated = {}
     cat_info_objs = {}
+    cat_info_objs['cc'] = CategoryInfo('cc')
+    cat_info_objs['cd'] = CategoryInfo('cd')
+    cat_info_objs['cb'] = CategoryInfo('cb')
+
     for ans in my_anss:
         #check whether the answer is duplicated in the same questions, which can happen in MCQ-type questions.
         q = Question.objects.filter(pk=ans.question_id).first()
@@ -35,12 +39,13 @@ def get_cat_infos(mp):
             ass_count += 1
             if q.category not in cat_info_objs:
                 cat_info_objs[q.category] = CategoryInfo(q.category)
-                cat_info_objs[q.category].totalScore = total_qs_count
+            cat_info_objs[q.category].totalScore = apv_qs.filter(category=q.category).count()
             cat_info_objs[q.category].addPoint(1)
     
     cat_infos = {}
     for k,ci in cat_info_objs.items():
         cat_infos[ GetCategoryLabel(ci.label) ] = ci.per
+    
     return cat_infos
 
 def load(request,profile):
@@ -89,8 +94,9 @@ def loadpage(request):
         save(request,mp)
 
         cat_infos = get_cat_infos(mp)
-        if 'Details' in cat_infos:
-            cat_infos['Details'] = 100
+        label = GetCategoryLabel('cd')
+        if label in cat_infos and cat_infos[label] > 0:
+            cat_infos[label] = 100
         
         data = {"per_ans":get_per_ans(mp), "cat_infos":cat_infos }
         
@@ -98,7 +104,8 @@ def loadpage(request):
     else: #Only for loading
         context = {}
         #labelling for categories    
-        category_pair = {"cc":"Common Questions","cd":"Details","cb":"Psychology","cu":"Registered by users"}        
+        category_pair = {"cc":GetCategoryLabel('cc'),"cd":GetCategoryLabel('cd'),\
+            "cb":GetCategoryLabel('cb'),"cu":"Registered by users"}
         context['cat_qs'] = {}
         for k,v in category_pair.items():
             context['cat_qs'][k] = apv_qs.filter(category=k)
@@ -109,7 +116,10 @@ def loadpage(request):
         context['answers'] = load(request,mp)
         context['per_ans'] = get_per_ans(mp)
         cat_infos = get_cat_infos(mp)
-        if 'Details' in cat_infos:
-            cat_infos['Details'] = 100
+
+        label = GetCategoryLabel('cd')
+        if label in cat_infos and cat_infos[label] > 0:
+            cat_infos[label] = 100
+        print(cat_infos)
         context['cat_infos'] = cat_infos
         return render(request,'find_mates.html',context)
