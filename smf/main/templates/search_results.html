@@ -24,66 +24,64 @@ function bar_color(id_bar,id_num,value)
 }
 
 $(document).ready(function()
-{   
-    
-
-    {% for se in search_entities %}
-
-    
-    {% if forloop.counter0 > 0 %} /* Because 0 is my data*/
-        /* Add events to result div(s) when they toggle*/
-        {% for k,v in se.cat_info.items %}
-            $('#rt_{{se.pf_pk}}').on('show.bs.collapse', function (e) 
-            {
-                setTimeout(function(){
-                    bar_color("per_bar_{{se.pf_pk}}_{{v.label}}","per_num_{{se.pf_pk}}_{{v.label}}","{{v.per}}");
-                }, 300);
-            });
-            $('#rt_{{se.pf_pk}}').on('hidden.bs.collapse', function (e) 
-            {
-                bar_color("per_bar_{{se.pf_pk}}_{{v.label}}","per_num_{{se.pf_pk}}_{{v.label}}",0);
-            });
-        {% endfor %}
-
-        setTimeout(() => {
-            $("#rbt_{{se.pf_pk}}").click();            
-        }, 100);
-        
-    {% endif %}
-
-    $("#sendbt_{{se.pf_pk}}").click(function()
-    { 
-        var msg_ = $("#msgtxt_{{se.pf_pk}}").val();
-        if(msg_.length > 0)
-        {
-            if(msg_[0] == '#')
-            {
-                msg_ = "";
-            }
-        }            
-        $("#img_prog_{{se.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
-        $.ajax({
-                type: "POST",
-                url: "{% url 'main:page_search_result' 'dummy' %}",
-                data:{
-                    pf_pk: '{{se.pf_pk}}',
-                    msg: msg_,                        
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                    percent: $("#percent_{{se.pf_pk}}").html(),
-                    dataType: "json",
-                },
-                success: function (data)
+{
+    {% for se in search_entities %}    
+        {% if forloop.counter0 > 0 %} /* Because 0 is my data*/
+            /* Add events to result div(s) when they toggle*/
+            {% for k,v in se.cat_info.items %}
+                $('#rt_{{se.pf_pk}}').on('show.bs.collapse', function (e) 
                 {
-                    $("#req_menu_div_{{se.pf_pk}}").hide();
-                    $("#img_status_{{se.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
-                    $("#status_{{se.pf_pk}}").html("* Requesting has been complete.");                        
-                },
-                failure: function ()
-                {                    
-                }
-            });
+                    e.stopPropagation();
+                    setTimeout(function(){
+                        bar_color("per_bar_{{se.pf_pk}}_{{v.label}}","per_num_{{se.pf_pk}}_{{v.label}}","{{v.per}}");
+                    }, 300);
+                });
+                $('#rt_{{se.pf_pk}}').on('hidden.bs.collapse', function (e) 
+                {
+                    e.stopPropagation();
+                    bar_color("per_bar_{{se.pf_pk}}_{{v.label}}","per_num_{{se.pf_pk}}_{{v.label}}",0);
+                });
+            {% endfor %}
+
+            setTimeout(() => {
+                $("#rbt_{{se.pf_pk}}").click();            
+            }, 100);
             
-    });
+        {% endif %}
+
+        $("#sendbt_{{se.pf_pk}}").click(function()
+        { 
+            var msg_ = $("#msgtxt_{{se.pf_pk}}").val();
+            if(msg_.length > 0)
+            {
+                if(msg_[0] == '#')
+                {
+                    msg_ = "";
+                }
+            }            
+            $("#img_prog_{{se.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'main:page_search_result' 'dummy' %}",
+                    data:{
+                        pf_pk: '{{se.pf_pk}}',
+                        msg: msg_,                        
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        percent: $("#percent_{{se.pf_pk}}").html(),
+                        dataType: "json",
+                    },
+                    success: function (data)
+                    {
+                        $("#req_menu_div_{{se.pf_pk}}").hide();
+                        $("#img_status_{{se.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
+                        $("#status_{{se.pf_pk}}").html("* Requesting has been complete.");                        
+                    },
+                    failure: function ()
+                    {                    
+                    }
+                });
+                
+        });
     {% endfor %}
 });
 
@@ -135,10 +133,6 @@ $(document).ready(function()
 
     .img_req{
         width:30px;        
-    }
-
-    .img_req:hover{
-        width:31px;
     }
 
     .img_status{
@@ -202,11 +196,13 @@ $(document).ready(function()
                             </div>
                             {% if forloop.counter0 > 0 %}
                             <div id="req_menu_div_{{se.pf_pk}}">
-                            <input id = "req_ip_{{se.pf_pk}}" src="{% static 'group2.png' %}" data-toggle="collapse" data-target="#req_div_{{se.pf_pk}}" class="img_req" type="image" />
-                            <div id="req_div_{{se.pf_pk}}" class="collapse">
+                            
+                            
+                            <div>                                
                                 <table style="width: 100%;">
-                                    <td style="width: 60%;">
-                                        <textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Message Optional) Request will be sent to the user annonmously"></textarea>
+                                    <td style="width: 35px;"><img src="{% static 'group2.png' %}" class="img_req"></td>                                    
+                                    <td style="width: 70%;">
+                                        <textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Optional Message) Request will be sent to the user annonmously"></textarea>
                                     </td>
                                     <td>
                                         <button id="sendbt_{{se.pf_pk}}"  type="button" style="border: 1;border-style: solid;margin-left: 3;" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
