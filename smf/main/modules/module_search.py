@@ -68,10 +68,10 @@ class CategoryInfo:
         self.per = 0
         self.label = label
     def CalcPercentage(self):
-        self.per = round(self.score / self.totalScore * 100,1)
+        self.per = round(self.score / self.totalScore * 100,2)
     def addPoint(self,point):
         self.score += point
-        self.per = round(self.score / self.totalScore * 100,1) if self.totalScore > 0 else 0
+        self.per = round(self.score / self.totalScore * 100,2) if self.totalScore > 0 else 0
         
 
 
