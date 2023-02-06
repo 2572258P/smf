@@ -64,6 +64,16 @@ Study Mate Finder - Find your soulmate
             color:rgb(255, 255, 255);
             text-decoration: none;
         }
+
+        .username_panel
+        {
+            background-color: rgb(5, 78, 137);
+            padding: 5;
+            border: 1px solid rgb(0, 0, 0);
+            border-radius: 5px 5px;
+        }
+
+        
     </style>
 
     <table class="tb" style="height: 130px; position: fixed;">
@@ -71,21 +81,22 @@ Study Mate Finder - Find your soulmate
         <tr style="height: 25px;">
             <td class="tb_td">
                 <div style="float:left; width:20%;">&nbsp</div>
-                <div class="letter_title" style="float:left; width:60%;" align="center">                                        
+                <div class="letter_title" style="float:left; width:60%;" align="center">
                     <a href="{% url 'main:home' %}">Study Mates Finder</a>
                 </div>
                 <div class = "div_side_menu" style="float:left; width:20%;">
-                {% if user.is_authenticated %}                    
-                    {% if has_request %}
+                {% if user.is_authenticated %}
+                    <span class="username_panel">{{user.username}}</span>
+                    {% if has_request %}                    
                     <a href="{% url 'main:page_mymates' %}"><img class="has_request_img" src="{% static 'mail4.png' %}" /></a>&nbsp&nbsp          
                     {% endif %}
-                    <a href="{% url 'main:signout' %}" class="sign_in_out">Sign-Out</a>
+                    <a href="{% url 'main:signout' %}" class="sign_in_out">Sign-Out</a>                    
                 {% else %}
                     <a href="{% url 'main:page_signin' %}" class="sign_in_out">Sign-In</a>
                 {% endif %}
                     | <a href="{% url 'main:about_us' %}">About Us</a>
-                    
                 </div>
+                <!--background-image: url('{% static "bg1.jpg" %}');-->
             </td>
         </tr>
         <tr>
@@ -114,7 +125,7 @@ Study Mate Finder - Find your soulmate
                 </div>
             </td>
         </tr>
-        <tr style="height: 10px;background-color: rgb(78, 0, 0);">
+        <tr style="background-repeat:no-repeat;background-position: 20;height: 10px;background-color: rgb(78, 0, 0);background-image: url('{% static "bg_small.jpg" %}');">
             <td></td>
         </tr>
         <tr>
@@ -128,5 +139,5 @@ Study Mate Finder - Find your soulmate
             {% block body_block %}
             {% endblock %}
         </div>
-    </div>  
+    </div>
 </body>

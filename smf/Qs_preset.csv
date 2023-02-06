@@ -20,17 +20,41 @@ match_type,smt
 5,5
 6,Other
 ,
-title,Where do you prefer to study?
+title,Let us know your preferable study partnership.
+gen_key,06/02/2023_lukyp
+desc,
+type,scq
+category,cc
+priority,high
+match_type,emt
+1,General long-term study partnership
+2,Specific short-term study partnership
+,
+title,Where are the preferable places to study together?
 gen_key,wdps
 desc,
 type,mcq
 category,cc
-priority,medium
+priority,high
 match_type,emt
 1,Home
 2,Lab
 3,Library
 4,Outside
+,
+title,Choose what you think about the most benefit of group studying.
+gen_key,06/02/2023_cwy
+desc,
+type,scq
+category,cc
+priority,high
+match_type,emt
+1,Social Relationship
+2,Friendship
+3,Coursework
+4,Sharing General Knowledge
+5,In-depth lecture topics
+,
 ,
 title,What do you like?
 gen_key,wdl_tale
@@ -52,13 +76,6 @@ match_type,xor
 1,Talking
 2,Listening
 ,
-title,"Please,tell me what you think about the benefit of group studying."
-gen_key,tm_ben
-desc,e.g. Social Activity /  Coursework /  etc.
-type,tbq
-category,cc
-priority,medium
-match_type,emt
 ,
 title,Computing Science - LV1
 gen_key,courses_lv1
@@ -235,11 +252,43 @@ desc,Any short or long answer is possible.
 type,tbq
 category,cb
 priority,medium
-match_type,emt
+match_type,smt
 ,
 title,Input any number from 1 to 100
 gen_key,05/02/2023_wwb
-desc,
+desc,Any short or long answer is possible.
+type,tbq
+category,cb
+priority,medium
+match_type,smt
+,
+title,"If you could change one thing about the way you were raised, what would it be?"
+gen_key,06/02/2023_ianf2
+desc,Any short or long answer is possible.
+type,tbq
+category,cb
+priority,medium
+match_type,smt
+,
+title,"If you could wake up tomorrow having gained any one quality or ability, what would it be?"
+gen_key,06/02/2023_iycwut2
+desc,Any short or long answer is possible.
+type,tbq
+category,cb
+priority,medium
+match_type,smt
+,
+title,"If you knew that in 1 year you'd die suddenly, would you change anything about the way you're living now? Why?"
+gen_key,06/02/2023_iytsw2
+desc,Any short or long answer is possible.
+type,tbq
+category,cb
+priority,medium
+match_type,smt
+,
+title,"If a crystal ball could tell you the truth about yourself, your life, the future, or anything else, what would you want to know?"
+gen_key,06/02/2023_abctt2
+desc,Any short or long answer is possible.
 type,tbq
 category,cb
 priority,medium

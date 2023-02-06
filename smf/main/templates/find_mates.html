@@ -1,10 +1,11 @@
 {% extends 'base_frame.html' %}
+{% load static %}
 
 {% load main_extras %}
 
 {% block head_block %}
 <style>
-    .q_high{
+     .q_high{
         color:rgb(225, 1, 1);
     }
     .q_medium{
@@ -20,16 +21,6 @@
         padding: 1%;
     }
 
-    .c_emt{        
-        font-weight: bold;
-    }
-    .c_smt{
-        font-weight: normal;
-    }
-    .c_xor{
-        font-weight: normal;
-        font-style:italic;
-    }
     textarea{
         resize: none;
 
@@ -67,6 +58,30 @@
         }
     }
 
+    function qtype_set(id,type)
+    {
+        if(type == "emt")
+        {
+            $(id).attr("src","{% static 'equal.png' %}");
+            $(id).attr("title","It matches when other users' answers are in common.");
+            $(id).css('width',25);
+        }
+        else if(type == "smt")
+        {
+            $(id).attr("src","{% static 'apx.png' %}");
+            $(id).attr("title","It calculates similarity with other users' answers.");
+            $(id).css('width',25);
+        }
+        else if(type == "xor")
+        {            
+            $(id).attr("src","{% static 'xor.png' %}");
+            $(id).attr("title","It matches only when other users have different answers.");
+            $(id).css('width',30);
+        }
+        
+        $(id).css('opacity',0.5);        
+    }
+
     let pri_color = {high:"q_high",medium:"q_medium",low:"q_low"}
     let type_color = {emt:"bold",xor:"q_medium",smt:"q_low"}
     $(document).ready(function()
@@ -83,14 +98,6 @@
         $("#menu_dmg").addClass("menu_select");
         {% for q in questions %}
             document.getElementById("title_{{q.id}}").classList.add(pri_color["{{q.priority}}"]);
-            {% for c in q.choice_set.all %}                
-                if("{{q.match_type}}" == 'emt')
-                    document.getElementById("choice_{{c.id}}").classList.add('c_emt');
-                else if("{{q.match_type}}" == 'xor')
-                    document.getElementById("choice_{{c.id}}").classList.add('c_xor');
-                else
-                    document.getElementById("choice_{{c.id}}").classList.add('c_smt');                    
-            {% endfor %}            
         {% endfor %}        
         
         $("#save_btn").click(function(e)
@@ -161,12 +168,16 @@
                     });
                 {% endif %}
             {% endfor %}
-        {% endfor %}        
+        {% endfor %}
+        $('[data-toggle="tooltip"]').tooltip();  
     });
 </script>
 {% endblock %}
 
 {% block body_block %}
+
+
+
 
 <form id="my_form" action="{% url 'main:page_findmates' %}" method="post">
 {% csrf_token %}
@@ -175,8 +186,7 @@
     <h2>{{message}}</h2>
     <p>
         <b>&lt;Question Attributes&gt;</b><br>
-        Priority Colour :<span class="q_high">High</span>,<span class='q_medium'>Medium</span>,<span class="q_low">Low</span><br>
-        Question Type :<span class="c_emt">Exact</span> / <span class="c_smt">Smilar</span> / <span class="c_xor">XOR</span>        
+        Priority Colour :<span class="q_high">High(1)</span>,<span class='q_medium'>Medium(0.66)</span>,<span class="q_low">Low(0.33)</span><br>
     </p>
     <br>
     
@@ -194,8 +204,8 @@
 
     <br>
     <p>
-        <span style="font-weight: bold;">The system uses your answers up to the answers you have finished.</span><br>        
-        <span>e.g., If you only care about the location for studying, you can answer only questions about it.</span>
+        <span style="font-weight: bold;">The system uses your answers up to the answers you have finished.</span><br>
+        <span>e.g., If you only care about the location for studying, you can answer only questions about it.</span><br>        
     </p><br>
     
 
@@ -203,16 +213,25 @@
     {% for k,v in cat_qs.items %}
         {% if v %}
         <button class="btn btn-primary cat_button" id = "bt_{{k}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo{{k}}">
-            {{ category_pair|get_val_in_dict:k  }}</button>        
+            {{ category_pair|get_val_in_dict:k  }}({{v|length}})</button>
         <p>
         <div id="demo{{k}}" class="collapse">
-        {% for q in v %}
+        {% for q in v %}            
             <input type="hidden" name="question{{q.pk}}" value="{{q.pk}}" id="question{{q.pk}}" >
             <div class="q_frame">
-                <h4 id="title_{{q.pk}}">{{ q.title }}</h4>
+                <h4 id="title_{{q.pk}}">{{ q.title }} <div class="container" style="float: right;width: 10%;">
+                    <img id="qtype_{{q.pk}}">                    
+                </div></h4>
+                <script>
+                    qtype_set("#qtype_{{q.pk}}","{{q.match_type}}");
+                </script>
+                
+                {% if q.desc %}
                 <p style="font-style: italic;font-size:95%;">{{q.desc}}</p>
+                {% endif %}
+                
                 {% for c in q.choice_set.all %}
-                    <label id="choice_{{c.pk}}">
+                    <label id="choice_{{c.pk}}" style="font-weight: normal;">
                     {% if answers|get_list_in_dict:q.pk|is_val_in_list:c.pk == True %}
                         <input type="{{q.ctrl_type}}" checked="checked" name="choice{{q.pk}}" value="{{ c.pk }}" id="q_{{q.pk}}_choice{{ forloop.counter }}" >
                     {% else %}
