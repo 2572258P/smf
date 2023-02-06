@@ -128,7 +128,7 @@
         $("#find_btn").click(function(e)
         {
             e.preventDefault();
-            window.location.href = "{% url 'main:page_search_start' user.username %}";            
+            window.location.href = "{% url 'main:page_search_start' user.username %}";
         });
 
         {% for k,v in cat_qs.items %}

@@ -267,7 +267,7 @@ $(document).ready(function()
 {% endif %}
 
 {% if profiles %}
-    <p><b>Users: {{profile_len}}</b></p>
+    <p><b>User Count: {{profile_len}}</b></p>
     <ul>
         {% for p in profiles %}
         <li>{{p.user.username}} / admin: {{p.admin}}</li>

@@ -11,8 +11,7 @@
         $('#username').val("{{username}}");        
         $('#username').prop( "disabled", true );
         $('#email').val("{{email}}");
-        $('#pf_text').val("{{pf_text}}");
-        console.log('{{pf_text_open}}')
+        $('#pf_text').val("{{pf_text}}");        
         $('#pf_text_open').prop('checked', "{{pf_text_open}}" == "True");
 
         $('#pw').hide();
@@ -23,7 +22,6 @@
 
         $('#submit').click(function()
         {
-
             $('#result').html('');
             if(check_validity(['username','email']) == false)
                return;
@@ -46,16 +44,61 @@
                 {
                     if(data.msg)
                     {
-                        $('#result').html(data.msg);                        
+                        $('#result').html(data.msg);
+                    }
+                },
+                failure: function ()
+                {
+
+                }
+            });            
+        });
+
+        $('#acc_del_confirm').click(function()
+        {            
+            $.ajax({                
+                type: "POST",
+                url: "{% url 'main:page_myaccount' %}",
+                data:
+                {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    cmd: "del_account",
+                    acc_del_msg: $('#acc_del_msg').val()
+                },
+                success: function (data)
+                {
+                    if(data.result)
+                    {
+                        $('#acc_del_result').html('Your account has been successfully deleted.');
+                        setTimeout(function(){
+                            window.location.href = "{% url 'main:home'  %}";                                
+                            },2000);
+                    }
+                    else
+                    {
+                        $('#acc_del_result').html('Delete confirm message is incorrect.');
                     }
                 },
                 failure: function ()
                 {
                 }
             });
-
-            
         });
     });
 </script>
+{% endblock %}
+
+{% block profile_end_block %} 
+
+<input id="delete" type="submit" value="Delete Account" data-toggle="collapse" data-target="#div_del"/>
+<div id="div_del" class="collapse">
+    <br>
+    <div><input id="acc_del_msg" name="acc_del_msg" placeholder="Type 'Delete' and confirm" type="text" class="form-control" name="text_del_confirm" ></div>
+    <input id="acc_del_confirm" type="submit" value="Confirm"> &nbsp
+    <span id="acc_del_result"></span>
+    
+</div>
+
+
+
 {% endblock %}

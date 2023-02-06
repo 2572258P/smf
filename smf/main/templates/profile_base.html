@@ -1,8 +1,7 @@
 {% extends 'base_frame.html' %}
 
 {% block head_block %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
 <script>
     function is_empty(id)
     {
@@ -63,9 +62,7 @@
     .div_body tr{
         border: 0;
         border-style:solid;        
-    }
-
-    
+    }    
 </style>
 <div class="div_body">
     <table>
@@ -106,8 +103,13 @@
             <td></td>
             <td> 
                 <input id="submit" type="submit" name="submit" />&nbsp<span id="result"></span>
+            </td>            
+        </tr>
+        <tr>
+            <td>                
             </td>
-        </tr>        
+            <td>{% block profile_end_block %} {% endblock %}</td>
+        </tr>    
         </div>
     </table>
 </div>
