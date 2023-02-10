@@ -5,9 +5,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'base_frame.css' %}">
+    <link rel="shortcut icon" href="">
 <title>
-Study Mate Finder - Find your soulmate
-<link rel="shortcut icon" href="">
+Study Mate Finder - Find your soulmates
 </title>
 
 {% block head_block %}
@@ -40,8 +40,8 @@ Study Mate Finder - Find your soulmate
         .letter_title
         {
             color: white;
-            font-size: large;
-            font-family:Comic Sans MS, Comic Sans, cursive;
+            font-size: x-large;
+            font-family:Arial,Calibri, Helvetica, sans-serif;
         }
         .letter_title a
         {
@@ -88,21 +88,22 @@ Study Mate Finder - Find your soulmate
                 {% if user.is_authenticated %}
                     <span class="username_panel">{{user.username}}</span>
                     {% if has_request %}                    
-                    <a href="{% url 'main:page_mymates' %}"><img class="has_request_img" src="{% static 'mail4.png' %}" /></a>&nbsp&nbsp          
+                    <a href="{% url 'main:page_mymates' %}"><img class="has_request_img" src="{% static 'image/mail4.png' %}" /></a>&nbsp&nbsp          
                     {% endif %}
                     <a href="{% url 'main:signout' %}" class="sign_in_out">Sign-Out</a>                    
                 {% else %}
                     <a href="{% url 'main:page_signin' %}" class="sign_in_out">Sign-In</a>
                 {% endif %}
                     | <a href="{% url 'main:about_us' %}">About Us</a>
+                    | <a href="{% url 'main:loading' %}">Loading</a>
                 </div>
-                <!--background-image: url('{% static "bg1.jpg" %}');-->
+                <!--background-image: url('{% static "image/bg1.jpg" %}');-->
             </td>
         </tr>
         <tr>
             <td class="tb_td">
                 <div style="float:left; width:20%;"><a href="{% url 'main:home' %}">
-                    <img src="{% static 'uog_logo.jpg' %}" class="img_logo"></a>                    
+                    <img src="{% static 'image/uog_logo.jpg' %}" class="img_logo"></a>                    
                 </div>
                 <div style="float:left; width:60%;" align="center">
                     <div class="menu_div">
@@ -125,7 +126,7 @@ Study Mate Finder - Find your soulmate
                 </div>
             </td>
         </tr>
-        <tr style="background-repeat:no-repeat;background-position: 20;height: 10px;background-color: rgb(78, 0, 0);background-image: url('{% static "bg_small.jpg" %}');">
+        <tr style="background-repeat:no-repeat;background-position: 20;height: 10px;background-color: rgb(78, 0, 0);background-image: url('{% static "image/bg_small.jpg" %}');">
             <td></td>
         </tr>
         <tr>

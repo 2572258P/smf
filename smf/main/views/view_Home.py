@@ -36,6 +36,9 @@ def loadpage(request):
     sen2 = request.POST.get('sen2','')
     comp_result = NLP.calculate_single_similarities(sen1,sen2)    
     context['compare_result'] = comp_result
+
+    target_count = 1
+    context['target_count'] = target_count
     
     if is_ajax(request): # Handling from ajax request
         response = {}
@@ -54,7 +57,7 @@ def loadpage(request):
             
             if prev_val + new_val == 0: #Opposite Vote
                 response['msg'] = "You have voted to " + ("up" if new_val > 0 else "down") + "."
-                new_val = new_val * 2
+                new_val = new_val * 2 # 1 - 2 = -1 or -1 + 2 = 1
             elif prev_val + new_val > 1 or prev_val + new_val < -1: #Up or Down vote again
                 new_val = -prev_val
                 response['msg'] = "You vote has been cancelled."
@@ -66,6 +69,7 @@ def loadpage(request):
         
         response['result_val'] = result_val
 
+        #__gt : greater than / __lt : less than
         vote_count_up = QuestionVote.objects.filter(question=q).filter(vote_val__gt=0).count()
         vote_count_down = QuestionVote.objects.filter(question=q).filter(vote_val__lt=0).count()
         
@@ -75,10 +79,12 @@ def loadpage(request):
         alluserCount = UserProfile.objects.all().exclude(admin=True).count()
         voteCount = QuestionVote.objects.filter(question=qid).filter(vote_val__gt=0).count();
 
-        if voteCount >= 2:
+
+        if voteCount >= target_count:
             q.category = 'cu'
             q.approved = True
             q.save()
+            response['suc_msg'] = "This draft questions has been approved."
 
         return JsonResponse(response)
     else:

@@ -14,6 +14,7 @@ class NLP():
     words = []
     scores = []
     initialized = False
+    model = None
     @staticmethod
     def Init():
         

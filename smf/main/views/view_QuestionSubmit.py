@@ -15,13 +15,21 @@ def loadpage(request,question_type="scq"):
     scq_text = request.POST.get('scq_text','')
     mcq_text = request.POST.get('mcq_text','')
     tbq_text = request.POST.get('tbq_text','')
-    category = request.POST.get('category','')
-    priority = request.POST.get('mPri','')
-    desc = request.POST.get('desc')
-    match_type = request.POST.get('mType','smt') #default value 'smt'
+    
+    if profile.admin:
+        category = request.POST.get('category','')
+        priority = request.POST.get('mPri','')
+        match_type = request.POST.get('mType','smt') #default value 'smt'
+    else:
+        category = 'cu'
+        priority = 'medium'
+        match_type = 'emt'
 
-    scq_choice_num = range(1,21)
-    mcq_choice_num = range(1,21)
+    desc = request.POST.get('desc')
+    
+
+    scq_choice_num = range(1,11)
+    mcq_choice_num = range(1,11)
     message = ''
     if scq_text == '' and mcq_text == '' and tbq_text == '':
         if question_type == 'tbq':
@@ -54,5 +62,5 @@ def loadpage(request,question_type="scq"):
         except Exception as inst:
             print(inst)
         
-    context = {'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type}
+    context = {'is_admin':profile.admin,'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type}
     return render(request,'question_submit.html',context)

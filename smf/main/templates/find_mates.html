@@ -4,16 +4,10 @@
 {% load main_extras %}
 
 {% block head_block %}
+<link rel="stylesheet" href="{% static 'page_common.css' %}">
+
+
 <style>
-     .q_high{
-        color:rgb(225, 1, 1);
-    }
-    .q_medium{
-        color:rgb(25, 110, 206);
-    }
-    .q_low{
-        color:rgb(88, 88, 88);
-    }
     .q_frame{
         background-color:rgb(249, 249, 249);
         border: 5px 5px;
@@ -23,10 +17,9 @@
 
     textarea{
         resize: none;
-
-    }    
+    }
     .cat_button{
-        width: 20%;
+        width: 300px;
         padding: 5px;        
     }
     .fake-link {
@@ -34,7 +27,6 @@
         text-decoration:underline;
         cursor: pointer;
     }
-
 </style>
 
 <script>
@@ -62,19 +54,19 @@
     {
         if(type == "emt")
         {
-            $(id).attr("src","{% static 'equal.png' %}");
-            $(id).attr("title","It matches when other users' answers are in common.");
+            $(id).attr("src","{% static 'image/equal.png' %}");
+            $(id).attr("title","It adds points when other users' answers are in common.");
             $(id).css('width',25);
         }
         else if(type == "smt")
         {
-            $(id).attr("src","{% static 'apx.png' %}");
-            $(id).attr("title","It calculates similarity with other users' answers.");
+            $(id).attr("src","{% static 'image/apx.png' %}");
+            $(id).attr("title","It calculates similarities by the NLP model over other users' answers.");
             $(id).css('width',25);
         }
         else if(type == "xor")
         {            
-            $(id).attr("src","{% static 'xor.png' %}");
+            $(id).attr("src","{% static 'image/xor.png' %}");
             $(id).attr("title","It matches only when other users have different answers.");
             $(id).css('width',30);
         }

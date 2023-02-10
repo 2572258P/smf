@@ -3,7 +3,7 @@ app_name = 'main'
 
 from main.views import view_Home,view_Signin,view_Base,view_Registration,view_MyAccount,\
 view_FindMates,view_QuestionEditor,view_QuestionSubmit,view_SearchStart,view_SearchResult,\
-view_MyMates,view_SigninRequirement,view_AboutUs
+view_MyMates,view_SigninRequirement,view_AboutUs,view_ProcessCommonLoading,view_ProcessCommonResult
 
 from django.views.generic.base import RedirectView
 
@@ -24,6 +24,8 @@ urlpatterns = [
     re_path(r'^page_search_result/(?P<username>\w+)',view_SearchResult.loadpage,name='page_search_result'),
     path('about_us/',view_AboutUs.loadpage,name='about_us'),
     path('page_signin_requirement/',view_SigninRequirement.loadpage,name='page_signin_requirement'),
+    path('loading/',view_ProcessCommonLoading.loadpage,name='loading'),
+    path('result/',view_ProcessCommonResult.loadpage,name='result'),
     
 
 ]

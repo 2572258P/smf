@@ -53,7 +53,7 @@ match_type,emt
 2,Friendship
 3,Coursework
 4,Sharing General Knowledge
-5,In-depth lecture topics
+5,In-depth Lecture Topics
 ,
 ,
 title,What do you like?
@@ -75,6 +75,16 @@ priority,medium
 match_type,xor
 1,Talking
 2,Listening
+,
+,
+title,What would you say to your potential study partner?
+gen_key,08/02/2023_wwy
+desc,"You can say any hopes, preferences, current problems with studying, etc."
+type,tbq
+category,cc
+priority,high
+match_type,smt
+,
 ,
 ,
 title,Computing Science - LV1

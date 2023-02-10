@@ -6,7 +6,10 @@
 <!-- Head_Block -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
-    
+ 
+ 
+
+
 $(document).ready(function()
 {
     {% for dq in draft_questions %}
@@ -23,10 +26,30 @@ $(document).ready(function()
                 },
                 success: function (data)
                 {
-                    //console.log(data.msg);
-                    $("#result_up{{dq.id}}").html(data.result_up);
-                    $("#result_down{{dq.id}}").html(data.result_down);
+                    let result = data.result_up - data.result_down;
+                    $("#result_vote{{dq.id}}").html(result);
+
+                    if(result < 0)
+                        $("#result_vote{{dq.id}}").css("color","red");
+                    else
+                        $("#result_vote{{dq.id}}").css("color","black");
+
                     $("#msg{{dq.id}}").html(data.msg);
+                    if(result == "{{target_count}}")
+                    {
+                        $("#msg{{dq.id}}").html("The questions has been approved.");
+                        $("#Up_{{dq.id}}").attr("disabled",true);
+                        $("#Down_{{dq.id}}").attr("disabled",true);
+                    }
+                    else
+                    {
+                        $("#msg{{dq.id}}").html(data.msg);
+                    }
+                    
+                    setTimeout(function(){
+                        $("#msg{{dq.id}}").html("");
+                    },1500);
+
                     switch(data.result_val)
                     {
                         case 0:
@@ -57,10 +80,18 @@ $(document).ready(function()
                     dataType: "json",
                 },
                 success: function (data){
-                    //console.log(data.msg);
-                    $("#result_up{{dq.id}}").html(data.result_up);
-                    $("#result_down{{dq.id}}").html(data.result_down);
+
+                    let result = data.result_up - data.result_down;
+                    $("#result_vote{{dq.id}}").html(result);
+                    if(result < 0)
+                        $("#result_vote{{dq.id}}").css("color","red");
+                    else
+                        $("#result_vote{{dq.id}}").css("color","black");
+
                     $("#msg{{dq.id}}").html(data.msg);
+                    setTimeout(function(){
+                        $("#msg{{dq.id}}").html("");
+                    },1500);
                     switch(data.result_val)
                     {
                         case 0:
@@ -180,7 +211,7 @@ $(document).ready(function()
     <tr style="height: 200px;"> <!-- Intro -->
         <td  style="width:20%;background-color: rgb(248, 248, 248)">            
         </td>
-        <td style="background-repeat: no-repeat;width:75%;background-color: rgb(248, 248, 248);background-image:url({% static 'bg2.png' %});">
+        <td style="background-repeat: no-repeat;width:75%;background-color: rgb(248, 248, 248);background-image:url({% static 'image/bg2.png' %});">
             <p class="intro_title">Let's enjoy studying together.</p>
             <p class="intro_body">
                 We believe you will find soulmates for your study.<br><br>
@@ -201,7 +232,7 @@ $(document).ready(function()
             
         </td>
         <td  style="width:60%;background-color:rgb(3, 50, 70);">
-            <img class="fadein_effect" src="{% static 'no_stranger.png'%}" style="height:250;">
+            <img class="fadein_effect" src="{% static 'image/no_stranger.png'%}" style="height:250;">
         </td>
         <td  style="width:20%;background-color:rgb(3, 50, 70);">
         </td>
@@ -209,9 +240,9 @@ $(document).ready(function()
         <td  style="width:20%;background-color: rgb(255, 255, 255);">
         </td>
         <td  style="width:60%;background-color: rgb(255, 255, 255);padding-top: 50;">
-            <p class="draft_title">Draft Questions - Registered by users</p>
+            <p class="draft_title">Draft Questions - Submitted by users</p>
             {% if not draft_questions %}
-                No questions yet. Regular users can register customized questions.
+                No questions yet. Regular users can submit customized questions.
             {% endif %}
             {% for q in draft_questions %}
                 <fieldset class="draft_questions_title">     
@@ -229,7 +260,7 @@ $(document).ready(function()
                 <br>
                 {% if user.is_authenticated %}
                     <input type="button" value="Up" id="Up_{{q.id}}" class="vote_button"/>
-                    <input type="button" value="Down" id="Down_{{q.id}}" class="vote_button"/>
+                    <input type="button" value="Down" id="Down_{{q.id}}" class="vote_button"/>                    
                     {% if my_vote|get_val_in_dict:q.id == 1 %}
                     <script>document.getElementById("Up_{{q.id}}").style.color = "red";</script>
                     {% endif %}
@@ -241,12 +272,23 @@ $(document).ready(function()
                     <script>document.getElementById("Down_{{q.id}}").style.color = "red";</script>
                     {% endif %}
                 {% endif %}
-                <label>Up: </label>
-                <label id="result_up{{q.id}}">{{up_vote_count|get_val_in_dict:q.id}}</label>    
+
+                <!--
+                <span id="result_up{{q.id}}">{{up_vote_count|get_val_in_dict:q.id}}</span>    
                 /
-                <label>Down:</label>
-                <label id="result_down{{q.id}}">{{down_vote_count|get_val_in_dict:q.id}}</label>
-                <br><label id="msg{{q.id}}"></label>
+                <span id="result_down{{q.id}}">{{down_vote_count|get_val_in_dict:q.id}}</span>
+                -->
+                <span id="result_vote{{q.id}}">0</span>
+                <span id="target_vote{{q.id}}">/ {{target_count}} (Target Count)</span>
+                <script>
+                    let up = "{{up_vote_count|get_val_in_dict:q.id}}"
+                    let down = "{{down_vote_count|get_val_in_dict:q.id}}"
+                    let result = up-down;
+                    $("#result_vote{{q.id}}").html(result);
+                    if(result < 0)
+                        $("#result_vote{{q.id}}").css("color","red");                    
+                </script>
+                <br><span id="msg{{q.id}}"></span>                
             </fieldset><br>
             {% endfor %}
             <br>

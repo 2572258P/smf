@@ -155,7 +155,7 @@ $(document).ready(function()
 <div class="basic_bg">
     <p>
         {% if updates|get_val_in_dict:rv.to_pk %}
-            <img class="img_new" src="{% static 'new3.png' %}">
+            <img class="img_new" src="{% static 'image/new3.png' %}">
             <span style="font-weight: bold;">New Request</span>
         {% endif %}
         {% if rv.msg %}
@@ -184,7 +184,7 @@ $(document).ready(function()
 {% for ac in acc %}
 <div class="basic_bg">
     {% if updates|get_val_in_dict:ac.to_pk %}
-        <img class="img_new" src="{% static 'new4.png' %}"><span style="font-weight: bold;">New Mate</span>
+        <img class="img_new" src="{% static 'image/new4.png' %}"><span style="font-weight: bold;">New Mate</span>
     {% endif %}
     <p>Username: {{ac.username}}</p>
     <p>Date: {{ac.date}} / Time: {{ac.time}}</p>

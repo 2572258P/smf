@@ -105,7 +105,7 @@ def loadpage(request):
         context = {}
         #labelling for categories    
         category_pair = {"cc":GetCategoryLabel('cc'),"cd":GetCategoryLabel('cd'),\
-            "cb":GetCategoryLabel('cb'),"cu":"Registered by users"}
+            "cb":GetCategoryLabel('cb'),"cu": GetCategoryLabel('cu')}
         context['cat_qs'] = {}
         for k,v in category_pair.items():
             context['cat_qs'][k] = apv_qs.filter(category=k)

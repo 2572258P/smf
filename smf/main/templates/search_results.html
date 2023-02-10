@@ -73,7 +73,7 @@ $(document).ready(function()
                     success: function (data)
                     {
                         $("#req_menu_div_{{se.pf_pk}}").hide();
-                        $("#img_status_{{se.pf_pk}}").attr("src","{% static 'check1.jpg' %}");
+                        $("#img_status_{{se.pf_pk}}").attr("src","{% static 'image/check1.jpg' %}");
                         $("#status_{{se.pf_pk}}").html("* Requesting has been complete.");                        
                     },
                     failure: function ()
@@ -92,7 +92,7 @@ $(document).ready(function()
 {% block body_block %}
 <style>
     .col_but{
-        width: 100%;
+        width: 590px;
         padding: 5px;
     }
     .result_bg
@@ -152,9 +152,9 @@ $(document).ready(function()
         {% for se in search_entities %}                   
             <table class="table_ret">
                 <tr> <!-- 1st Line -->
-                    <td style="width: 650px;"> <!-- Result Bar Button -->
+                    <td style="width: 600px;"> <!-- Result Bar Button -->
                     <button class="btn btn-primary col_but" id = "rbt_{{se.pf_pk}}" type="button" class="btn btn-info" data-toggle="collapse" data-target="#rt_{{se.pf_pk}}, #rt_prg_{{se.pf_pk}}">
-                        <span id="username_{{se.pk}}">Unknown User</span> | <span>Point ( {{se.accPoint}} / {{se.totalPoint}} ) </span></button>
+                        <span id="username_{{se.pk}}">Unconnected User</span> | <span>Point ( {{se.accPoint}} / {{se.totalPoint}} ) </span></button>
                     </td>
                     {% if se.username %}
                     <script>
@@ -168,7 +168,7 @@ $(document).ready(function()
                     </td>
                 </tr>
                 <tr> <!-- 2nd Line -->
-                    <td style=""> <!-- Body Text -->
+                    <td> <!-- Body Text -->
                         <div id="rt_{{se.pf_pk}}" class="collapse" style="padding-top:10">
                             {% if forloop.counter0 == 0 %}
                                 <script> 
@@ -195,12 +195,12 @@ $(document).ready(function()
                             </p>
                             </div>
                             {% if forloop.counter0 > 0 %}
-                            <div id="req_menu_div_{{se.pf_pk}}">
+                            <!-- <div id="req_menu_div_{{se.pf_pk}}">
                             
                             
                             <div>                                
                                 <table style="width: 100%;">
-                                    <td style="width: 35px;"><img src="{% static 'group2.png' %}" class="img_req"></td>                                    
+                                    <td style="width: 35px;"><img src="{% static 'image/group2.png' %}" class="img_req"></td>                                    
                                     <td style="width: 70%;">
                                         <textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Optional Message) Request will be sent to the user annonmously"></textarea>
                                     </td>
@@ -209,7 +209,7 @@ $(document).ready(function()
                                         <img id="img_prog_{{se.pf_pk}}" class="img_status">
                                     </td>
                                 </table>
-                            </div>
+                            </div>-->
                             </div>
                             {% endif %}
                         </div>
@@ -229,11 +229,11 @@ $(document).ready(function()
                                     <span id="per_num_{{se.pf_pk}}_{{v.label}}"></span>
                                 </div>
                                 </div>
-                            </div>                                
+                            </div>
                         {% endfor %}
                         </div>
                         {% endif %}
-                    </td>                    
+                    </td>
                 </tr>
             </table>
         
@@ -244,9 +244,9 @@ $(document).ready(function()
             "con":"* You both are connected.",
             };
             var sources = {
-                "req":"{% static 'check1.jpg' %}",
-                "rev":"{% static 'mail.png' %}",
-                "con":"{% static 'hand_shake.jpg' %}",
+                "req":"{% static 'image/check1.jpg' %}",
+                "rev":"{% static 'image/mail.png' %}",
+                "con":"{% static 'image/hand_shake.jpg' %}",
             }
             var status = "";
             

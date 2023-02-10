@@ -1,28 +1,7 @@
 {% extends 'base_frame.html' %}
-
+{% load static %}
 {% block head_block %}
-<style>
-    .textarea_title {
-        resize: none;
-        width: 90%;
-    }
-    .choice_field {
-        resize: none;
-        width: 50%;
-    }
-    
-    .div_section{
-        background-color: rgb(248, 248, 248);
-        border-radius: 20px 20px;
-        padding: 1%;
-        width: 60%;
-    }
-
-    .bold{
-        font-weight: bold;
-    }
-
-</style>
+<link rel="stylesheet" href="{% static 'page_common.css' %}">
 
 <script>
     $(document).ready(function()
@@ -37,10 +16,32 @@
     }
 </script>
 
+<style>
+    .textarea_title {
+        resize: none;
+        width: 90%;
+    }
+    .choice_field {
+        resize: none;
+        width: 50%;
+    }   
+
+    .bold{
+        font-weight: bold;
+    }
+
+    .div_bg{
+    background-color: rgb(248, 248, 248);
+    border-radius: 20px 20px;
+    padding: 1%;
+    width: 60%;
+    }
+</style>
 {% endblock %}
 
 {% block body_block %}
 
+    
 <p>Type Of Question:
 <select id="qType" onchange="selectQuestion()">
     <option value="scq">Single Choice Question</option>
@@ -48,16 +49,20 @@
     <option value="tbq">Text-based Question</option>
 </select>
 <p><h2>{{message}}</h2></p>
+<p>
+    * A user can submit draft questions. It will be officially registered after having voted from the majority of users.
+</p>
+
 
 <form action="{% url 'main:page_question_submit' %}" method="post">
 {% csrf_token %}
 
 {% if selectedType == 'tbq'%}
-<div = class="div_section">
+<div = class="div_bg">
         <p style="font-weight:bold">Q) Text-based Question Title: (Enter your question below)</p>
         <p><textarea name="tbq_text" rows="2" cols="50" class="textarea_title"></textarea></p>
 </div><br>
-<div = class="div_section">
+<div = class="div_bg">
         <p style="font-weight:bold">Q) Description: (Optional)</p>
         <p><textarea name="desc" rows="3" cols="50" class="textarea_title"></textarea></p>
 </div><br>
@@ -65,15 +70,15 @@
 {% endif %}
 
 {% if selectedType == 'scq' %}
-<div class="div_section">
+<div class="div_bg">
     <p class="bold"> Q) Single Choice Question: (Enter your question below)</p>
     <p><textarea name="scq_text" rows="2" cols="50" class="textarea_title"></textarea></p>    
 </div><br>
-<div = class="div_section">
+<div = class="div_bg">
     <p style="font-weight:bold">Q) Description: (Optional)</p>
     <p><textarea name="desc" rows="3" cols="50" class="textarea_title"></textarea></p>
 </div><br>
-<div class="div_section">
+<div class="div_bg">
     <p class="bold">Add choices for the question:</p>
     {% for i in scq_choice_num %}
         <p>{{ forloop.counter }}:<input class="choice_field" type="text" name="scq_c{{ forloop.counter }}"></p>
@@ -82,15 +87,15 @@
 {% endif %}
 
 {% if selectedType == 'mcq'%}
-<div = class="div_section">
+<div = class="div_bg">
     <p class="bold">Q) Multiple Choice Question: (Enter your question below)</p>
     <p><textarea name="mcq_text" id="mcq_text" rows="2" cols="50" class="textarea_title"></textarea></p> 
 </div><br>
-<div = class="div_section">
+<div = class="div_bg">
     <p style="font-weight:bold">Q) Description: (Optional)</p>
     <p><textarea name="desc" rows="3" cols="50" class="textarea_title"></textarea></p>
 </div><br>
-<div = class="div_section">
+<div = class="div_bg">
 <label for="html">Add choices for the question: </label>
 {% for i in mcq_choice_num %}
     <p><label>{{ forloop.counter }}: </label>
@@ -98,16 +103,20 @@
 {% endfor %}
 </div><br>
 {% endif %}
-
-
-<div class="div_section">
+<br>
+<div class="div_bg">
 <p>Categogy:
     <select id="category" name="category">
+{% if is_admin %}
         <option value="cc">Common</option>
         <option value="cd">Detail</option>
-        <option value="cb">Behavioural</option>
+        <option value="cb">Pychology</option>
+{% else %}
+        <option value="cu">Registered By Users</option>
+{% endif %}
     </select>
 </p>
+
 
 
 <p>Priority:
@@ -116,6 +125,7 @@
     <option value="medium">Medium</option>
     <option value="low">Low</option>
 </select>
+<span class="q_high">High(1)</span>,<span class='q_medium'>Medium(0.66)</span>,<span class="q_low">Low(0.33)</span><br>
 </p>
 
 {% if selectedType == 'scq' or selectedType == 'mcq' %}
@@ -125,9 +135,16 @@
     <option value="smt">Similar Answer Match</option>
     <option value="emt">Exact Answer Match</option>
     <option value="xor">XOR Answer Match</option>
-</select>
+</select><br>
+<p><img style="height:20px;opacity:0.7" src="{% static 'image/apx.png' %}">
+    Similar Answer Match - It calculates similarities by the NLP model over other users' answers. </p>
+<p><img style="height:20px;opacity:0.7" src="{% static 'image/equal.png' %}">
+    Exact Answer Match - It adds points when other users' answers are in common. </p>
+<p><img style="height:20px;opacity:0.7" src="{% static 'image/xor.png' %}">
+    XOR Answer Match - It matches only when other users have different answers.</p>
 </p>
 {% endif %}
+
 <input type="submit" name="Create" value="Create Question">
 </div>
 </form>
