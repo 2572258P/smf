@@ -17,4 +17,4 @@ def GetCategoryLabel(letters):
     elif letters == 'cb':
         return 'Pychology'
     elif letters == 'cu':
-        return 'Registered By Users'
+        return 'Registered_By_Users'

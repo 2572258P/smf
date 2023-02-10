@@ -85,6 +85,7 @@ def handle_search_result(request,username):
             percent = round(accPoint / totalPoint * 100,2)
             totalPoint = round(totalPoint,2)
             ose.generateAll(oup.pk,percent,myProfile,accPoint,totalPoint)
+            ose.sortCategory()
             searchEntities.append(ose)
     
     context['search_entities'] = sorted(searchEntities,key = SearchEntity.getAccPoint,reverse=True)    

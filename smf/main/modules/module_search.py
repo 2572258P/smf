@@ -1,8 +1,8 @@
 
-
 from main.models.models import Question,Answer,UserProfile,InvData,Choice
 from .module_common import GetCategoryLabel
 from .module_NLP import NLP
+
 
 class WeightCalculator():
     def __init__(self,match_type):
@@ -51,6 +51,7 @@ def getPercentWithAnswers(mp,op,anss1,anss2):
     
     return int((matchedCount / totalCount) * 100)
 
+
 def gen_table_by_answers(ansQueryForAll):
     result = {}
     for ans in ansQueryForAll:
@@ -62,19 +63,21 @@ def gen_table_by_answers(ansQueryForAll):
     return result
 
 class CategoryInfo:
-    def __init__(self,label):
+    def __init__(self,label,code):
         self.totalScore = 0
         self.score = 0
         self.per = 0
         self.label = label
+        self.code = code
+
     def CalcPercentage(self):
         self.per = round(self.score / self.totalScore * 100,2)
+        
     def addPoint(self,point):
         self.score += point
         self.per = round(self.score / self.totalScore * 100,2) if self.totalScore > 0 else 0
-        
-
-
+    def getPer(self):
+        return self.per
 
 class SearchEntity:
     def __init__(self):
@@ -82,14 +85,16 @@ class SearchEntity:
 
     def addCatTotalScore(self,cat_str,score):
         if cat_str not in self.cat_info:
-            self.cat_info[cat_str] = CategoryInfo(GetCategoryLabel(cat_str))
+            self.cat_info[cat_str] = CategoryInfo(GetCategoryLabel(cat_str),cat_str)
         self.cat_info[cat_str].totalScore += score
 
     def addCatScore(self,cat_str,score):
         if cat_str not in self.cat_info:
-            self.cat_info[cat_str] = CategoryInfo(GetCategoryLabel(cat_str))
-            
+            self.cat_info[cat_str] = CategoryInfo(GetCategoryLabel(cat_str),cat_str)            
         self.cat_info[cat_str].score += score
+    
+    def sortCategory(self):
+        self.cat_info = dict(sorted(self.cat_info.items(),key = lambda i: i[1].per,reverse=True))
 
     def getPercent(self):
         return self.percent

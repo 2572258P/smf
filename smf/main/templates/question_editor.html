@@ -64,13 +64,8 @@ No questions on the list
                 <option value="cc">Common</option>
                 <option value="cd">Detail</option>
                 <option value="cb">Bevioural</option>
+                <option value="cu">Registered_By_Users</option>
             </select><br>
-            {%if q.category == "cu" %} <!-- User Registered -->
-                <script>
-                    $("#cat_{{q.pk}}").prop('disabled', true)
-                </script>
-                <span>This question was registered by a user</span>
-            {% endif %}
             Priority:
             <select id="mPri_{{q.pk}}" name="mPri_{{q.pk}}">
                 <option value="high">High</option>

@@ -26,26 +26,34 @@ def get_cat_infos(mp):
     my_anss = Answer.objects.filter(profile=mp)
     ass_count = 0
     duplicated = {}
+
+    cat_list = ['cc','cd','cb','cu']
     cat_info_objs = {}
-    cat_info_objs['cc'] = CategoryInfo('cc')
-    cat_info_objs['cd'] = CategoryInfo('cd')
-    cat_info_objs['cb'] = CategoryInfo('cb')
+
 
     for ans in my_anss:
         #check whether the answer is duplicated in the same questions, which can happen in MCQ-type questions.
         q = Question.objects.filter(pk=ans.question_id).first()
         if q and ans.question_id not in duplicated:            
             duplicated[ans.question_id] = ans.question_id
-            ass_count += 1
+            ass_count += 1            
             if q.category not in cat_info_objs:
-                cat_info_objs[q.category] = CategoryInfo(q.category)
+                cat_info_objs[q.category] = CategoryInfo(GetCategoryLabel(q.category), q.category)
             cat_info_objs[q.category].totalScore = apv_qs.filter(category=q.category).count()
             cat_info_objs[q.category].addPoint(1)
     
-    cat_infos = {}
-    for k,ci in cat_info_objs.items():
-        cat_infos[ GetCategoryLabel(ci.label) ] = ci.per
+
+    #Convert them into the dictionary becasue Json does not accept django class or object
     
+    cat_infos = {}
+    for ci in cat_list[0:-1]:
+        cat_infos[GetCategoryLabel(ci)] = 0
+    if Question.objects.filter(category='cu'):
+        cat_infos[GetCategoryLabel('cu')] = 0
+
+    for k,v in cat_info_objs.items():
+        cat_infos[v.label] = v.per
+
     return cat_infos
 
 def load(request,profile):
@@ -86,7 +94,7 @@ def loadpage(request):
     apv_qs = Question.objects.all().exclude(approved=False) # Get all questions except unapproved Qs
     mp = UserProfile.objects.filter(user=request.user).first()
     if not mp:
-        return HttpResponse("{} User Profile Does not Exist".format(request.user))
+        return HttpResponse("{} User Profile does not exist".format(request.user))
     #Total count of approved quetions
 
     if is_ajax(request): #Saving
@@ -94,21 +102,26 @@ def loadpage(request):
         save(request,mp)
 
         cat_infos = get_cat_infos(mp)
-        label = GetCategoryLabel('cd')
-        if label in cat_infos and cat_infos[label] > 0:
-            cat_infos[label] = 100
+        
+        if GetCategoryLabel('cd') in cat_infos:
+            if cat_infos[GetCategoryLabel('cd')] > 0: # 100% when a user answers at least one question in the 'cd' category
+                cat_infos[GetCategoryLabel('cd')] = 100
         
         data = {"per_ans":get_per_ans(mp), "cat_infos":cat_infos }
-        
         return JsonResponse(data)
+
     else: #Only for loading
         context = {}
-        #labelling for categories    
-        category_pair = {"cc":GetCategoryLabel('cc'),"cd":GetCategoryLabel('cd'),\
-            "cb":GetCategoryLabel('cb'),"cu": GetCategoryLabel('cu')}
+        #labelling for categories
+        cat_list = ['cc','cd','cb','cu']
+        category_pair = {}
+        for ci in cat_list:
+            category_pair[ci] = GetCategoryLabel(ci)
+        
         context['cat_qs'] = {}
         for k,v in category_pair.items():
             context['cat_qs'][k] = apv_qs.filter(category=k)
+
         context['category_pair'] = category_pair
         context['questions'] = apv_qs
         context['answers'] = {}        
@@ -117,9 +130,10 @@ def loadpage(request):
         context['per_ans'] = get_per_ans(mp)
         cat_infos = get_cat_infos(mp)
 
-        label = GetCategoryLabel('cd')
-        if label in cat_infos and cat_infos[label] > 0:
-            cat_infos[label] = 100
-        print(cat_infos)
+        
+        if GetCategoryLabel('cd') in cat_infos:
+            if cat_infos[GetCategoryLabel('cd')] > 0: # 100% when a user answers at least one question in the 'cd' category
+                cat_infos[GetCategoryLabel('cd')] = 100
+        
         context['cat_infos'] = cat_infos
         return render(request,'find_mates.html',context)

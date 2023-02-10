@@ -81,7 +81,7 @@
         setTimeout(function()
         {
             {% for label,per in cat_infos.items %}
-                bar_color("per_bar_"+"{{label}}","per_num_"+"{{label}}", "{{per}}");
+                bar_color("per_bar_{{label}}","per_num_{{label}}", "{{per}}");
             {% endfor %}
         },300);
 
@@ -107,9 +107,8 @@
                     $("#save_msg").html("Your data successfully have been saved.");
                     setTimeout(function(){$("#save_msg").html("");}, 3000);
                     
-                    for(key in data.cat_infos){
-                        bar_color("per_bar_"+key,"per_num_"+key, data.cat_infos[key]);                        
-                    }
+                    for(key in data.cat_infos)
+                        bar_color("per_bar_"+ key,"per_num_"+key,data.cat_infos[key] );
                 },
                 failure: function ()
                 {                    
@@ -185,7 +184,7 @@
     <b>Complete Rate</b><br>    
     {% for label,per in cat_infos.items %}
         <div class="row" style="border-style:solid;border:0;height: 30px;">
-            <div align="right"><span class="col-sm-1" style="width: 180px;">{{label}}:</span></div>        
+            <div align="right"><span class="col-sm-1" style="width: 180px;">{{label}}:</span></div>
             <div class="progress" class="col-sm-9" style="width:500px">
                 <div id="per_bar_{{label}}"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:0%;">
                     <span id="per_num_{{label}}">0</span>
@@ -199,8 +198,6 @@
         <span style="font-weight: bold;">The system uses your answers up to the answers you have finished.</span><br>
         <span>e.g., If you only care about the location for studying, you can answer only questions about it.</span><br>        
     </p><br>
-    
-
 
     {% for k,v in cat_qs.items %}
         {% if v %}

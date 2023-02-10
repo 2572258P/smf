@@ -59,7 +59,7 @@ $(document).ready(function()
                     msg_ = "";
                 }
             }            
-            $("#img_prog_{{se.pf_pk}}").attr("src","{% static 'loading4.gif' %}");
+            $("#img_prog_{{se.pf_pk}}").attr("src","{% static 'image/loading4.gif' %}");
             $.ajax({
                     type: "POST",
                     url: "{% url 'main:page_search_result' 'dummy' %}",
@@ -217,13 +217,13 @@ $(document).ready(function()
                     
                     <td style="padding:10;vertical-align:top">
                         {% if forloop.counter0 > 0 %}
-                        <div id="rt_prg_{{se.pf_pk}}" class="collapse result_bg2" style="padding:10">
+                        <div id="rt_prg_{{se.pf_pk}}" class="collapse result_bg2" style="padding:10;width: 470px;">
                         <p>Overall Accuracy Rate: <span id="percent_{{se.pf_pk}}">{{se.percent}}</span>%</p>
 
                         <p id="acc_label_{{se.pf_pk}}" style="font-weight: bold;">By categories:</p>
                         {% for k,v in se.cat_info.items %}                
                             <div class="row" style="border-style:solid;border:0;height: 30px;">
-                                <div align="right"><span class="col-sm-1" style="width: 30%;">{{v.label}}:</span></div>
+                                <div align="right"><span class="col-sm-1" style="width: 155px;padding-right: 10px;">{{v.label}}</span></div>
                                 <div class="progress" class="col-sm-9" style="width:60%">
                                 <div id="per_bar_{{se.pf_pk}}_{{v.label}}"class="progress-bar active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:0%;">
                                     <span id="per_num_{{se.pf_pk}}_{{v.label}}"></span>
