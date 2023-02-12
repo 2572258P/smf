@@ -5,8 +5,29 @@
 
 
 {% block head_block %}
+<script>
+    $(document).ready(function()
+    {
+        setTimeout(function()
+        {
+            $('#main_msg').html("{{main_msg}}");
+            $('#sub_msg').html("{{sub_msg}}");
+            $('#sub_msg').html("{{sub_msg}}");
+        },500);
+
+        setTimeout(function()
+        {
+            $("#image").attr("src","{% static 'image/confirm.gif' %}");
+        },1000);
+
+        
+    });
+</script>
+
 {% endblock %}
 
 {% block body_block %}
-{{message}}
+<h1 id="main_msg" style="display: inline;"></h1><img id="image" style="height: 60px;">
+<h3 id="sub_msg"></h3>
+
 {% endblock %}

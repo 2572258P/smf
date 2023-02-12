@@ -129,13 +129,17 @@
 <span class="q_high">High(1)</span>,<span class='q_medium'>Medium(0.66)</span>,<span class="q_low">Low(0.33)</span><br>
 </p>
 
-{% if selectedType == 'scq' or selectedType == 'mcq' %}
-</p>
+
+
 <p>Type Of Match:
 <select id="mType" name="mType">
+{% if selectedType == 'scq' or selectedType == 'mcq' %}
     <option value="smt">Similar Answer Match</option>
     <option value="emt">Exact Answer Match</option>
     <option value="xor">XOR Answer Match</option>
+{% else %}
+    <option value="smt">Similar Answer Match</option>
+{% endif %}
 </select><br>
 <p><img style="height:20px;opacity:0.7" src="{% static 'image/apx.png' %}">
     Similar Answer Match - It calculates similarities by the NLP model over other users' answers. </p>
@@ -144,7 +148,7 @@
 <p><img style="height:20px;opacity:0.7" src="{% static 'image/xor.png' %}">
     XOR Answer Match - It matches only when other users have different answers.</p>
 </p>
-{% endif %}
+
 
 <input type="submit" name="Create" value="Create Question">
 </div>

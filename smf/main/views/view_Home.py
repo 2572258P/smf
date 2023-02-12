@@ -37,7 +37,7 @@ def loadpage(request):
     comp_result = NLP.calculate_single_similarities(sen1,sen2)    
     context['compare_result'] = comp_result
 
-    target_count = 1
+    target_count = round(UserProfile.objects.all().count() / 3)
     context['target_count'] = target_count
     
     if is_ajax(request): # Handling from ajax request

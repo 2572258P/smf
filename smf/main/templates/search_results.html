@@ -25,7 +25,7 @@ function bar_color(id_bar,id_num,value)
 
 $(document).ready(function()
 {
-    {% for se in search_entities %}    
+    {% for se in search_entities %}
         {% if forloop.counter0 > 0 %} /* Because 0 is my data*/
             /* Add events to result div(s) when they toggle*/
             {% for k,v in se.cat_info.items %}
@@ -66,8 +66,7 @@ $(document).ready(function()
                     data:{
                         pf_pk: '{{se.pf_pk}}',
                         msg: msg_,                        
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        percent: $("#percent_{{se.pf_pk}}").html(),
+                        csrfmiddlewaretoken: '{{ csrf_token }}',                        
                         dataType: "json",
                     },
                     success: function (data)
@@ -83,6 +82,31 @@ $(document).ready(function()
                 
         });
     {% endfor %}
+
+
+    {% for se in search_entities %}
+        {% for qt in se.QTs %}
+        {% if forloop.counter == se.QTs|length and se.QTs|length > 5 %}
+            console.log("Ready:"+"{{se.pf_pk}}");
+            $('#va_bt_{{se.pf_pk}}').click(function()
+            {
+                var div = document.getElementById("va_div_{{se.pf_pk}}");
+                var button = document.getElementById("va_bt_{{se.pf_pk}}");
+                if(div.style.display == "none")
+                {
+                    $('#va_div_{{se.pf_pk}}').css("display","inline");
+                    button.innerHTML = "view less";
+                }
+                else
+                {
+                    $('#va_div_{{se.pf_pk}}').css("display","none");
+                    button.innerHTML = "view all";                        
+                }                    
+            });
+        {% endif %}
+        {% endfor %}
+    {% endfor %}
+
 });
 
 
@@ -146,10 +170,15 @@ $(document).ready(function()
     .table_ret td,tr{
         border: 0px solid;
     }
+    .fake-link {
+        color:black;
+        text-decoration:underline;
+        cursor: pointer;
+    }
     
 </style>
     {% if search_entities %}
-        {% for se in search_entities %}                   
+        {% for se in search_entities %}
             <table class="table_ret">
                 <tr> <!-- 1st Line -->
                     <td style="width: 600px;"> <!-- Result Bar Button -->
@@ -180,36 +209,41 @@ $(document).ready(function()
                             <div class="result_bg">
                             <p>
                                 {% for qt in se.QTs%}
+                                {% if forloop.counter == 5 and se.QTs|length > 5 %}
+                                    <div id="va_div_{{se.pf_pk}}" style="display:none;">
+                                    <script>
+                                        console.log("{{se.pf_pk}}");
+                                    </script>
+                                {% endif %}
                                 <p>Q) {{qt}}<br>                    
-                                    {% for anss in se.Anss|get_val_in_list:forloop.counter0 %}
-                                        {% if forloop.counter0 <= 4 %}
-                                            A) <span>{{anss}}</span>
-                                        {% endif %}
-                                        {% if forloop.counter0 == 5 %}
-                                            <span>... ...</span>
-                                        {% endif %}
+                                    {% for anss in se.Anss|get_val_in_list:forloop.counter0 %}                                        
+                                    A) <span>{{anss}}</span>
                                     {% endfor %}
                                 </p>
+                                {% if forloop.counter == se.QTs|length and se.QTs|length > 5 %}
+                                    </div>
+                                    <span id="va_bt_{{se.pf_pk}}" class="fake-link">view all</span>
+                                {% endif %}
                                 {% endfor %}
-                                <span>Profile Text: </span>{{se.profile_text}}
+                                <br>
+                                <br>
+                                <span><b>Profile Text</b><br></span>{{se.profile_text}}
                             </p>
                             </div>
                             {% if forloop.counter0 > 0 %}
-                            <!-- <div id="req_menu_div_{{se.pf_pk}}">
-                            
-                            
+                            <div id="req_menu_div_{{se.pf_pk}}">                            
                             <div>                                
                                 <table style="width: 100%;">
                                     <td style="width: 35px;"><img src="{% static 'image/group2.png' %}" class="img_req"></td>                                    
                                     <td style="width: 70%;">
-                                        <textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="#(Optional Message) Request will be sent to the user annonmously"></textarea>
+                                        <textarea class="form-control text_box" id="msgtxt_{{se.pf_pk}}" rows="1" class="textarea_title" placeholder="(Optional) Please, let the user knows your request motivation."></textarea>
                                     </td>
                                     <td>
                                         <button id="sendbt_{{se.pf_pk}}"  type="button" style="border: 1;border-style: solid;margin-left: 3;" class="btn btn-success" data-toggle="button" aria-pressed="false" autocomplete="off">Request</button>
                                         <img id="img_prog_{{se.pf_pk}}" class="img_status">
                                     </td>
                                 </table>
-                            </div>-->
+                            </div>
                             </div>
                             {% endif %}
                         </div>

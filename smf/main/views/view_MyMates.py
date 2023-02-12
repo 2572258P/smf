@@ -6,29 +6,33 @@ from django.utils import timezone
 
 from .view_Base import is_ajax,CheckAuth,ShowNotAuthedPage
 from main.models.models import Question,Answer,UserProfile,InvData,Update
+from ..modules.module_NLP import NLP
+from ..modules.module_search import SearchEntity,getSeachEntity
 
 class mymate_info:
-    def __init__(self,to_pk,date="",time="",msg="",email="",profile_text="",username="",percent=0):
-        self.percent = percent
-        self.to_pk = to_pk
-        self.email = email
-        self.msg = msg
-        self.time = time
-        self.date = date
-        self.profile_text = profile_text
-        self.username = username
+    def __init__(self):
+        self.status = ""
+        self.to_pk = -1
+        self.email = ''
+        self.msg = ''
+        self.time = ''
+        self.date = ''
+        self.profile_text = ''
+        self.username = ''
+        self.se = None
 
 def GetBodyTextForSuccess(Inv):
     return "Congratulations! your request has been accepted by the other user. \n\n\
 Message: {}\n\
-Match Percent: {}%\n\
 Please visit our webiste and check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format( Inv.message if len(Inv.message) > 0 else "No Message Attached.",Inv.percent)
+http://18.170.55.54/main/my_mates/".format( Inv.message if len(Inv.message) > 0 else "No Message Attached.")
 
 def loadpage(request):
     if CheckAuth(request) is False:
         return ShowNotAuthedPage()
 
+    NLP.Init()
+    
     if is_ajax(request):
         cmd = request.POST.get('cmd')
         data = {}
@@ -69,24 +73,56 @@ def loadpage(request):
         return JsonResponse(data)
     else:
         context = {}
+
         mp = UserProfile.objects.filter(user=request.user).first()
-        sent_data = InvData.objects.filter(from_pk=mp.pk,accepted=False)
-        rev_data = InvData.objects.filter(to_pk=mp.pk,accepted=False)
-        acc_data = InvData.objects.filter(from_pk=mp.pk,accepted=True) | InvData.objects.filter(to_pk=mp.pk,accepted=True)
-        context['sent'] = []
-        context['rev']  = []
-        context['acc']  = []
+        my_pk = mp.pk
+        sent_data = InvData.objects.filter(from_pk=my_pk,accepted=False)
+        rev_data = InvData.objects.filter(to_pk=my_pk,accepted=False)
+        acc_data = InvData.objects.filter(from_pk=my_pk,accepted=True) | InvData.objects.filter(to_pk=my_pk,accepted=True)
 
-        for sd in sent_data:
-            context['sent'].append(mymate_info(date=str(sd.date),time=sd.time.strftime('%I:%H %p'),to_pk=sd.to_pk,msg=sd.message,percent=sd.percent))
-        for rv in rev_data:
-            context['rev'].append(mymate_info(date=str(rv.date),time=rv.time.strftime('%I:%H %p'),to_pk=rv.from_pk,msg=rv.message,percent=rv.percent))
-        for ac in acc_data:
-            connected_pk = ac.to_pk if ac.from_pk == mp.pk else ac.from_pk
-            up = UserProfile.objects.filter(pk=connected_pk).first()
-            context['acc'].append(mymate_info(username=up.user.username,date=str(ac.date),time=ac.time.strftime('%I:%H %p'),to_pk=connected_pk,msg=ac.message,email=up.email,profile_text=up.profile_text,percent=ac.percent))
+        # Get a precomputed similarity table with my mates
+        otherUserPfs = []
+        for invd in sent_data | rev_data | acc_data:
+            target_pk = invd.from_pk if my_pk != invd.from_pk else invd.to_pk
+            otherUserPfs.append(UserProfile.objects.filter(pk=target_pk).first())
+
+        SimDictTable_tbq = NLP.gen_sim_dict_from_tbq(mp,otherUserPfs)
+
+        context['mates'] = {}
+        labels = {'req':'Requested', 'rev':'Received', 'acc':'Connected'}
+        context['labels'] = labels
+        for key in labels:
+            context['mates'][key] = []
         
+        # Create MyMateInfo for all
+        for invd in sent_data | rev_data | acc_data:
+            status = ''
+            target_pk = -1
+            mi = mymate_info()
+            target_pk = invd.from_pk if my_pk != invd.from_pk else invd.to_pk
+            if invd.accepted: #accepted
+                mi.status = 'acc'
+            elif invd.from_pk == my_pk:  #requested
+                mi.status = 'req'
+            elif invd.to_pk == my_pk: #received
+                mi.status = 'rev'            
 
+            op = UserProfile.objects.filter(pk = target_pk).first()
+            if op == None:
+                continue
+
+            mi.to_pk = target_pk
+            mi.email = op.email        
+            mi.msg = invd.message
+            mi.profile_text = op.profile_text
+            mi.time = invd.time
+            mi.date = invd.date
+            mi.username = op.user.username
+            se = getSeachEntity(mp,op,SimDictTable_tbq)
+            mi.se = se
+            context['mates'][mi.status].append(mi)
+
+        #Update Checks
         context['updates'] = {}
         for ud in Update.objects.filter(profile=mp).all():
             context['updates'][ud.to_pk] = ud.to_pk

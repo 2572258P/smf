@@ -3,6 +3,9 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from django.shortcuts import redirect
+from django.urls import reverse
+
 from main.views.view_Base import CheckAuth,ShowNotAuthedPage
 from main.models.models import Question,Answer,UserProfile
 
@@ -16,15 +19,9 @@ def loadpage(request,question_type="scq"):
     mcq_text = request.POST.get('mcq_text','')
     tbq_text = request.POST.get('tbq_text','')
     
-    if profile.admin:
-        category = request.POST.get('category','')
-        priority = request.POST.get('mPri','')
-        match_type = request.POST.get('mType','smt') #default value 'smt'
-    else:
-        category = 'cu'
-        priority = 'medium'
-        match_type = 'emt'
-
+    category = request.POST.get('category','')
+    priority = request.POST.get('mPri','')
+    match_type = request.POST.get('mType','smt') #default value 'smt'
     desc = request.POST.get('desc')
     
 
@@ -39,7 +36,7 @@ def loadpage(request,question_type="scq"):
         elif question_type == 'mcq':
             message = 'Multiple-Choice Question - Enter a question and choices.'        
     else:
-        try:            
+        try:
             if len(scq_text) > 0:
                 q = Question(approved=profile.admin,type="scq",ctrl_type='radio',title=scq_text,pub_date=timezone.now(),priority = priority,match_type = match_type,category=category,desc=desc)
                 q.save()
@@ -56,11 +53,14 @@ def loadpage(request,question_type="scq"):
                         q.choice_set.create(choice_text=choice_text)
             if len(tbq_text) > 0:                
                 q = Question(approved=profile.admin,type="tbq",ctrl_type='textarea',title=tbq_text,desc=desc,pub_date=timezone.now(),priority = priority,match_type = match_type,category=category)
-                q.save()
-            message = 'New question has been successfully created.'
+                q.save()            
+            request.session['main_msg'] = 'Your new question has been successfully created.'
+            if profile.admin == False:
+                request.session['sub_msg'] = 'It will be registered once voting reaches the target count.'
+            return redirect(reverse('main:result'))
 
         except Exception as inst:
             print(inst)
         
-    context = {'is_admin':profile.admin,'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type}
+    context = {'message':message,'scq_choice_num':scq_choice_num,'mcq_choice_num':mcq_choice_num,'selectedType':question_type}
     return render(request,'question_submit.html',context)

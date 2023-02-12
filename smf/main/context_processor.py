@@ -8,7 +8,6 @@ def main_cp(request):
         if mp:
             context['has_request'] = True if Update.objects.filter(profile=mp).count() > 0 else False
             context['is_admin'] = mp.admin
-
     else:
         context['has_request'] = False
         context['is_admin'] = False

@@ -9,106 +9,131 @@ $(document).ready(function()
 {
     $("#menu_mates").addClass("menu_select");
 
-    {% for sd in sent %}
-        $("#cancel_{{sd.to_pk}}").click(function()
-        {
-            $.ajax({
-                    type: "POST",
-                    url: "{% url 'main:page_mymates' %}",
-                    data:{
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        cmd:"cancel",
-                        to_pk: "{{sd.to_pk}}"
-                    },
-                    success: function (data)
-                    {
-                        $("#cancel_msg_{{sd.to_pk}}").html("Cancelled");
-                        $("#cancel_{{sd.to_pk}}").hide();
-                    },
-                    failure: function ()
-                    {                    
-                    }
+
+    {% for key,mis in mates.items %}
+        {% for mi in mis %}
+            //Cancellation of request
+            {% if key == 'req'%}
+                $("#cancel_{{mi.to_pk}}").click(function()
+                {
+                    $.ajax({
+                            type: "POST",
+                            url: "{% url 'main:page_mymates' %}",
+                            data:{
+                                csrfmiddlewaretoken: '{{ csrf_token }}',
+                                cmd:"cancel",
+                                to_pk: "{{mi.to_pk}}"
+                            },
+                            success: function (data)
+                            {
+                                $("#cancel_msg_{{mi.to_pk}}").html("Cancelled");
+                                $("#cancel_{{mi.to_pk}}").hide();
+                            },
+                            failure: function ()
+                            {
+                            }
+                        });
                 });
-        });
+            {% endif %}
+
+            //Accept or Reject on the received invitations
+            {% if key == 'rev'%}
+                $("#acc_{{mi.to_pk}}").click(function()
+                {
+                    $("#img_loading_{{mi.to_pk}}").show();            
+                    $.ajax({
+                            type: "POST",
+                            url: "{% url 'main:page_mymates' %}",
+                            data:{
+                                csrfmiddlewaretoken: '{{ csrf_token }}',
+                                cmd:"accept",
+                                to_pk: "{{mi.to_pk}}"
+                            },
+                            success: function (data)
+                            {                                
+                                $("#rev_msg_{{mi.to_pk}}").html("Accepted");
+                                $("#rev_but_div_{{mi.to_pk}}").hide();
+                                $("#img_loading_{{mi.to_pk}}").hide();
+                            }
+                        });
+                });            
+
+                $("#rej_{{mi.to_pk}}").click(function()
+                {
+                    $.ajax({
+                            type: "POST",
+                            url: "{% url 'main:page_mymates' %}",
+                            data:{
+                                csrfmiddlewaretoken: '{{ csrf_token }}',
+                                cmd:"reject",
+                                to_pk: "{{mi.to_pk}}"
+                            },
+                            success: function (data)
+                            {                                
+                                $("#rev_msg_{{mi.to_pk}}").html("Rejected");
+                                $("#rev_but_div_{{mi.to_pk}}").hide();
+                                
+                            },
+                            failure: function ()
+                            {                    
+                            }
+                        });
+                });
+            {% endif %}
+
+            //Disconnect with connected mates
+            {% if key == 'acc'%}
+            $("#dis_{{mi.to_pk}}").click(function()
+            {
+                $.ajax({
+                        type: "POST",
+                        url: "{% url 'main:page_mymates' %}",
+                        data:{
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            cmd:"disconnect",
+                            to_pk: "{{mi.to_pk}}"
+                        },
+                        success: function (data)
+                        {
+                            $("#dis_msg_{{mi.to_pk}}").html("Disconnected");
+                            $("#dis_{{mi.to_pk}}").hide();                       
+                        },
+                    });
+            });
+
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+   
+
+    {% for key,mis in mates.items %}
+        {% for mi in mis %}
+            {% for qt in mi.se.QTs %}
+            {% if forloop.counter == mi.se.QTs|length and forloop.counter > 3%}
+                $('#va_bt_{{mi.to_pk}}').click(function()
+                {
+                    var div = document.getElementById("va_div_{{mi.to_pk}}");
+                    var button = document.getElementById("va_bt_{{mi.to_pk}}");
+                    if(div.style.display == "none")
+                    {
+                        $('#va_div_{{mi.to_pk}}').css("display","inline");
+                        button.innerHTML = "view less";
+                    }
+                    else
+                    {
+                        $('#va_div_{{mi.to_pk}}').css("display","none");
+                        button.innerHTML = "view all";                        
+                    }                    
+                });
+            {% endif %}
+            {% endfor %}
+        {% endfor %}
     {% endfor %}
 
-    {% for rv in rev %}
-        $("#acc_{{rv.to_pk}}").click(function()
-        {
-            $("#img_loading_{{rv.to_pk}}").show();            
-            $.ajax({
-                    type: "POST",
-                    url: "{% url 'main:page_mymates' %}",
-                    data:{
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        cmd:"accept",
-                        to_pk: "{{rv.to_pk}}"
-                    },
-                    success: function (data)
-                    {
-                        $("#rev_msg_{{rv.to_pk}}").html("Accepted");
-                        $("#rev_but_div_{{rv.to_pk}}").hide();
-                        $("#img_loading_{{rv.to_pk}}").hide();
-                    },
-                    failure: function ()
-                    {                    
-                    }
-                });
-        });
-    {% endfor %}
-    {% for rv in rev %}
-        $("#rej_{{rv.to_pk}}").click(function()
-        {
-            $.ajax({
-                    type: "POST",
-                    url: "{% url 'main:page_mymates' %}",
-                    data:{
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        cmd:"reject",
-                        to_pk: "{{rv.to_pk}}"
-                    },
-                    success: function (data)
-                    {
-                        $("#rev_msg_{{rv.to_pk}}").html("Rejected");
-                        $("#rev_but_div_{{rv.to_pk}}").hide();
-                        
-                    },
-                    failure: function ()
-                    {                    
-                    }
-                });
-        });
-    {% endfor %}
 
-    {% for ac in acc %}
-        $("#dis_{{ac.to_pk}}").click(function()
-        {
-            $.ajax({
-                    type: "POST",
-                    url: "{% url 'main:page_mymates' %}",
-                    data:{
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        cmd:"disconnect",
-                        to_pk: "{{ac.to_pk}}"
-                    },
-                    success: function (data)
-                    {
-                        $("#dis_msg_{{ac.to_pk}}").html("Disconnected");
-                        $("#dis_{{ac.to_pk}}").hide();                       
-                    },
-                    failure: function ()
-                    {                    
-                    }
-                });
-        });
-    {% endfor %}
 
 });
 </script>
-
-{% endblock %}
-
-{% block body_block %}
 <style>
     .basic_bg{
         background-color:rgb(249, 249, 249);
@@ -116,8 +141,15 @@ $(document).ready(function()
         border-radius: 10px; 
         padding: 1%;
     }
+
+    .p_text{
+        line-height: 1;
+    }
+    .p_text_narrow{
+        line-height: 0.8;
+    }
     .button_width{
-        width: 15%;
+        width: 250px;
 
     }
     .img_new{
@@ -126,87 +158,156 @@ $(document).ready(function()
     .img_loading{
         width: 25px;
         
+    }    
+    .table1 td,tr
+    {
+        /*
+        border:1;
+        border-style: solid;
+        border-color: black;
+        */
+        font-weight: normal;
+        font-size: 14px;
     }
+    .fake-link {
+        color:black;
+        text-decoration:underline;
+        cursor: pointer;
+    }
+    
 </style>
+{% endblock %}
+
+{% block body_block %}
+
+{% for key,mis in mates.items %}
 <p>
-<button class="btn btn-primary button_width" type="button" data-toggle="collapse" data-target="#div_sent">Requested ({{sent|length }})</button>
-<div id="div_sent" class="collapse">
-{% for sd in sent %}
-<div class="basic_bg">
-    <p>Date: {{sd.date}} / Time: {{sd.time}}</p>
-    {% if sd.msg %}
-        <p>{{sd.msg}}</p>
-    {% else %}
-        <p style="font-style:italic;">No message attached</p>
-    {% endif %}
-    <p>Overall Accuracy Rate: <span style="font-weight: bold;">{{sd.percent}} %</span></p>
+<button class="btn btn-primary button_width" type="button" 
+    data-toggle="collapse" data-target="#div_{{key}}">
+    {{ labels|get_val_in_dict:key }} ({{mis|length}}) </button>
     
-    <button id="cancel_{{sd.to_pk}}">Cancel</button>
-    <span style="font-style:italic;" id="cancel_msg_{{sd.to_pk}}"></span>
-</div><br>
-{% endfor %}
-</div>
-</p>
-
-<p>
-<button class="btn btn-primary button_width" type="button" data-toggle="collapse" data-target="#div_rev">Received ({{rev|length }})</button>
-<div id="div_rev" class="collapse">
-{% for rv in rev %}
-<div class="basic_bg">
-    <p>
-        {% if updates|get_val_in_dict:rv.to_pk %}
-            <img class="img_new" src="{% static 'image/new3.png' %}">
-            <span style="font-weight: bold;">New Request</span>
-        {% endif %}
-        {% if rv.msg %}
-            {{rv.msg}}
-        {% else %}
-            <span style="font-style:italic;">No message attached</span>
-        {% endif %}
-    </p>
-    <p>Overall Accuracy Rate: <span style="font-weight: bold;">{{rv.percent}} %</span></p>
-
-    <p>Date: {{rv.date}} / Time: {{rv.time}}</p>
-    <div id="rev_but_div_{{rv.to_pk}}">
-        <button id="acc_{{rv.to_pk}}">Accept</button>
-        <button id="rej_{{rv.to_pk}}">Reject</button>
-        <img id="img_loading_{{rv.to_pk}}" hidden="hidden" class="img_loading" src="{% static 'image/loading4.gif' %}" >
-    </div>
-    <span style="font-style:italic;" id="rev_msg_{{rv.to_pk}}"></span>
-</div><br>
-{% endfor %}
-</div>
-</p>
-
-<p>
-<button class="btn btn-primary button_width" type="button" data-toggle="collapse" data-target="#div_dis">Connected ({{acc|length }})</button>
-<div id="div_dis" class="collapse">
-{% for ac in acc %}
-<div class="basic_bg">
-    {% if updates|get_val_in_dict:ac.to_pk %}
-        <img class="img_new" src="{% static 'image/new4.png' %}"><span style="font-weight: bold;">New Mate</span>
-    {% endif %}
-    <p>Username: {{ac.username}}</p>
-    <p>Date: {{ac.date}} / Time: {{ac.time}}</p>
-    <p>Email: <a href="mailto:{{ac.email}}">{{ac.email}}</a></p>    
-    <p>Profile Text: {{ac.profile_text}}</p>
-
-    {% if ac.msg %}
-    <p>Message: {{ac.msg}}</p>
-    {% endif %}
-    <p>Overall Accuracy Rate: <span style="font-weight: bold;">{{ac.percent}} %</span></p>
+{% for mi in mis %}
+<div id="div_{{key}}" class="collapse basic_bg">
+    <table class="table1">
+    <tr>
+        <td style="width:430px;border-right: 1px solid rgb(207, 207, 207);">            
+            {% if key == 'acc' %}
+                <p style="font-weight:bold">Username: {{mi.username}}</p>
+                <p class="p_text">Email: <a href="mailto:{{ac.email}}">{{mi.email}}</a></p>
+            {% endif %}
     
-    <button id="dis_{{ac.to_pk}}">Disconnect</button>
-    <span style="font-style:italic;" id="dis_msg_{{ac.to_pk}}"></span>
-</div><br>
-{% endfor %}
-</div>
-</p>
+            {% if mi.msg %}
+                <p class="p_text">Message: {{mi.msg}}</p>
+            {% else %}
+                <p class="p_text">Message: No message attached.</p>
+            {% endif %}
+    
+            <p class="p_text">Date: {{mi.date}}</p>
+            <p class="p_text">Time: {{mi.time}}</p>
+            <!-- Buttons for each status -->
+            {% if key == 'req' %}
+                <button id="cancel_{{mi.to_pk}}">Cancel</button>
+                <span style="font-style:italic;" id="cancel_msg_{{mi.to_pk}}"></span>
+            {% endif %}
+    
+            {% if key == 'rev' %}
+                <div id="rev_but_div_{{mi.to_pk}}">
+                    <button id="acc_{{mi.to_pk}}">Accept</button>
+                    <button id="rej_{{mi.to_pk}}">Reject</button>
+                    <img id="img_loading_{{mi.to_pk}}" hidden="hidden" class="img_loading" src="{% static 'image/loading4.gif' %}" >                    
+                </div>
+                <span style="font-style:italic;" id="rev_msg_{{mi.to_pk}}"></span>
+            {% endif %}
+    
+            {% if key == 'acc' %}
+            <p class="p_text">Profile Text: {{mi.profile_text}}</p>
+            <button id="dis_{{mi.to_pk}}">Disconnect</button>
+            <span style="font-style:italic;" id="dis_msg_{{mi.to_pk}}"></span>
+            {% endif %}
+        </td>
+        <td style="padding: 10;">
+            {% if key == 'req' %} <!-- For my requests -->
+            <p>Overall Accuracy Rate: {{mi.se.percent}} %</p>
+                {% for k,v in mi.se.cat_info.items %}
+                    {% if forloop.counter0 == 0 %}
+                        <p>1st Match Category: {{v.label}}({{v.per}}%)</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
 
+            {% if key == 'rev' %} <!-- For received invitations -->
+                <p><b>Summary</b></p>
+                <p class="p_text">Overall Accuracy Rate: {{mi.se.percent}}%<br>
+                {% for k,v in mi.se.cat_info.items %}
+                    <span>{{v.label}}({{v.per}}%)</span>
+                    {% if forloop.counter < mi.se.cat_info.items|length %}
+                        <span>/</span>
+                    {% endif %}
+                {% endfor %}
+                </p>
+
+                <p><b>Q&As In High Priority</b></p>
+                
+                {% for qt in mi.se.QTs %}
+                    {% if forloop.counter == 3 and mi.se.QTs|length > 3 %}
+                        <div id="va_div_{{mi.to_pk}}" style="display:none;">
+                    {% endif %}
+                        {% if mi.se.prios|get_val_in_list:forloop.counter0 == 'high' %}            
+                        <p>Q) {{qt}}<br>
+                            {% for anss in mi.se.Anss|get_val_in_list:forloop.counter0 %}
+                                A) <span>{{anss}}</span>
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+                    {% if forloop.counter == mi.se.QTs|length and forloop.counter > 3%}
+                        </div>
+                        <span id="va_bt_{{mi.to_pk}}" class="fake-link">view all</span>
+                    {% endif %}
+                {% endfor %}                
+                
+            {% endif %}
+
+            {% if key == 'acc' %} <!-- For connected mates -->
+            <p><b>Summary</b></p>
+            <p class="p_text">Overall Accuracy Rate: {{mi.se.percent}}%<br>
+            {% for k,v in mi.se.cat_info.items %}
+                <span>{{v.label}}({{v.per}}%)</span>
+                {% if forloop.counter < mi.se.cat_info.items|length %}
+                    <span>/</span>
+                {% endif %}
+            {% endfor %}
+            </p>
+
+            <p><b>All Q&As</b></p>
+            {% for qt in mi.se.QTs %}  
+            {% if forloop.counter == 3 and mi.se.QTs|length > 3 %}
+                <div id="va_div_{{mi.to_pk}}" style="display:none;">
+            {% endif %}              
+                <p>Q) {{qt}}<br>
+                    {% for anss in mi.se.Anss|get_val_in_list:forloop.counter0 %}
+                        A) <span>{{anss}}</span>
+                    {% endfor %}
+                </p>
+            {% if forloop.counter == mi.se.QTs|length and forloop.counter > 3%}
+                </div>
+                <span id="va_bt_{{mi.to_pk}}" class="fake-link">view all</span>
+            {% endif %}
+            {% endfor %}
+            </p>
+            {% endif %}
+        </td>
+    </tr>
+    </table>
+</div>
+
+    {% endfor %}
+</p>
+{% endfor %}
 <script>
-    $("#div_sent").collapse({toggle: true});
-    $("#div_rev").collapse({toggle: true});
-    $("#div_dis").collapse({toggle: true});
+    {% for key,mis in mates.items %}
+        $("#div_{{key}}").collapse({toggle: true});
+    {% endfor %}
+
 </script>
 
 {% endblock %}

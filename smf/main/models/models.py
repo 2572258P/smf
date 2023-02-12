@@ -62,10 +62,7 @@ class InvData(models.Model):
     to_pk = models.IntegerField(default=0)#profile pk
     accepted  = models.BooleanField(default=False)
     message = models.CharField(max_length=512)
-    date = models.DateField(default=timezone.now)
-    time = models.TimeField(default=timezone.now)
-    percent = models.FloatField(default=0)
-
-    
+    date = models.CharField(max_length=16)
+    time = models.CharField(max_length=16)
 
 

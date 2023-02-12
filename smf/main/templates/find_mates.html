@@ -27,6 +27,7 @@
         text-decoration:underline;
         cursor: pointer;
     }
+    
 </style>
 
 <script>
@@ -227,8 +228,15 @@
                         <input type="{{q.ctrl_type}}" name="choice{{q.pk}}" value="{{ c.pk }}" id="q_{{q.pk}}_choice{{ forloop.counter }}" >
                     {% endif %}
                     {{c.choice_text}}</label>
+
                     {% if q.choice_set.all.count > 2 %}
                         <br>
+                    {% else %}
+                        <span id="white_space"></span>
+                        <script>
+                            if("{{c.choice_text}}".length > 10)
+                                $('#white_space').html("<br>");
+                        </script>
                     {% endif %}
                 {% endfor %}
                 {% if 'scq' == q.type %}

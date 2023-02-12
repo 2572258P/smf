@@ -84,25 +84,36 @@ class NLP():
 
         return cosine_scores
     @staticmethod
-    def gen_sim_table_from_tbq(myProfile):
+    def gen_sim_dict_from_tbq(myProfile,otherPFs):
+        if len(otherPFs) == 0:
+            return None
+            
         tbqs = Question.objects.filter(type='tbq').exclude(approved=False)
         table = {}
-        for tbq in tbqs:
-            table[tbq.id] = {}
+        for tbq in tbqs:            
+            myans = Answer.objects.filter(question_id = tbq.id,profile=myProfile).first()
+            if myans is None: #if the current account does not have the answer, do not create the table.
+                continue
             otherAnsArr = []
             myAnsArr = []
-            allOtherUsers = UserProfile.objects.all().exclude(user=myProfile.user)            
-            myans = Answer.objects.filter(question_id = tbq.id,profile=myProfile).first()
-            myAnsArr.append( myans.answer_text if myans != None else "")
-            for OUP in allOtherUsers:
+            table[tbq.id] = {}
+            myAnsArr.append( myans.answer_text )
+
+            for OUP in otherPFs:
                 otherAns = Answer.objects.filter(question_id = tbq.id,profile=OUP).first()
                 otherAnsArr.append( otherAns.answer_text if otherAns != None else "")
+
             print("---- Start NLP Operation -----")
             startTime = time.time()
+            
             simResult = NLP.calculate_similarities(myAnsArr,otherAnsArr)
+            for i in range(len(otherAnsArr)):
+                if len(otherAnsArr[i]) == 0:
+                    simResult[0][i] = 0
+
             print("----- End NLP Operation Time: {}s".format(time.time()-startTime))
             i = 0
-            for OUP in allOtherUsers:
+            for OUP in otherPFs:
                 table[tbq.id][OUP.user.username] = s_to_f(simResult[0][i])
-                i += 1
+                i += 1        
         return table

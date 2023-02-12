@@ -80,22 +80,26 @@ Study Mate Finder - Find your soulmates
         <th class="tb_th"></th>
         <tr style="height: 25px;">
             <td class="tb_td">
-                <div style="float:left; width:20%;">&nbsp</div>
-                <div class="letter_title" style="float:left; width:60%;" align="center">
+                <div style="float:left; width:25%;">&nbsp</div>
+                <div class="letter_title" style="float:left; width:50%;" align="center">
                     <a href="{% url 'main:home' %}">Study Mates Finder</a>
                 </div>
-                <div class = "div_side_menu" style="float:left; width:20%;">
+                <div class = "div_side_menu" style="float:left; width:25%;">
                 {% if user.is_authenticated %}
-                    <span class="username_panel">{{user.username}}</span>
-                    {% if has_request %}                    
-                    <a href="{% url 'main:page_mymates' %}"><img class="has_request_img" src="{% static 'image/mail4.png' %}" /></a>&nbsp&nbsp          
+                    <span class="username_panel">{{user.username}}
+                        {% if is_admin %}
+                        - admin
+                        {% endif %}
+                    </span>
+                    {% if has_request %}
+                    &nbsp<a href="{% url 'main:page_mymates' %}"><img class="has_request_img" src="{% static 'image/mail4.png' %}" /></a>
                     {% endif %}
+                    <span>&nbsp</span>
                     <a href="{% url 'main:signout' %}" class="sign_in_out">Sign-Out</a>                    
                 {% else %}
                     <a href="{% url 'main:page_signin' %}" class="sign_in_out">Sign-In</a>
                 {% endif %}
-                    | <a href="{% url 'main:about_us' %}">About Us</a>
-                    | <a href="{% url 'main:loading' %}">Loading</a>
+                    | <a href="{% url 'main:about_us' %}">About Us</a>                    
                 </div>
                 <!--background-image: url('{% static "image/bg1.jpg" %}');-->
             </td>

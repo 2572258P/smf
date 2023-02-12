@@ -1,7 +1,8 @@
 
 from main.models.models import Question,Answer,UserProfile,InvData,Choice
-from .module_common import GetCategoryLabel
+from .module_common import GetCategoryLabel,GetWeightByPriority
 from .module_NLP import NLP
+
 
 
 class WeightCalculator():
@@ -71,7 +72,7 @@ class CategoryInfo:
         self.code = code
 
     def CalcPercentage(self):
-        self.per = round(self.score / self.totalScore * 100,2)
+        self.per = round(self.score / self.totalScore * 100,2) if self.totalScore > 0 else 0
         
     def addPoint(self,point):
         self.score += point
@@ -100,18 +101,19 @@ class SearchEntity:
         return self.percent
     def getAccPoint(self):
         return self.accPoint
-    def generateAll(self,other_pk,percent,mp,accPoint,totalPoint):
+    def generateAll(self,other_pf,percent,mp,accPoint,totalPoint):
         self.percent = percent
-        self.pf_pk = other_pk
+        self.pf_pk = other_pf.pk
         self.profile_text = ""
         self.QTs = []
         self.Anss = []
+        self.prios = []
         self.username = ""
         self.accPoint = accPoint
         self.totalPoint = totalPoint
 
         profile = UserProfile.objects.filter(pk=self.pf_pk).first()
-        if InvData.objects.filter(from_pk=mp.pk,to_pk=other_pk,accepted=True).first() or InvData.objects.filter(from_pk=other_pk,to_pk=mp.pk,accepted=True).first():
+        if InvData.objects.filter(from_pk=mp.pk,to_pk=other_pf.pk,accepted=True).first() or InvData.objects.filter(from_pk=other_pf.pk,to_pk=mp.pk,accepted=True).first():
             self.username = profile.user.username
         
         if profile and profile.profile_text_open == True:
@@ -123,9 +125,9 @@ class SearchEntity:
             ans_models = Answer.objects.filter(question_id=q.pk,profile=profile)
             if not Answer.objects.filter(question_id=q.pk,profile=mp):
                 continue
-
             if ans_models.count() == 0:
                 continue
+            self.prios.append(q.priority)
             self.QTs.append(q.title)
             ans_ls = []
             for am in ans_models:
@@ -137,6 +139,38 @@ class SearchEntity:
                     ans_ls.append(am.answer_text)
             self.Anss.append(ans_ls)
         
-        
-        for k,v in self.cat_info.items():            
+        for k,v in self.cat_info.items():
             v.CalcPercentage()
+
+
+def getSeachEntity(my_pf,other_pf,SimDictTable_tbq):
+    myQnATable = gen_table_by_answers(Answer.objects.filter(profile=my_pf))
+    otherQnATable = gen_table_by_answers(Answer.objects.filter(profile=other_pf))  
+
+    accPoint = 0
+    totalPoint = 0
+    ose = SearchEntity()
+    for myQId in myQnATable.keys():
+        qo = Question.objects.filter(pk=myQId).first()
+        priorityWeight = GetWeightByPriority(qo.priority) if qo != None else 0
+        totalPoint = totalPoint + priorityWeight
+        ose.addCatTotalScore(qo.category,priorityWeight)
+
+        score = 0
+        if myQId in otherQnATable: #if the other users have the same questions with me
+            score = myQnATable[myQId].calcChoiceWeight(otherQnATable[myQId]) * priorityWeight                
+        if myQId in SimDictTable_tbq:
+            score = SimDictTable_tbq[myQId][other_pf.user.username] * priorityWeight
+        accPoint += score        
+        ose.addCatScore(qo.category,score)
+            
+    if len(otherQnATable) > 0 and totalPoint > 0:
+        accPoint = round(accPoint,2)
+        percent = round(accPoint / totalPoint * 100,2)
+        totalPoint = round(totalPoint,2)
+        ose.generateAll(other_pf,percent,my_pf,accPoint,totalPoint)
+        ose.sortCategory()
+        return ose
+
+    return None
+
