@@ -57,6 +57,8 @@ def handle_search_result(request,username):
     myse = SearchEntity() 
     myse.generateAll(myProfile,100,myProfile,100,100)
     searchEntities.append(myse)
+    context['my_entity'] = myse
+    
 
     
     for oup in allOtherUsers: #iterate all other users' profiles and calulation weight with mine

@@ -254,9 +254,13 @@ $(document).ready(function()
                     {% endif %}
                         {% if mi.se.prios|get_val_in_list:forloop.counter0 == 'high' %}            
                         <p>Q) {{qt}}<br>
-                            {% for anss in mi.se.Anss|get_val_in_list:forloop.counter0 %}
-                                A) <span>{{anss}}</span>
-                            {% endfor %}
+                            {% if mi.se.opens|get_val_in_list:forloop.counter0 %}
+                                {% for anss in mi.se.Anss|get_val_in_list:forloop.counter0 %}
+                                    A) <span>{{anss}}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span style="font-style: italic;">Blinded by the user</span>
+                            {% endif %}
                         </p>
                         {% endif %}
                     {% if forloop.counter == mi.se.QTs|length and forloop.counter > 3%}
@@ -284,9 +288,14 @@ $(document).ready(function()
                 <div id="va_div_{{mi.to_pk}}" style="display:none;">
             {% endif %}              
                 <p>Q) {{qt}}<br>
+                    {% if mi.se.opens|get_val_in_list:forloop.counter0 %}
                     {% for anss in mi.se.Anss|get_val_in_list:forloop.counter0 %}
                         A) <span>{{anss}}</span>
-                    {% endfor %}
+                    {% endfor %}                        
+                    {% else %}
+                        <img style="height:10" src="{% static 'image/close.png' %}">
+                        <span style="font-style: italic;font-size: small;">Blinded</span>
+                    {% endif %}
                 </p>
             {% if forloop.counter == mi.se.QTs|length and forloop.counter > 3%}
                 </div>

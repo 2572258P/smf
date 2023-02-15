@@ -50,6 +50,7 @@ class Answer(models.Model):
     question_id = models.IntegerField(default=-1)
     choice_id =  models.IntegerField(default=-1)
     answer_text = models.CharField(max_length=1000)
+    open_to_others = models.BooleanField(default=False)
 
 class QuestionVote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)    

@@ -196,7 +196,7 @@
 
     <br>
     <p>
-        <span style="font-weight: bold;">The system uses your answers up to the answers you have finished.</span><br>
+        <span style="font-weight: bold;">The system uses your answers up to your finished answers, and you will see others' answers up to your range.</span><br>
         <span>e.g., If you only care about the location for studying, you can answer only questions about it.</span><br>        
     </p><br>
 
@@ -252,7 +252,15 @@
 
 
                 {% if 'tbq' == q.type %}
-                    <textarea name="text_ans{{q.pk}}" id="text_ans{{q.pk}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea>
+                    <textarea name="text_ans{{q.pk}}" id="text_ans{{q.pk}}" rows="4" cols="50">{{ answers|get_val_in_dict:q.id|get_val_in_list:0}}</textarea><br>                    
+                    <label>
+                        {% if opens|get_val_in_dict:q.id %}
+                        <input type="checkbox" checked="checked" name="oto_{{q.pk}}">&nbsp
+                        {% else %}
+                        <input type="checkbox" name="oto_{{q.pk}}" >&nbsp
+                        {% endif %}
+                        <span style="font-weight:normal;font-style: italic;">open to others - keep safe your and others' privacy.</span>
+                    </label>
                 {% endif %}
                 </div>
             <br>

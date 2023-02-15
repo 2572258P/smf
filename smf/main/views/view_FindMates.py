@@ -56,35 +56,41 @@ def get_cat_infos(mp):
 
     return cat_infos
 
-def load(request,profile):
-    answers = {}
 
+
+def load(request,profile,out_answers,out_open_to_others):
     if profile:
         for ans in Answer.objects.filter(profile=profile):            
-            if ans.question_id not in answers:
-                answers[ans.question_id] = []
+            if ans.question_id not in out_answers:
+                out_answers[ans.question_id] = []                
             if ans.choice_id != -1:
-                answers[ans.question_id].append(ans.choice_id)
-            answers[ans.question_id].append(ans.answer_text)
-    return answers
+                out_answers[ans.question_id].append(ans.choice_id)            
+            if ans.question_id not in out_open_to_others:
+                out_open_to_others[ans.question_id] = ans.open_to_others
+            out_answers[ans.question_id].append(ans.answer_text)
     
+
+
+
 def save(request,profile):
     for q in Question.objects.all().filter(approved=True):
         anss = Answer.objects.filter(profile=profile,question_id=q.pk)
         anss.delete()
-        if q.type == 'scq' or q.type == 'mcq':
+        if q.type == 'scq' or q.type == 'mcq':            
             c_id = "choice" + str(q.pk)
             if q.type == 'scq' and request.POST.get(c_id):
-                a = Answer(profile=profile,question_id=q.pk,choice_id=request.POST.get(c_id,-1))
+                a = Answer(profile=profile,question_id=q.pk,choice_id=request.POST.get(c_id,-1),open_to_others=True)
                 a.save()
             elif q.type == 'mcq':
                 for ans in request.POST.getlist(c_id):                    
-                    a = Answer(profile=profile,question_id=q.pk,choice_id=ans)
+                    a = Answer(profile=profile,question_id=q.pk,choice_id=ans,open_to_others=True)
                     a.save()
         elif q.type == 'tbq':
-            text_ans = request.POST["text_ans%i"%q.pk]
+            text_ans = request.POST.get("text_ans"+str(q.pk),None)
+            open_to_others = True if request.POST.get("oto_"+str(q.pk),None) else False
             if len(text_ans) > 0:
-                a = Answer(profile=profile,question_id=q.pk,answer_text=text_ans)
+
+                a = Answer(profile=profile,question_id=q.pk,answer_text=text_ans,open_to_others=open_to_others)
                 a.save()
 
 def loadpage(request):
@@ -124,9 +130,10 @@ def loadpage(request):
 
         context['category_pair'] = category_pair
         context['questions'] = apv_qs
-        context['answers'] = {}        
         context['message'] = "Data have been successfully loaded."                
-        context['answers'] = load(request,mp)
+        context['answers'] = {}
+        context['opens'] = {}
+        load(request,mp,context['answers'],context['opens'])        
         context['per_ans'] = get_per_ans(mp)
         cat_infos = get_cat_infos(mp)
 

@@ -107,7 +107,9 @@ class SearchEntity:
         self.profile_text = ""
         self.QTs = []
         self.Anss = []
+        self.opens = []
         self.prios = []
+        self.types = []
         self.username = ""
         self.accPoint = accPoint
         self.totalPoint = totalPoint
@@ -119,7 +121,7 @@ class SearchEntity:
         if profile and profile.profile_text_open == True:
             self.profile_text = profile.profile_text
         else:
-            self.profile_text = "This user has disabled the option \"Open Profile Texts In Search\"."
+            self.profile_text = "Profile text is not opened."
         
         for q in Question.objects.all():
             ans_models = Answer.objects.filter(question_id=q.pk,profile=profile)
@@ -129,14 +131,19 @@ class SearchEntity:
                 continue
             self.prios.append(q.priority)
             self.QTs.append(q.title)
+            self.opens.append(False)
+            self.types.append(q.type)
             ans_ls = []
-            for am in ans_models:
+
+            for am in ans_models:                
                 if len(am.answer_text) <= 0: #non-text-based
                     ch = Choice.objects.filter(pk=am.choice_id).first()
                     if ch:
                         ans_ls.append(ch.choice_text)
                 else:
-                    ans_ls.append(am.answer_text)
+                    ans_ls.append(am.answer_text)                
+                self.opens[len(self.opens)-1] = am.open_to_others
+                    
             self.Anss.append(ans_ls)
         
         for k,v in self.cat_info.items():
