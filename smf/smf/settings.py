@@ -35,7 +35,7 @@ SECRET_KEY = 'django-insecure-6#_f*nd-k&=ovp5v%y)x)0dt4(_1l5zqk&5*m==b966&kuy%s)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['18.133.142.110','127.0.0.1','35.176.27.58']
+ALLOWED_HOSTS = ['18.133.142.110','127.0.0.1','35.176.27.58','www.uogsmf.org']
 
 
 # Passwords are saved in DB with encryption
