@@ -9,6 +9,7 @@
         $('#title').html("Create Your New SMF Account");
 
         $('#pf_text_open').prop('checked',true)
+        $('#pf_subscribe_dq').prop('checked',true)
         $('#submit').click(function()
         {
             
@@ -28,6 +29,8 @@
                     email: $('#email').val(),
                     pf_text: $('#pf_text').val(),
                     pf_text_open: $('#pf_text_open').is(":checked"),
+                    pf_subscribe_dq: $('#pf_subscribe_dq').is(":checked"),
+                    
                     dataType: "json",
                 },
                 success: function (data)

@@ -10,7 +10,9 @@ class UserProfile(models.Model):
     profile_text = models.CharField(max_length=500)
     email = models.EmailField(max_length=254)
     admin = models.BooleanField(default=False)
-    profile_text_open = models.BooleanField(default=True)    
+    profile_text_open = models.BooleanField(default=True)
+    subscribe_dq = models.BooleanField(default=True)
+
     def __str__(self):
         return self.user.username
 

@@ -16,6 +16,7 @@ def loadpage(request):
                 pf.email = request.POST.get('email')
                 pf.profile_text = request.POST.get('pf_text')
                 pf.profile_text_open = request.POST.get('pf_text_open') == 'true'
+                pf.subscribe_dq = request.POST.get('pf_subscribe_dq') == 'true'
                 pf.save()
             response['msg'] = "updated"
         elif cmd == 'del_account':
@@ -37,5 +38,6 @@ def loadpage(request):
             context['email'] = pf.email
             context['pf_text'] = pf.profile_text
             context['pf_text_open'] = 'True' if pf.profile_text_open == True else 'False'
+            context['pf_subscribe_dq'] = 'True' if pf.subscribe_dq == True else 'False'
             
         return render(request,'profile_management.html',context )

@@ -33,6 +33,7 @@ def loadpage(request):
             userpf = UserProfile(user=newuser,
             profile_text=request.POST.get('pf_text'),
             profile_text_open=request.POST.get('pf_text_open') == 'true',
+            subscribe_dq=request.POST.get('pf_subscribe_dq') == 'true',
             email=request.POST.get('email'))
             userpf.save()
             

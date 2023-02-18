@@ -57,6 +57,11 @@ def loadpage(request,question_type="scq"):
             request.session['main_msg'] = 'Your new question has been successfully created.'
             if profile.admin == False:
                 request.session['sub_msg'] = 'It will be registered once voting reaches the target count.'
+            #Emails to subscribers
+            emails = []
+            for pf in Userprofile.objects.filter(subscribe_dq=True):
+                emails.append(pf.email)
+
             return redirect(reverse('main:result'))
 
         except Exception as inst:

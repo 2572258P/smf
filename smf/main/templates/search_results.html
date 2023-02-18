@@ -181,7 +181,7 @@ $(document).ready(function()
         height: 25px;
     }
     .privacy_close{
-        height: 20px;
+        height: 15px;
     }
     
 </style>
@@ -221,7 +221,7 @@ $(document).ready(function()
                                     <div id="va_div_{{se.pf_pk}}" style="display:none;">
                                 {% endif %}
                                 <p><span class="q_result">Q) {{qt}}</span> 
-                                    {% if se.pf_pk == my_entity.pf_pk %}
+                                    {% if se.pf_pk == my_entity.pf_pk %}                                        
                                         {% if se.types|get_val_in_list:forloop.counter0 == 'tbq' %}
                                             {% if se.opens|get_val_in_list:forloop.counter0 %}
                                             <span><img class="privacy_open" src="{% static 'image/open.png' %}"></img></span>
@@ -235,12 +235,14 @@ $(document).ready(function()
                                         {% endfor %}
                                     <span></span>
                                     {% else %}
-                                        <br>
                                         {% if se.opens|get_val_in_list:forloop.counter0 == False %}
-                                            <span style="font-style: italic;">The answer is not opened.</span>
+                                            <span><img class="privacy_close" src="{% static 'image/close.png' %}"></img></span><br>
+                                            <span style="font-style: italic;">The user did not open the answer.</span>                                            
                                         {% elif my_entity.opens|get_val_in_list:forloop.counter0 == False %}
-                                            <span style="font-style: italic;">Check "open to others" if you want to see it.</span>
+                                            <span><img class="privacy_close" src="{% static 'image/close.png' %}"></img></span><br>
+                                            <span style="font-style: italic;">Enable "open in search" option if you want to see it.</span>                                            
                                         {% else %}
+                                            <span><img class="privacy_open" src="{% static 'image/open.png' %}"></img></span><br>
                                             {% for ans in se.Anss|get_val_in_list:forloop.counter0 %}
                                                 A) <span>{{ans}}</span>
                                             {% endfor %}

@@ -259,7 +259,9 @@
                         {% else %}
                         <input type="checkbox" name="oto_{{q.pk}}" >&nbsp
                         {% endif %}
-                        <span style="font-weight:normal;font-style: italic;">open to others - keep safe your and others' privacy.</span>
+                        <span style="font-weight:bold;color:rgb(165, 124, 0)">open in search</span><span style="font-style: italic;font-weight:normal;font-size:small"> - keep safe your and others' privacy.</span>
+                        <img style="height:15px" src="{% static 'image/open.png'%}">
+                        <img style="height:10px" src="{% static 'image/close.png'%}">
                     </label>
                 {% endif %}
                 </div>

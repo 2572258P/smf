@@ -13,6 +13,7 @@
         $('#email').val("{{email}}");
         $('#pf_text').val("{{pf_text}}");        
         $('#pf_text_open').prop('checked', "{{pf_text_open}}" == "True");
+        $('#pf_subscribe_dq').prop('checked', "{{pf_subscribe_dq}}" == "True");
 
         $('#pw').hide();
         $('#pw_confirm').hide();
@@ -38,6 +39,7 @@
                     email: $('#email').val(),
                     pf_text: $('#pf_text').val(),
                     pf_text_open: $('#pf_text_open').is(':checked'),
+                    pf_subscribe_dq: $('#pf_subscribe_dq').is(':checked'),
                     dataType: "json",
                 },
                 success: function (data)
