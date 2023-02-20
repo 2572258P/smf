@@ -64,7 +64,7 @@ def loadpage(request,question_type="scq"):
                 emails.append(pf.email)
 
             body = "A new question has been registered. Please, vote the questiion. SMF(http://www.uogsmf.org)"
-            send_mail('[SMF] A New Questions Is Waiting For Your Vote.',body, 'SMF Notification<2572258p@gmail.com>', emails)
+            send_mail('[SMF] A New Question Is Waiting For Your Vote.',body, 'SMF Notification<2572258p@gmail.com>', emails)
 
             return redirect(reverse('main:result'))
 
