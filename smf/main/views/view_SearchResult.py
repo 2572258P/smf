@@ -18,7 +18,7 @@ def GetBodyTextForRequest(Inv):
     return "A user in SMF service requested you.\n\n\
 Message: {}\n\
 Please visit our webiste check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format(Inv.message if len(Inv.message) > 0 else "No Message Attached.")
+http://www.uogsmf.org/main/page_mymates/".format(Inv.message if len(Inv.message) > 0 else "No Message Attached.")
 
 
 

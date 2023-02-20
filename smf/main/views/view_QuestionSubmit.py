@@ -2,6 +2,7 @@ from django.http import HttpResponse,JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.mail import send_mail
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -59,8 +60,11 @@ def loadpage(request,question_type="scq"):
                 request.session['sub_msg'] = 'It will be registered once voting reaches the target count.'
             #Emails to subscribers
             emails = []
-            for pf in Userprofile.objects.filter(subscribe_dq=True):
+            for pf in UserProfile.objects.filter(subscribe_dq=True):
                 emails.append(pf.email)
+
+            body = "A new question has been registered. Please, vote the questiion. SMF(http://www.uogsmf.org)"
+            send_mail('[SMF] A New Questions Is Waiting For Your Vote.',body, 'SMF Notification<2572258p@gmail.com>', emails)
 
             return redirect(reverse('main:result'))
 

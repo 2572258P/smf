@@ -6,6 +6,7 @@ from django.db.models import Q
 from .view_Base import is_ajax
 from main.models.models import Question,Answer,UserProfile,Choice,QuestionVote
 from main.modules.module_NLP import NLP
+from django.core.mail import send_mail
 
 
 def loadpage(request):
@@ -85,6 +86,13 @@ def loadpage(request):
             q.approved = True
             q.save()
             response['suc_msg'] = "This draft questions has been approved."
+            #Send email to all who have subscribed.
+            title = q.title
+            emails = []
+            for pf in UserProfile.objects.filter(subscribe_dq=True):
+                emails.append(pf.email)
+            body = "New question [Title:{} ] has been registered. Please, vote the questiion. SMF(http://www.uogsmf.org)".format(title)
+            send_mail('[SMF] New Question Has Been Approved.',body, 'SMF Notification<2572258p@gmail.com>', emails)
 
         return JsonResponse(response)
     else:

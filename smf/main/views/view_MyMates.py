@@ -25,7 +25,7 @@ def GetBodyTextForSuccess(Inv):
     return "Congratulations! your request has been accepted by the other user. \n\n\
 Message: {}\n\
 Please visit our webiste and check the \"My Mates\" menu.\n\
-http://18.170.55.54/main/my_mates/".format( Inv.message if len(Inv.message) > 0 else "No Message Attached.")
+http://www.uogsmf.org/main/page_mymates/".format( Inv.message if len(Inv.message) > 0 else "No Message Attached.")
 
 def loadpage(request):
     if CheckAuth(request) is False:
