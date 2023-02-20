@@ -91,7 +91,7 @@ def loadpage(request):
             emails = []
             for pf in UserProfile.objects.filter(subscribe_dq=True):
                 emails.append(pf.email)
-            body = "New question [Title:{} ] has been registered. Please, vote the questiion. SMF(http://www.uogsmf.org)".format(title)
+            body = "New question [Title:{} ] has been registered. Now you can answer the questiion. SMF(http://www.uogsmf.org)".format(title)
             send_mail('[SMF] New Question Has Been Approved.',body, 'SMF Notification<2572258p@gmail.com>', emails)
 
         return JsonResponse(response)
