@@ -76,15 +76,6 @@ match_type,xor
 1,Talking
 2,Listening
 ,
-title,What personal quality do you have?
-gen_key,20/02/2023_dfy
-desc,
-type,scq
-category,cc
-priority,medium
-match_type,xor
-1,Introvert
-2,Extrovert
 ,
 title,What would you say to your potential study partner?
 gen_key,08/02/2023_wwy
