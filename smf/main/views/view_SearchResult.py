@@ -69,7 +69,7 @@ def handle_search_result(request,username):
         if otherEntity:
             searchEntities.append(otherEntity)
                 
-    context['search_entities'] = sorted(searchEntities,key = SearchEntity.getAccPoint,reverse=True)    
+    context['search_entities'] = sorted(searchEntities,key = SearchEntity.getAccPoint,reverse=True)[0:10]
 
     
     #Status with others

@@ -78,7 +78,7 @@ match_type,xor
 ,
 ,
 title,What would you say to your potential study partner?
-gen_key,08/02/2023_wwy
+gen_key,c1
 desc,"You can say any hopes, preferences, current problems with studying, etc."
 type,tbq
 category,cc
@@ -257,7 +257,7 @@ match_type,emt
 51,WEB SCIENCE FOR MSC COMPSCI5107
 ,
 title,What was the best moment in the past?
-gen_key,hdb_1
+gen_key,p1
 desc,Any short or long answer is possible.
 type,tbq
 category,cb
@@ -265,7 +265,7 @@ priority,medium
 match_type,smt
 ,
 title,Input any number from 1 to 100
-gen_key,05/02/2023_wwb
+gen_key,p2
 desc,Any short or long answer is possible.
 type,tbq
 category,cb
@@ -273,7 +273,7 @@ priority,medium
 match_type,smt
 ,
 title,"If you could change one thing about the way you were raised, what would it be?"
-gen_key,06/02/2023_ianf2
+gen_key,p3
 desc,Any short or long answer is possible.
 type,tbq
 category,cb
@@ -281,7 +281,7 @@ priority,medium
 match_type,smt
 ,
 title,"If you could wake up tomorrow having gained any one quality or ability, what would it be?"
-gen_key,06/02/2023_iycwut2
+gen_key,p4
 desc,Any short or long answer is possible.
 type,tbq
 category,cb
@@ -289,7 +289,7 @@ priority,medium
 match_type,smt
 ,
 title,"If you knew that in 1 year you'd die suddenly, would you change anything about the way you're living now? Why?"
-gen_key,06/02/2023_iytsw2
+gen_key,p5
 desc,Any short or long answer is possible.
 type,tbq
 category,cb
@@ -297,7 +297,7 @@ priority,medium
 match_type,smt
 ,
 title,"If a crystal ball could tell you the truth about yourself, your life, the future, or anything else, what would you want to know?"
-gen_key,06/02/2023_abctt2
+gen_key,p6
 desc,Any short or long answer is possible.
 type,tbq
 category,cb

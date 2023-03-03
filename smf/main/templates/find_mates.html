@@ -177,12 +177,12 @@
     <input type="hidden" name="test_name" value="test_value">
     <h2>{{message}}</h2>
     <p>
-        <b>Question Attributes</b><br>
+        <b>Question Attribute</b><br>
         Priority Colour :<span class="q_high">High(1)</span>,<span class='q_medium'>Medium(0.66)</span>,<span class="q_low">Low(0.33)</span><br>
     </p>
     <br>
 
-    <b>Complete Rate</b><br>    
+    <b>Your Completion Rate</b><br>    
     {% for label,per in cat_infos.items %}
         <div class="row" style="border-style:solid;border:0;height: 30px;">
             <div align="right"><span class="col-sm-1" style="width: 180px;">{{label}}:</span></div>
@@ -197,7 +197,7 @@
     <br>
     <p>
         <span style="font-weight: bold;">The system uses your answers up to your finished answers, and you will see others' answers up to your range.</span><br>
-        <span>e.g., If you only care about the location for studying, you can answer only questions about it.</span><br>        
+        <span>i.e., If study location only matters, you can answer the question about it.</span><br>        
     </p><br>
 
     {% for k,v in cat_qs.items %}
