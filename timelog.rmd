@@ -1,27 +1,44 @@
+* Project: Study Mates Finder
+* Name: Jungshic Park
+* Student ID : 257258p
+* Supervisor: Dr Gethin Norman
 
-# Timelog
+<b>Total Weekly Based Time Line From September 2022 * June 2023</b>
+2022
+* September
+	* 5th: The first meeting with the supervisor, discussion about the motivation etc.,
+* October
+	* 1st: PRISM Introduction
+	* 2nd: Read PRISM documents
+	* 3rd: Read additional PRISM documents
+	* 4th:  Created samples on PRISM
+* November
+	* 1st: Discussion to change the project topic
+	* 2nd: New project topic suggestion
+	* 3rd: Survey about the new project topic
+	* 4th: Project start on GitHub as new project approved
+* December
+	* 1st: Design documentation / Base infrastructure settings
+	* 2nd: Initial project flow structure updated in the codebase / Dashboard page
+	* 3rd: Implementation (1) Question Generator (2) Database Save/Load (2) Random text answer allocation 
+	* 4th: Natural Language Processing applied to the project to calculate text similarity / Writing dissertation
 
-* PROJECT NAME
-* YOUR NAME
-* STUDENT_ID
-* SUPERVISOR NAME
-
-## Guidance
-
-* This file contains the time log for your project. It will be submitted along with your final dissertation.
-* **YOU MUST KEEP THIS UP TO DATE AND UNDER VERSION CONTROL.**
-* This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
-* Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
-
-## Week 1
-
-### 19 Oct 2019
-
-* *4 hours* Read the project guidance notes
-* *0.5 hour* Created GitLab repository and cloned the cookiecutter for the projects
-* *1 hour* Modified dissertation template, compiled  
-
-## 20 Oct 2019
-
-* *1 hour* meeting with supervisor
-* *2 hours* writing initial version of test harness
+2023
+* January
+	* 1st: Deployed Cloud Computing Service, AWS / Essential menu UI elements added
+	* 2nd: Implemented computation of similarities among all question types / Result Computation
+	* 3rd: Project performance test / NLP drops performance | Found recent CUDA increases NLP Library(Sentence Transformer) performance
+	* 4th: Implemented Question User Vote System / Implemented Email Notification / Friend Invitation
+* February
+	* 1st: Code structure refactoring
+	* 2nd: Refactored all exchange data between backend and frontend with Ajax
+	* 3rd: Design renewal and improvement with animation UI 
+	* 4th: User privacy policy applied
+March
+	* 1st ~ 4th: Burn Treatment in Royal hospital
+April
+	* 1st ~ 4th: Burn Treatment in Royal hospital
+* May
+	* 1st ~ 4th: Focused Dissertation
+* June
+	* 1st ~ 4th: Finalized Dissertation
